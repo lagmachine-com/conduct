@@ -29,7 +29,6 @@ struct CommonArgs {
 }
 
 pub fn cli() {
-    info!("Hello from CLI!");
     let args = CLI::parse();
     match args.command {
         Commands::Create(common_args) => todo!(),

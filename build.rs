@@ -1,10 +1,66 @@
 use std::process::Command;
-fn main() {
-    // note: add error checking yourself.
+
+fn get_git_description() {
+    let output = Command::new("git").args(&["describe"]).output();
+
+    match output {
+        Ok(output) => match output.status.success() {
+            true => {
+                let desc = String::from_utf8(output.stdout).unwrap();
+                println!("cargo:rustc-env=GIT_DESCRIPTION={}", desc);
+            }
+            false => println!("cargo:rustc-env=GIT_DESCRIPTION={}", "unknown"),
+        },
+        Err(_) => {
+            println!("cargo:rustc-env=GIT_DESCRIPTION={}", "unknown");
+        }
+    }
+}
+
+fn get_git_status() {
     let output = Command::new("git")
-        .args(&["rev-parse", "HEAD"])
-        .output()
-        .unwrap();
-    let git_hash = String::from_utf8(output.stdout).unwrap();
-    println!("cargo:rustc-env=GIT_HASH={}", git_hash);
+        .args(&["status", "--porcelain"])
+        .output();
+
+    match output {
+        Ok(output) => match output.status.success() {
+            true => {
+                let status = String::from_utf8(output.stdout).unwrap();
+                if status.len() > 0 {
+                    println!("cargo:rustc-env=GIT_SUFFIX={}", "-dirty");
+                } else {
+                    println!("cargo:rustc-env=GIT_SUFFIX={}", "");
+                }
+            }
+            false => println!("cargo:rustc-env=GIT_SUFFIX={}", ""),
+        },
+        Err(_) => {
+            println!("cargo:rustc-env=GIT_SUFFIX={}", "")
+        }
+    }
+}
+
+fn get_git_branch() {
+    let output = Command::new("git")
+        .args(&["branch", "--show-current"])
+        .output();
+
+    match output {
+        Ok(output) => match output.status.success() {
+            true => {
+                let branch = String::from_utf8(output.stdout).unwrap();
+                println!("cargo:rustc-env=GIT_BRANCH={}", branch);
+            }
+            false => println!("cargo:rustc-env=GIT_BRANCH={}", "main"),
+        },
+        Err(_) => {
+            println!("cargo:rustc-env=GIT_BRANCH={}", "main");
+        }
+    }
+}
+
+fn main() {
+    get_git_description();
+    get_git_status();
+    get_git_branch();
 }
