@@ -1,7 +1,7 @@
 use std::process::Command;
 
 fn get_git_description() {
-    let output = Command::new("git").args(&["describe"]).output();
+    let output = Command::new("git").args(&["describe", "--dirty"]).output();
 
     match output {
         Ok(output) => match output.status.success() {
@@ -13,29 +13,6 @@ fn get_git_description() {
         },
         Err(_) => {
             println!("cargo:rustc-env=GIT_DESCRIPTION={}", "unknown");
-        }
-    }
-}
-
-fn get_git_status() {
-    let output = Command::new("git")
-        .args(&["status", "--porcelain"])
-        .output();
-
-    match output {
-        Ok(output) => match output.status.success() {
-            true => {
-                let status = String::from_utf8(output.stdout).unwrap();
-                if status.len() > 0 {
-                    println!("cargo:rustc-env=GIT_SUFFIX={}", "-dirty");
-                } else {
-                    println!("cargo:rustc-env=GIT_SUFFIX={}", "");
-                }
-            }
-            false => println!("cargo:rustc-env=GIT_SUFFIX={}", ""),
-        },
-        Err(_) => {
-            println!("cargo:rustc-env=GIT_SUFFIX={}", "")
         }
     }
 }
@@ -61,6 +38,5 @@ fn get_git_branch() {
 
 fn main() {
     get_git_description();
-    get_git_status();
     get_git_branch();
 }
