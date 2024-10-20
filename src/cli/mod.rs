@@ -1,60 +1,45 @@
-use clap::{Args, Parser, Subcommand};
+mod args;
+mod command_create;
+mod command_summary;
+mod commands;
+mod result;
+use args::GlobalArgs;
+use clap::Parser;
+use commands::Commands;
 use log::*;
+pub use result::CliResult;
+
 #[derive(Debug, Parser)]
 #[command(name = "conduct")]
 #[command(about = "Generic asset and version management for creative projects", long_about = None)]
 struct CLI {
     #[command(subcommand)]
-    command: Option<Commands>,
+    command: Option<commands::Commands>,
 
-    #[arg(short, long, help = "Override the targeted project directory")]
-    project_dir: Option<String>,
-}
-
-#[derive(Debug, Subcommand)]
-enum Commands {
-    Create(CommonArgs),
-}
-
-#[derive(Debug, Args)]
-struct CommonArgs {
-    #[arg(short, long)]
-    department: Option<String>,
-
-    #[arg(short, long)]
-    asset: Option<String>,
-
-    #[arg(short, long)]
-    element: Option<String>,
-
-    #[arg(short, long)]
-    scene: Option<String>,
-}
-
-pub enum CliResult {
-    ShowUI,
-    Success,
+    #[command(flatten)]
+    pub global_args: GlobalArgs,
 }
 
 pub fn cli() -> CliResult {
     let args = CLI::parse();
 
-    if let Some(project_dir) = args.project_dir {
+    if let Some(project_dir) = args.global_args.project_dir {
         info!("Overriding project directory with: '{}'", project_dir)
     }
+
+    let mut project = crate::core::project::create_project();
 
     match args.command {
         Some(command) => {
             info!("Running command: {:?}", command);
             match command {
-                Commands::Create(_common_args) => {
-                    return CliResult::Success;
-                }
+                Commands::Create(args) => args.execute(&mut project),
+                Commands::Summary(args) => args.execute(&mut project),
             }
         }
         None => {
             info!("Missing subcommand, showing UI");
-            return CliResult::ShowUI;
+            return CliResult::ShowUI(project);
         }
     }
 }

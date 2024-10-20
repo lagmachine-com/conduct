@@ -1,4 +1,5 @@
 mod cli;
+pub mod core;
 mod gui;
 
 use log::*;
@@ -19,7 +20,8 @@ fn main() {
     let result = cli::cli();
 
     match result {
-        cli::CliResult::ShowUI => gui::gui(),
-        _ => return,
+        cli::CliResult::ShowUI(project) => gui::gui(project),
+        cli::CliResult::Success => return,
+        cli::CliResult::SaveChanges => return,
     }
 }

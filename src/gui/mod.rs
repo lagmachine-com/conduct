@@ -1,45 +1,27 @@
-#[derive(Default)]
-struct Counter {
+mod message;
+mod update;
+mod view;
+
+use iced::{Task, Theme};
+
+struct UIState {
+    project: crate::core::project::Project,
     value: i32,
 }
 
-use iced::widget::{button, column, text, Column};
-
-#[derive(Debug, Clone, Copy)]
-pub enum Message {
-    Increment,
-    Decrement,
-}
-
-impl Counter {
-    pub fn view(&self) -> Column<Message> {
-        // We use a column: a simple vertical layout
-        column![
-            // The increment button. We tell it to produce an
-            // `Increment` message when pressed
-            button("+").on_press(Message::Increment),
-            // We show the value of the counter here
-            text(self.value).size(50),
-            // The decrement button. We tell it to produce a
-            // `Decrement` message when pressed
-            button("-").on_press(Message::Decrement),
-        ]
+impl UIState {
+    pub fn theme(&self) -> Theme {
+        Theme::Ferra
     }
 }
 
-impl Counter {
-    pub fn update(&mut self, message: Message) {
-        match message {
-            Message::Increment => {
-                self.value += 1;
-            }
-            Message::Decrement => {
-                self.value -= 1;
-            }
-        }
-    }
-}
+pub fn gui(project: crate::core::project::Project) {
+    let state = UIState {
+        project: project,
+        value: 0,
+    };
 
-pub fn gui() {
-    _ = iced::run("Conduct", Counter::update, Counter::view)
+    _ = iced::application("Conduct", UIState::update, UIState::view)
+        .theme(UIState::theme)
+        .run_with(|| (state, Task::none()));
 }
