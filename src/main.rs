@@ -6,7 +6,7 @@ use log::*;
 
 fn main() {
     stderrlog::new()
-        .verbosity(log::LevelFilter::Info)
+        .verbosity(log::LevelFilter::Debug)
         .module(module_path!())
         .init()
         .unwrap();
@@ -22,6 +22,6 @@ fn main() {
     match result {
         cli::CliResult::ShowUI(project) => gui::gui(project),
         cli::CliResult::Success => return,
-        cli::CliResult::SaveChanges => return,
+        cli::CliResult::SaveChanges => todo!(),
     }
 }
