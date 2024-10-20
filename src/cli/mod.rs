@@ -5,7 +5,10 @@ use log::*;
 #[command(about = "Generic asset and version management for creative projects", long_about = None)]
 struct CLI {
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
+
+    #[arg(short, long, help = "Override the targeted project directory")]
+    project_dir: Option<String>,
 }
 
 #[derive(Debug, Subcommand)]
@@ -28,9 +31,30 @@ struct CommonArgs {
     scene: Option<String>,
 }
 
-pub fn cli() {
+pub enum CliResult {
+    ShowUI,
+    Success,
+}
+
+pub fn cli() -> CliResult {
     let args = CLI::parse();
+
+    if let Some(project_dir) = args.project_dir {
+        info!("Overriding project directory with: '{}'", project_dir)
+    }
+
     match args.command {
-        Commands::Create(common_args) => todo!(),
+        Some(command) => {
+            info!("Running command: {:?}", command);
+            match command {
+                Commands::Create(_common_args) => {
+                    return CliResult::Success;
+                }
+            }
+        }
+        None => {
+            info!("Missing subcommand, showing UI");
+            return CliResult::ShowUI;
+        }
     }
 }

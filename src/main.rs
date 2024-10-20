@@ -4,7 +4,11 @@ mod gui;
 use log::*;
 
 fn main() {
-    stderrlog::new().verbosity(5).init().unwrap();
+    stderrlog::new()
+        .verbosity(log::LevelFilter::Info)
+        .module(module_path!())
+        .init()
+        .unwrap();
 
     info!(
         "Conduct {} ({})",
@@ -12,9 +16,10 @@ fn main() {
         env!("GIT_BRANCH"),
     );
 
-    if std::env::args().len() > 1 {
-        cli::cli();
-    } else {
-        gui::gui()
+    let result = cli::cli();
+
+    match result {
+        cli::CliResult::ShowUI => gui::gui(),
+        _ => return,
     }
 }
