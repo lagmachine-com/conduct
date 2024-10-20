@@ -31,7 +31,7 @@ pub fn cli() -> CliResult {
 
     match args.command {
         Some(command) => {
-            info!("Running command: {:?}", command);
+            debug!("Running command: {:?}", command);
             match command {
                 Commands::Create(args) => args.execute(&mut project),
                 Commands::Summary(args) => args.execute(&mut project),
