@@ -1,17 +1,39 @@
 identifier: bsc
 display_name: Basic Project
 departments:
-  model: {}
-  light: {}
+  model: 
+    exports:
+      .glb: scripts/export_glb_mesh.py
+  lookdev:
+    imports:
+      .glb: scripts/import_glb_mesh.py
+    exports:
+      .blend: scripts/export_shader.py
 assets:
   3d:
     character:
       suzanneA:
-        departments: {}
+        departments:
+          model: 
+            - mesh
+          lookdev:
+            - shader
       suzanneB:
-        departments: {}
+        departments: 
+          model: 
+            - mesh
+          lookdev:
+            - shader
     prop:
       defaultCubeA:
-        departments: {}
+        departments: 
+          model: 
+            - mesh
+          lookdev:
+            - shader
       defaultCubeB:
-        departments: {}
+        departments: 
+          model: 
+            - mesh
+          lookdev:
+            - shader

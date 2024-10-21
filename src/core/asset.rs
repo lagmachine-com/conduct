@@ -1,15 +1,19 @@
-use std::{collections::HashMap, hash::Hash};
+use std::collections::HashMap;
 
-use iced::keyboard::key;
 use log::{debug, info};
+use serde::{Deserialize, Serialize};
 
 pub enum AssetEntry {
     Asset(Asset),
     Category(AssetCategory),
 }
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Asset {
-    pub identifier: String,
+    #[serde(skip_serializing)]
+    pub name: String,
+
+    pub departments: HashMap<String, Vec<String>>,
 }
 
 pub struct AssetCategory {
@@ -22,13 +26,18 @@ fn is_mapping_asset(map: &serde_yaml::Mapping) -> bool {
 }
 
 pub fn parse_entry_as_asset(map: &serde_yaml::Mapping, key: String) -> Asset {
-    let asset = Asset {
-        identifier: key.to_owned(),
-    };
+    let mut data = map.clone();
+    data.insert(
+        serde_yaml::Value::String("name".to_string()),
+        serde_yaml::Value::String(key),
+    );
 
-    info!("Found asset: {}", asset.identifier);
+    let asset = serde_yaml::from_value::<Asset>(serde_yaml::Value::Mapping(data))
+        .expect("Unable to parse asset");
 
-    return asset;
+    debug!("\tReading asset: {}", asset.name);
+
+    asset
 }
 
 pub fn parse_entry(map: &serde_yaml::Mapping, key: String) -> AssetEntry {
@@ -36,7 +45,7 @@ pub fn parse_entry(map: &serde_yaml::Mapping, key: String) -> AssetEntry {
         return AssetEntry::Asset(parse_entry_as_asset(map, key));
     }
 
-    info!("Found asset category: {}", key);
+    debug!("Reading asset category: {}", key);
 
     let mut category = AssetCategory {
         name: key.to_owned(),

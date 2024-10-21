@@ -1,8 +1,14 @@
+use std::collections::HashMap;
+
+use log::{debug, info};
+
 use super::asset::AssetCategory;
+use super::department::Department;
 
 pub struct Project {
     identifier: String,
     display_name: String,
+    pub departments: HashMap<String, Department>,
     pub assets: AssetCategory,
 }
 
@@ -35,6 +41,16 @@ pub fn from_yaml(content: String) -> Project {
         .as_str()
         .expect("Display name was not a string");
 
+    info!(" --- Reading Departments --- ");
+    let dept_data = map
+        .get("departments")
+        .expect("Could not read departments")
+        .as_mapping()
+        .expect("Departments was not a valid mapping");
+
+    let departments = crate::core::department::from_yaml(dept_data);
+
+    info!(" --- Reading Assets ---");
     let asset_data = map
         .get("assets")
         .expect("Could not read assets")
@@ -47,5 +63,6 @@ pub fn from_yaml(content: String) -> Project {
         identifier: identifier.to_string(),
         display_name: display_name.to_string(),
         assets: assets,
+        departments: departments,
     }
 }

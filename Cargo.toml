@@ -15,5 +15,6 @@ lto = true
 clap = { version = "4.5.20", features=["derive"] }
 iced = { version = "0.13.1", default-features = false, features=["tiny-skia"] }
 log = "0.4.22"
+serde = { version = "1.0.210", features = ["derive"] }
 serde_yaml = "0.9.34"
 stderrlog = "0.6.0"

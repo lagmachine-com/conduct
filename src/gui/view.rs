@@ -27,7 +27,7 @@ impl UIState {
             .iter()
             .fold(Column::new(), |column, pair| match pair.1 {
                 crate::core::asset::AssetEntry::Asset(asset) => {
-                    column.push(text(asset.identifier.clone()).style(text::primary))
+                    column.push(text(asset.name.clone()).style(text::primary))
                 }
                 crate::core::asset::AssetEntry::Category(asset_category) => column.push(column![
                     text(asset_category.name.clone()).style(text::secondary),
