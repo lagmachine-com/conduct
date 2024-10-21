@@ -6,14 +6,16 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [profile.release]
-strip = true  # Automatically strip symbols from the binary.
-opt-level = "z"
-lto = true
+panic = "abort" # Strip expensive panic clean-up logic
+codegen-units = 1 # Compile crates one after another so the compiler can optimize better
+lto = true # Enables link to optimizations
+opt-level = "s" # Optimize for binary size
+strip = true # Remove debug symbols
 
 
 [dependencies]
 clap = { version = "4.5.20", features=["derive"] }
-iced = { version = "0.13.1", default-features = false, features=["tiny-skia"] }
 log = "0.4.22"
 serde_yaml = "0.9.34"
 stderrlog = "0.6.0"
+tauri = { version = "1.7",  default-features = false, features=["wry"] }

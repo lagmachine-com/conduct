@@ -47,6 +47,7 @@ pub fn cli() -> CliResult {
     let dir = get_project_manifest_path(&args);
 
     if !std::fs::exists(&dir).expect("Unable to check if manifest file exists") {
+        warn!("Could not find project manifest file");
         return CliResult::Error;
     }
 

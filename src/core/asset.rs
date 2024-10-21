@@ -1,7 +1,5 @@
-use std::{collections::HashMap, hash::Hash};
-
-use iced::keyboard::key;
 use log::{debug, info};
+use std::{collections::HashMap, hash::Hash};
 
 pub enum AssetEntry {
     Asset(Asset),
