@@ -1,0 +1,17 @@
+identifier: bsc
+display_name: Basic Project
+departments:
+  model: {}
+  light: {}
+assets:
+  3d:
+    character:
+      suzanneA:
+        departments: {}
+      suzanneB:
+        departments: {}
+    prop:
+      defaultCubeA:
+        departments: {}
+      defaultCubeB:
+        departments: {}

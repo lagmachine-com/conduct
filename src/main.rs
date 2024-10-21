@@ -23,5 +23,6 @@ fn main() {
         cli::CliResult::ShowUI(project) => gui::gui(project),
         cli::CliResult::Success => return,
         cli::CliResult::SaveChanges => todo!(),
+        cli::CliResult::Error => todo!(),
     }
 }
