@@ -12,26 +12,26 @@ departments:
 assets:
   3d:
     character:
-      suzanneA:
+      - suzanneA:
         departments:
           model: 
             - mesh
           lookdev:
             - shader
-      suzanneB:
+      - suzanneB:
         departments: 
           model: 
             - mesh
           lookdev:
             - shader
     prop:
-      defaultCubeA:
+      - defaultCubeA:
         departments: 
           model: 
             - mesh
           lookdev:
             - shader
-      defaultCubeB:
+      - defaultCubeB:
         departments: 
           model: 
             - mesh
