@@ -59,6 +59,17 @@ pub fn from_yaml(content: String) -> Project {
 
     let assets = crate::core::asset::from_yaml(asset_data);
 
+    info!(" --- Reading Version Control ---");
+    let config = map
+        .get("version_control")
+        .expect("Could not read version control config")
+        .as_mapping()
+        .expect("Version control config was not a valid mapping");
+
+    let config = crate::core::version_control::from_yaml(config);
+
+    debug!("Using version control config: {:?}", config);
+
     Project {
         identifier: identifier.to_string(),
         display_name: display_name.to_string(),

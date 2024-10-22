@@ -37,3 +37,7 @@ assets:
             - mesh
           lookdev:
             - shader
+version_control:
+  type: symlink
+  relative: true
+  pool: "POOL_DIR"
