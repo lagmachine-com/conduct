@@ -24,9 +24,11 @@ pub struct AssetCategory {
 
 pub fn parse_category_assets(value: &Vec<serde_yaml::Value>, key: String) -> AssetEntry {
     let mut result = AssetCategory {
-        name: key,
+        name: key.clone(),
         children: HashMap::new(),
     };
+
+    debug!("Reading asset category: {}", key);
 
     for asset_entry in value.iter() {
         let mapping = asset_entry
@@ -40,7 +42,7 @@ pub fn parse_category_assets(value: &Vec<serde_yaml::Value>, key: String) -> Ass
             .as_str()
             .expect("Asset key was not a valid string");
 
-        debug!("Found asset key: {}", key);
+        debug!("  Reading asset: {}", key);
 
         let mut data = mapping.clone();
         data.insert(
@@ -50,6 +52,14 @@ pub fn parse_category_assets(value: &Vec<serde_yaml::Value>, key: String) -> Ass
 
         let asset = serde_yaml::from_value::<Asset>(Value::Mapping(data))
             .expect("Unable to parse asset form yaml data");
+
+        for dept in asset.departments.iter() {
+            debug!("    Asset {} has department: {}", asset.name, dept.0);
+
+            for entry in dept.1.iter() {
+                debug!("      - : {entry}");
+            }
+        }
 
         result
             .children
@@ -65,7 +75,7 @@ pub fn parse_category(value: &serde_yaml::Mapping, key: String) -> AssetEntry {
         children: HashMap::new(),
     };
 
-    debug!("Parsing asset category: {}", key);
+    debug!("Reading asset category: {}", key);
 
     for entry in value.iter() {
         let key = entry
