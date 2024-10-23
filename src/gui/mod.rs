@@ -1,17 +1,24 @@
-use std::borrow::Cow;
+mod api;
+mod embedded_files;
+mod router;
 
-use include_directory::include_directory;
-use log::info;
 use tao::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
     window::WindowBuilder,
 };
-use wry::{http::Response, WebViewBuilder};
 
-static PROJECT_DIR: include_directory::Dir = include_directory!("$CARGO_MANIFEST_DIR/ui/dist");
+use wry::WebViewBuilder;
 
-pub fn gui(project: crate::core::project::Project) {
+fn get_url() -> String {
+    #[cfg(any(target_os = "windows", target_os = "android"))]
+    return "http://conduct.base".to_string();
+
+    #[cfg(not(any(target_os = "windows", target_os = "android")))]
+    return "conduct://base".to_string();
+}
+
+pub fn gui(_project: crate::core::project::Project) {
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new()
         .with_title("conduct")
@@ -19,34 +26,8 @@ pub fn gui(project: crate::core::project::Project) {
         .unwrap();
 
     let builder = WebViewBuilder::new()
-        .with_url("conduct://home")
-        .with_custom_protocol("conduct".to_string(), |a, b| {
-            let mut path = b.uri().path();
-            if path.eq("/") {
-                path = "index.html"
-            }
-            info!("Requesting file: {}", path);
-
-            for entry in PROJECT_DIR.entries().iter() {
-                info!("Has entry: {}", entry.path().to_str().unwrap());
-            }
-
-            if PROJECT_DIR.contains(path) {
-                let data = PROJECT_DIR.get_file(path);
-                let str = data.unwrap().contents_utf8().unwrap();
-                Response::builder()
-                    .status(200)
-                    .header("Content-Type", "text/html; charset=utf-8")
-                    .body(Cow::Owned(str.into()))
-                    .unwrap()
-            } else {
-                Response::builder()
-                    .status(404)
-                    .header("Content-Type", "text/html; charset=utf-8")
-                    .body(Cow::Owned("Not found".into()))
-                    .unwrap()
-            }
-        });
+        .with_url(get_url())
+        .with_custom_protocol("conduct".to_string(), router::route);
 
     #[cfg(any(
         target_os = "windows",

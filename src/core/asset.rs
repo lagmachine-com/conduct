@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use log::{debug, info};
+use log::debug;
 use serde::{Deserialize, Serialize};
 use serde_yaml::Value;
 
