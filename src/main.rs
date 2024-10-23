@@ -20,7 +20,7 @@ fn main() {
     let result = cli::cli();
 
     match result {
-        cli::CliResult::ShowUI(project) => gui::gui(project),
+        cli::CliResult::ShowUI(project) => gui::gui(Some(project)),
         cli::CliResult::Success => return,
         cli::CliResult::SaveChanges => todo!(),
         cli::CliResult::Error => todo!(),
