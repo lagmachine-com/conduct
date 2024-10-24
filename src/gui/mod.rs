@@ -64,7 +64,7 @@ pub fn gui(project: crate::core::project::Project) {
         target_os = "ios",
         target_os = "android"
     ))]
-    let _webview = builder.build(&window)?;
+    let _webview = builder.build(&window).unwrap();
     #[cfg(not(any(
         target_os = "windows",
         target_os = "macos",
