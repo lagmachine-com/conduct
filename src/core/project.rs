@@ -5,6 +5,7 @@ use log::{debug, info};
 use super::asset::AssetCategory;
 use super::department::Department;
 
+#[derive(Clone)]
 pub struct Project {
     identifier: String,
     display_name: String,

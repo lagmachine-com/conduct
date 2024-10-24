@@ -2,6 +2,9 @@ mod api;
 mod embedded_files;
 mod router;
 
+use std::sync::{Arc, Mutex};
+
+use router::RequestContext;
 use tao::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
@@ -18,16 +21,25 @@ fn get_url() -> String {
     return "conduct://base".to_string();
 }
 
-pub fn gui(_project: crate::core::project::Project) {
+pub fn gui(project: crate::core::project::Project) {
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new()
         .with_title("conduct")
         .build(&event_loop)
         .unwrap();
 
+    let project = Arc::new(Mutex::new(project.clone()));
+
+    //let pin = Arc::pin(project);
     let builder = WebViewBuilder::new()
         .with_url(get_url())
-        .with_custom_protocol("conduct".to_string(), router::route);
+        .with_custom_protocol("conduct".to_string(), move |id, request| {
+            let context = RequestContext {
+                project: project.clone(),
+            };
+
+            router::route(id, request, context)
+        });
 
     #[cfg(any(
         target_os = "windows",

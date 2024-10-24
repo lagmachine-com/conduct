@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use log::debug;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Department {
     #[serde(skip_serializing)]
     pub name: String,
