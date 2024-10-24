@@ -24,21 +24,14 @@ pub fn route(
 
     info!("Received request: {}", request.uri().path());
 
+    let builder = Response::builder();
+
+    #[cfg(debug_assertions)]
+    let builder = builder.header("Access-Control-Allow-Origin", "http://localhost:3000");
+
     if path.starts_with("/api") {
-        if let Some(response) = api::handle(&request) {
-            return response;
-        }
+        return api::handle(&request, builder, context);
     }
 
-    if let Some(response) = embedded_files::get(path.to_string()) {
-        return response;
-    }
-
-    Response::builder()
-        .status(404)
-        .header("Content-Type", "text/html; charset=utf-8")
-        .body(Cow::Owned(
-            context.project.lock().unwrap().get_display_name().into(),
-        ))
-        .unwrap()
+    return embedded_files::get(path.to_string(), builder);
 }
