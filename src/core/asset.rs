@@ -1,15 +1,16 @@
 use std::collections::HashMap;
 
-use log::{debug, info};
+use log::debug;
 use serde::{Deserialize, Serialize};
 use serde_yaml::Value;
 
+#[derive(Clone)]
 pub enum AssetEntry {
     Asset(Asset),
     Category(AssetCategory),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Asset {
     #[serde(skip_serializing)]
     pub name: String,
@@ -17,6 +18,7 @@ pub struct Asset {
     pub departments: HashMap<String, Vec<String>>,
 }
 
+#[derive(Clone)]
 pub struct AssetCategory {
     pub name: String,
     pub children: HashMap<String, AssetEntry>,
