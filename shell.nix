@@ -16,6 +16,7 @@ shell = pkgs.mkShell {
     libsoup_3
   ];
 
+  RUST_SRC_PATH = "${unstable.rust.packages.stable.rustPlatform.rustLibSrc}";
   RUST_BACKTRACE = 1;
   WEBKIT_DISABLE_COMPOSITING_MODE=1;
 };
