@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use log::{debug, info};
 
-use super::asset::AssetCategory;
+use super::asset::{Asset, AssetCategory, AssetEntry};
 use super::department::Department;
 use super::version_control::VersionControlConfig;
 
@@ -23,6 +23,95 @@ impl Project {
     pub fn get_display_name(&self) -> String {
         self.display_name.clone()
     }
+
+    pub fn get_assets_flattened(&self) -> HashMap<String, &Asset> {
+        let mut result = HashMap::new();
+        insert_assets_to_map(&self.assets, "".to_string(), &mut result);
+        return result;
+    }
+
+    pub fn get_asset_by_path(&self, path: String) -> Option<&Asset> {
+        let parts = path.split('/');
+
+        let mut current = &self.assets;
+
+        for part in parts.into_iter() {
+            info!("Looking for part: {}", part);
+            let result = current.children.get(part);
+            match result {
+                Some(result) => match result {
+                    AssetEntry::Asset(asset) => return Some(asset),
+                    AssetEntry::Category(asset_category) => current = asset_category,
+                },
+                None => return None,
+            }
+        }
+
+        None
+    }
+
+    pub fn get_mut_asset_by_path(&mut self, path: String) -> Option<&mut Asset> {
+        let parts = path.split('/');
+
+        let mut current = &mut self.assets;
+
+        for part in parts.into_iter() {
+            info!("Looking for part: {}", part);
+            let result = current.children.get_mut(part);
+            match result {
+                Some(result) => match result {
+                    AssetEntry::Asset(asset) => return Some(asset),
+                    AssetEntry::Category(asset_category) => current = asset_category,
+                },
+                None => return None,
+            }
+        }
+
+        None
+    }
+}
+
+fn insert_assets_to_map<'a>(
+    category: &'a AssetCategory,
+    current_path: String,
+    current: &mut HashMap<String, &'a Asset>,
+) {
+    let mut path = current_path.to_owned();
+
+    if path.is_empty() == false {
+        path.push('/');
+    }
+
+    for child in category.children.iter() {
+        let mut path = path.clone();
+
+        let name = match child.1 {
+            AssetEntry::Asset(asset) => &asset.name,
+            AssetEntry::Category(asset_category) => &asset_category.name,
+        };
+
+        path.push_str(&name);
+
+        match child.1 {
+            AssetEntry::Asset(asset) => {
+                current.insert(path, asset);
+            }
+            AssetEntry::Category(asset_category) => {
+                insert_assets_to_map(asset_category, path, current);
+            }
+        }
+    }
+}
+
+// TODO: Actually validate stuff
+fn is_valid_project_structure(project: &Project) -> bool {
+    let flat = project.get_assets_flattened();
+
+    for entry in flat.iter() {
+        debug!("Checking asset: {}", entry.0);
+    }
+
+    return true;
 }
 
 pub fn from_yaml(content: String) -> Project {
@@ -73,11 +162,17 @@ pub fn from_yaml(content: String) -> Project {
 
     debug!("Using version control config: {:?}", config);
 
-    Project {
+    let result = Project {
         identifier: identifier.to_string(),
         display_name: display_name.to_string(),
         assets: assets,
         departments: departments,
         version_control: config,
+    };
+
+    if is_valid_project_structure(&result) {
+        return result;
     }
+
+    panic!("Project structure was not valid")
 }
