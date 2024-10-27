@@ -21,6 +21,7 @@ fn get_custom_protocol_url() -> String {
     return "conduct://base".to_string();
 }
 
+#[allow(unreachable_code)]
 fn get_homepage_url() -> String {
     #[cfg(debug_assertions)]
     return "http://localhost:3000".to_string();

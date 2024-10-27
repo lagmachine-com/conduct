@@ -1,22 +1,20 @@
 mod args;
-mod command_create;
-mod command_summary;
-mod commands;
 mod result;
 use std::{fs::File, io::Read, path::PathBuf};
 
 use args::GlobalArgs;
 use clap::Parser;
-use commands::Commands;
 use log::*;
 pub use result::CliResult;
+
+use crate::core::commands::{Command, CommandType};
 
 #[derive(Debug, Parser)]
 #[command(name = "conduct")]
 #[command(about = "Generic asset and version management for creative projects", long_about = None)]
 struct CLI {
     #[command(subcommand)]
-    command: Option<commands::Commands>,
+    command: Option<CommandType>,
 
     #[command(flatten)]
     pub global_args: GlobalArgs,
@@ -47,7 +45,7 @@ pub fn cli() -> CliResult {
     let dir = get_project_manifest_path(&args);
 
     if !std::fs::exists(&dir).expect("Unable to check if manifest file exists") {
-        return CliResult::Error;
+        return CliResult::Error("Project manifest file was not found".to_owned());
     }
 
     let mut file = File::open(&dir).expect("Unable to open project manifest file");
@@ -64,9 +62,9 @@ pub fn cli() -> CliResult {
     match args.command {
         Some(command) => {
             debug!("Running command: {:?}", command);
-            match command {
-                Commands::Create(args) => args.execute(&mut project),
-                Commands::Summary(args) => args.execute(&mut project),
+            match CommandType::execute(command, &mut project) {
+                Ok(_) => CliResult::Success,
+                Err(_) => CliResult::Error("".to_string()),
             }
         }
         None => {

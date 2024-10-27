@@ -1,19 +1,4 @@
-use clap::{Args, Parser};
-
-#[derive(Debug, Args)]
-pub struct CommonArgs {
-    #[arg(short, long)]
-    department: Option<String>,
-
-    #[arg(short, long)]
-    asset: Option<String>,
-
-    #[arg(short, long)]
-    element: Option<String>,
-
-    #[arg(short, long)]
-    scene: Option<String>,
-}
+use clap::Parser;
 
 #[derive(Debug, Parser)]
 pub struct GlobalArgs {

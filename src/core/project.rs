@@ -4,6 +4,7 @@ use log::{debug, info};
 
 use super::asset::AssetCategory;
 use super::department::Department;
+use super::version_control::VersionControlConfig;
 
 #[derive(Clone)]
 pub struct Project {
@@ -11,6 +12,7 @@ pub struct Project {
     display_name: String,
     pub departments: HashMap<String, Department>,
     pub assets: AssetCategory,
+    pub version_control: VersionControlConfig,
 }
 
 impl Project {
@@ -76,5 +78,6 @@ pub fn from_yaml(content: String) -> Project {
         display_name: display_name.to_string(),
         assets: assets,
         departments: departments,
+        version_control: config,
     }
 }

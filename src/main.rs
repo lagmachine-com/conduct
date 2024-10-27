@@ -22,7 +22,6 @@ fn main() {
     match result {
         cli::CliResult::ShowUI(project) => gui::gui(project),
         cli::CliResult::Success => return,
-        cli::CliResult::SaveChanges => todo!(),
-        cli::CliResult::Error => todo!(),
+        cli::CliResult::Error(msg) => error!("Error while executing command: {}", msg),
     }
 }

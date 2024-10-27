@@ -1,21 +1,22 @@
+mod direct;
+mod symlink;
+mod versioned_directories;
+
+use direct::VersionControlConfigDirect;
+use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
+use symlink::VersionControlConfigSymlink;
+use versioned_directories::VersionControlConfigVersionedDirectories;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-
-pub struct VersionControlConfigDirect {}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VersionControlConfigVersionedDirectories {}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VersionControlConfigSymlink {
-    relative: bool,
-    pool: String,
+#[enum_dispatch]
+pub trait VersionControl {
+    fn export(&self);
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
+#[enum_dispatch(VersionControl)]
 pub enum VersionControlConfig {
     Direct(VersionControlConfigDirect),
     VersionedDirectories(VersionControlConfigVersionedDirectories),
