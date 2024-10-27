@@ -19,7 +19,7 @@ use serde::{Deserialize, Serialize};
 
 #[enum_dispatch]
 pub trait Command {
-    fn execute(self, _project: &mut Project) -> Result<(), CommandError>;
+    fn execute(self, _project: &mut Project) -> Result<Option<serde_json::Value>, CommandError>;
 }
 
 #[derive(Debug, Subcommand, Serialize, Deserialize)]

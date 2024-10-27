@@ -13,7 +13,10 @@ pub struct CreateArgs {
 }
 
 impl Command for CreateArgs {
-    fn execute(self, _project: &mut Project) -> Result<(), CommandError> {
-        Ok(())
+    fn execute(
+        self,
+        _project: &mut Project,
+    ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
+        Ok(None)
     }
 }

@@ -6,6 +6,7 @@ use args::GlobalArgs;
 use clap::Parser;
 use log::*;
 pub use result::CliResult;
+use serde::de::value;
 
 use crate::core::commands::{Command, CommandType};
 
@@ -62,8 +63,17 @@ pub fn cli() -> CliResult {
     match args.command {
         Some(command) => {
             debug!("Running command: {:?}", command);
-            match CommandType::execute(command, &mut project) {
-                Ok(_) => CliResult::Success,
+            let result = CommandType::execute(command, &mut project);
+
+            match result {
+                Ok(value) => match value {
+                    Some(value) => {
+                        let str = serde_json::to_string_pretty(&value).unwrap();
+                        info!("{}", str);
+                        return CliResult::Success;
+                    }
+                    None => CliResult::Success,
+                },
                 Err(_) => CliResult::Error("".to_string()),
             }
         }

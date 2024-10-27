@@ -15,7 +15,10 @@ pub struct ExportArgs {
 }
 
 impl Command for ExportArgs {
-    fn execute(self, _project: &mut Project) -> Result<(), CommandError> {
+    fn execute(
+        self,
+        _project: &mut Project,
+    ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         info!("Exporting Asset!");
 
         if self.common.asset.is_none() {
@@ -26,6 +29,6 @@ impl Command for ExportArgs {
             return Err(CommandError::InvalidArguments);
         }
 
-        Ok(())
+        Ok(None)
     }
 }
