@@ -1,14 +1,15 @@
+import { createResource, type Component, Show, Switch, Match } from 'solid-js';
+
 import logo from './logo.svg';
 import styles from './App.module.css';
-import { createSignal, createResource, Switch, Match, Suspense } from "solid-js";
-import { get } from './api'
+import { get } from './api';
 
 const fetchProjectInfo = async () => {
   const response = await get("api/json");
   return response.text();
 }
 
-function App() {
+const App: Component = () => {
   const [info] = createResource(fetchProjectInfo);
 
   return (
@@ -28,6 +29,7 @@ function App() {
       </header>
     </div>
   );
-}
+};
+
 
 export default App;
