@@ -324,6 +324,7 @@ dependencies = [
  "serde_yaml",
  "stderrlog",
  "tao",
+ "ts-rs",
  "wry",
 ]
 
@@ -2355,6 +2356,29 @@ dependencies = [
  "serde_spanned",
  "toml_datetime",
  "winnow",
+]
+
+[[package]]
+name = "ts-rs"
+version = "10.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a2f31991cee3dce1ca4f929a8a04fdd11fd8801aac0f2030b0fa8a0a3fef6b9"
+dependencies = [
+ "lazy_static",
+ "thiserror",
+ "ts-rs-macros",
+]
+
+[[package]]
+name = "ts-rs-macros"
+version = "10.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ea0b99e8ec44abd6f94a18f28f7934437809dd062820797c52401298116f70e"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.79",
+ "termcolor",
 ]
 
 [[package]]
