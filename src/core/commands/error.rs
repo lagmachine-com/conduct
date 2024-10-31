@@ -9,6 +9,8 @@ impl Error for CommandError {}
 
 impl fmt::Display for CommandError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Oh no, something bad went down")
+        match self {
+            CommandError::InvalidArguments => write!(f, "Invalid arguments"),
+        }
     }
 }

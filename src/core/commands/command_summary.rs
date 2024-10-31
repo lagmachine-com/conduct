@@ -2,7 +2,6 @@ use clap::Args;
 use log::info;
 
 use serde::{Deserialize, Serialize};
-use serde_json::json;
 use ts_rs::TS;
 
 use crate::core::project::Project;
