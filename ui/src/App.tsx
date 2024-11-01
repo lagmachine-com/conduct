@@ -1,6 +1,6 @@
 import { createResource, type Component, Show, Switch, Match } from 'solid-js';
 
-import { get, getSummary } from './api';
+import { get, getSummary, doExport, doCreate } from './api';
 
 import { Button } from './components/ui/button';
 import { ColorModeProvider } from '@kobalte/core/color-mode';
@@ -18,8 +18,8 @@ const App: Component = () => {
           <p class="text-sm text-muted-foreground">{info()!.identifier}</p>
           <Separator class='my-4'></Separator>
           <div class='flex space-x-3'>
-            <Button>Button 1</Button>
-            <Button>Button 2</Button>
+            <Button on: click={() => doExport()}>Export Asset</Button>
+            <Button on: click={() => doCreate()}>Create Asset</Button>
             <Button>Button 3</Button>
           </div>
         </div>

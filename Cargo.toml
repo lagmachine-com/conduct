@@ -24,4 +24,5 @@ serde_yaml = "0.9.34"
 stderrlog = "0.6.0"
 tao = "0.30.3"
 ts-rs = { version = "10.0.0", features = ["serde-compat"] }
+url = "2.5.2"
 wry = { version = "0.46.3", features = ["linux-body"] }

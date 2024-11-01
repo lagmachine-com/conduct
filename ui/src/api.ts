@@ -13,6 +13,16 @@ export function get(path: string) {
 }
 
 export async function getSummary(): Promise<SummaryResponse> {
-    let result = await window.conduct.get("api/command/summary")
+    let result = await window.conduct.get("api/v1/command/summary")
+    return await result.json() as SummaryResponse
+}
+
+export async function doExport(): Promise<SummaryResponse> {
+    let result = await window.conduct.get("api/v1/command/export?asset=suzanneA&department=model")
+    return await result.json() as SummaryResponse
+}
+
+export async function doCreate(): Promise<SummaryResponse> {
+    let result = await window.conduct.get("api/v1/command/create?asset=suzanneA&department=model")
     return await result.json() as SummaryResponse
 }

@@ -326,6 +326,7 @@ dependencies = [
  "stderrlog",
  "tao",
  "ts-rs",
+ "url",
  "wry",
 ]
 

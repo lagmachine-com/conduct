@@ -1,6 +1,7 @@
-use log::debug;
+use log::{debug, info};
 use matchit::Params;
 use serde_json::json;
+use url::Url;
 use wry::http::Request;
 
 use crate::{
@@ -13,12 +14,12 @@ use crate::{
 
 pub fn register_routes(router: &mut matchit::Router<ApiRequestHandler>) {
     router
-        .insert("/api/command/{command_name}", do_command)
+        .insert("/api/v1/command/{command_name}", do_command)
         .unwrap();
 }
 
 fn do_command(
-    _request: &Request<Vec<u8>>,
+    request: &Request<Vec<u8>>,
     params: Params,
     context: RequestContext,
 ) -> Option<ApiResult> {
@@ -29,11 +30,24 @@ fn do_command(
         ));
     }
 
+    let url = Url::parse(request.uri().to_string().as_str()).unwrap();
+
     let id = command.unwrap();
 
-    let value = json!({
+    let mut value = json!({
         "type": id
     });
+
+    for pair in url.query_pairs().into_iter() {
+        let obj = value.as_object_mut().unwrap();
+        match obj.insert(
+            pair.0.to_string(),
+            serde_json::Value::String(pair.1.to_string()),
+        ) {
+            Some(_) => return Some(ApiResult::Error("Conflicting arguments".to_string())),
+            None => (),
+        }
+    }
 
     let command = serde_json::from_value::<CommandType>(value);
     match command {
