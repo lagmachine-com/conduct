@@ -1,6 +1,7 @@
-mod api;
+mod api_result;
 mod embedded_files;
 mod router;
+mod routes;
 
 use std::sync::{Arc, Mutex};
 
@@ -46,7 +47,6 @@ pub fn gui(project: crate::core::project::Project) {
 
     let project = Arc::new(Mutex::new(project.clone()));
 
-    //let pin = Arc::pin(project);
     let builder = WebViewBuilder::new()
         .with_url(get_homepage_url())
         .with_devtools(true)
