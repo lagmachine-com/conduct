@@ -20,11 +20,7 @@ pub struct RequestContext {
     pub project: Arc<Mutex<Project>>,
 }
 
-pub fn route(
-    _id: &str,
-    request: Request<Vec<u8>>,
-    context: RequestContext,
-) -> Response<Cow<'static, [u8]>> {
+pub fn route(request: Request<Vec<u8>>, context: RequestContext) -> Response<Cow<'static, [u8]>> {
     let path = request.uri().path();
 
     info!("Received request: {}", request.uri().path());

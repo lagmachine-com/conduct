@@ -5,6 +5,7 @@ mod routes;
 
 use std::sync::{Arc, Mutex};
 
+use log::info;
 use router::RequestContext;
 use tao::{
     event::{Event, WindowEvent},
@@ -51,13 +52,25 @@ pub fn gui(project: crate::core::project::Project) {
         .with_url(get_homepage_url())
         .with_devtools(true)
         .with_initialization_script(get_init_script().as_str())
-        .with_custom_protocol("conduct".to_string(), move |id, request| {
-            let context = RequestContext {
-                project: project.clone(),
-            };
+        .with_asynchronous_custom_protocol(
+            "conduct".into(),
+            move |_webview_id, request, responder| {
+                // here you can use a tokio task, thread pool or anything
+                // to do heavy computation to resolve your request
+                // e.g. downloading files, opening the camera...
 
-            router::route(id, request, context)
-        });
+                let project = project.clone();
+
+                std::thread::spawn(move || {
+                    let context = RequestContext {
+                        project: project.clone(),
+                    };
+
+                    let response = router::route(request, context);
+                    responder.respond(response);
+                });
+            },
+        );
 
     #[cfg(any(
         target_os = "windows",
