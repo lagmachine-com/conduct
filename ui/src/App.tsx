@@ -18,8 +18,8 @@ const App: Component = () => {
           <p class="text-sm text-muted-foreground">{info()!.identifier}</p>
           <Separator class='my-4'></Separator>
           <div class='flex space-x-3'>
-            <Button on: click={() => doExport()}>Export Asset</Button>
-            <Button on: click={() => doCreate()}>Create Asset</Button>
+            <Button on:click={() => doExport()}>Export Asset</Button>
+            <Button on:click={() => doCreate()}>Create Asset</Button>
             <Button>Button 3</Button>
           </div>
         </div>

@@ -1,4 +1,7 @@
+use std::{sync::RwLock, thread, time::Duration};
+
 use clap::{command, Args};
+use log::info;
 
 use crate::core::project::Project;
 use serde::{Deserialize, Serialize};
@@ -15,8 +18,10 @@ pub struct CreateArgs {
 impl Command for CreateArgs {
     fn execute(
         self,
-        _project: &mut Project,
+        _project: &RwLock<Project>,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
+        thread::sleep(Duration::from_secs(5));
+        info!("Returning result from command create!");
         Ok(None)
     }
 }

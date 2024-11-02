@@ -1,3 +1,5 @@
+use std::sync::RwLock;
+
 use clap::Args;
 use log::info;
 
@@ -21,8 +23,10 @@ pub struct SummaryResponse {
 impl Command for SummaryArgs {
     fn execute(
         self,
-        project: &mut Project,
+        project: &RwLock<Project>,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
+        let project = project.read().unwrap();
+
         info!("Project Summary:");
         info!("Identifier: {}", project.get_identifier());
         info!("Display Name: {}", project.get_display_name());

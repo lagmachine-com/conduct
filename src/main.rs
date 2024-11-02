@@ -20,7 +20,7 @@ fn main() {
     let result = cli::cli();
 
     match result {
-        cli::CliResult::ShowUI(project) => gui::gui(project),
+        cli::CliResult::ShowUI(project) => gui::gui(project, None),
         cli::CliResult::Success => return,
         cli::CliResult::Error(msg) => error!("Error while executing command: {}", msg),
     }

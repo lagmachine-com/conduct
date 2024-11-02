@@ -1,13 +1,13 @@
 mod args;
 mod result;
-use std::{fs::File, io::Read, path::PathBuf};
+use std::{fs::File, io::Read, path::PathBuf, sync::RwLock};
 
 use args::GlobalArgs;
 use clap::Parser;
 use log::*;
 pub use result::CliResult;
 
-use crate::core::commands::{Command, CommandType};
+use crate::core::commands::{write_command_result, Command, CommandType};
 
 #[derive(Debug, Parser)]
 #[command(name = "conduct")]
@@ -55,20 +55,19 @@ pub fn cli() -> CliResult {
     file.read_to_string(&mut contents)
         .expect("Unable to read file");
 
-    let mut project = crate::core::project::from_yaml(contents);
-
+    let project = crate::core::project::from_yaml(contents);
+    let project = RwLock::new(project);
     info!("Project directory: {}", dir.to_str().unwrap());
 
     match args.command {
         Some(command) => {
             debug!("Running command: {:?}", command);
-            let result = CommandType::execute(command, &mut project);
+            let result = CommandType::execute(command, &project);
 
             match result {
                 Ok(value) => match value {
                     Some(value) => {
-                        let str = serde_json::to_string_pretty(&value).unwrap();
-                        info!("{}", str);
+                        write_command_result(value);
                         return CliResult::Success;
                     }
                     None => CliResult::Success,
@@ -78,7 +77,7 @@ pub fn cli() -> CliResult {
         }
         None => {
             info!("Missing subcommand, showing UI");
-            return CliResult::ShowUI(project);
+            return CliResult::ShowUI(project.read().unwrap().clone());
         }
     }
 }

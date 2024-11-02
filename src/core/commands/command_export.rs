@@ -1,3 +1,5 @@
+use std::sync::RwLock;
+
 use clap::{command, Args};
 use log::info;
 
@@ -17,7 +19,7 @@ pub struct ExportArgs {
 impl Command for ExportArgs {
     fn execute(
         self,
-        _project: &mut Project,
+        _project: &RwLock<Project>,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         info!("Exporting Asset!");
 

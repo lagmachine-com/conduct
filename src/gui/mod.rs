@@ -3,17 +3,25 @@ mod embedded_files;
 mod router;
 mod routes;
 
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, RwLock};
 
-use router::{ApiRequestHandler, RequestContext};
+use log::{debug, info};
+use router::{ApiEntry, RequestContext};
 use routes::register_routes;
 use tao::{
+    dpi::{LogicalSize, Size},
     event::{Event, WindowEvent},
-    event_loop::{ControlFlow, EventLoop},
+    event_loop::{ControlFlow, EventLoop, EventLoopBuilder},
     window::WindowBuilder,
 };
 
 use wry::WebViewBuilder;
+
+use crate::core::commands::DialogOptions;
+
+enum UserWindowEvent {
+    Exit,
+}
 
 fn get_custom_protocol_url() -> String {
     #[cfg(any(target_os = "windows", target_os = "android"))]
@@ -39,20 +47,37 @@ fn get_init_script() -> String {
     return result;
 }
 
-pub fn gui(project: crate::core::project::Project) {
-    let event_loop = EventLoop::new();
+pub fn gui(project: crate::core::project::Project, dialog_options: Option<DialogOptions>) {
+    let event_loop: EventLoop<UserWindowEvent> = EventLoopBuilder::with_user_event().build();
+    let proxy = event_loop.create_proxy();
+
+    let project = Arc::new(RwLock::new(project.clone()));
+
+    let router = Arc::new(RwLock::new(matchit::Router::<ApiEntry>::new()));
+    register_routes(router.write().as_mut().unwrap());
+
+    let mut page = get_homepage_url();
+    let mut title = "conduct".to_string();
+
+    let mut size = LogicalSize::<f64>::new(1280.0, 720.0);
+
+    if let Some(options) = dialog_options {
+        page += options.path.as_str();
+        title = options.title;
+        size.height = options.height;
+        size.width = options.width;
+    }
+
     let window = WindowBuilder::new()
-        .with_title("conduct")
+        .with_title(title)
+        .with_inner_size(Size::Logical(size))
         .build(&event_loop)
         .unwrap();
 
-    let project = Arc::new(Mutex::new(project.clone()));
-
-    let router = Arc::new(Mutex::new(matchit::Router::<ApiRequestHandler>::new()));
-    register_routes(router.lock().as_mut().unwrap());
+    info!("Starting ui with page: {}", page);
 
     let builder = WebViewBuilder::new()
-        .with_url(get_homepage_url())
+        .with_url(page)
         .with_devtools(true)
         .with_initialization_script(get_init_script().as_str())
         .with_asynchronous_custom_protocol(
@@ -64,7 +89,16 @@ pub fn gui(project: crate::core::project::Project) {
                     project: project.clone(),
                 };
 
-                router::route(request, router.clone(), context, responder);
+                let result = router::route(request, router.clone(), context, responder);
+
+                if let Some(result) = result {
+                    debug!("Received control flow result from api: {:?}", result);
+                    match result {
+                        router::ApiControlFlowResult::Close => {
+                            let _ = proxy.send_event(UserWindowEvent::Exit);
+                        }
+                    };
+                };
             },
         );
 
@@ -91,12 +125,19 @@ pub fn gui(project: crate::core::project::Project) {
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
 
-        if let Event::WindowEvent {
-            event: WindowEvent::CloseRequested,
-            ..
-        } = event
-        {
-            *control_flow = ControlFlow::Exit;
+        match event {
+            Event::WindowEvent { event, .. } => match event {
+                WindowEvent::CloseRequested => {
+                    *control_flow = ControlFlow::Exit;
+                }
+                _ => (),
+            },
+            Event::UserEvent(event) => match event {
+                UserWindowEvent::Exit => {
+                    *control_flow = ControlFlow::Exit;
+                }
+            },
+            _ => (),
         }
     });
 }

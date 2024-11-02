@@ -26,3 +26,8 @@ export async function doCreate(): Promise<SummaryResponse> {
     let result = await window.conduct.get("api/v1/command/create?asset=suzanneA&department=model")
     return await result.json() as SummaryResponse
 }
+
+export async function exitDialog(): Promise<SummaryResponse> {
+    let result = await window.conduct.get("api/v1/dialog/exit")
+    return await result.json() as SummaryResponse
+}

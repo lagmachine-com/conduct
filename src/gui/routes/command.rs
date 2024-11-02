@@ -8,13 +8,19 @@ use crate::{
     core::commands::{Command, CommandType},
     gui::{
         api_result::ApiResult,
-        router::{ApiRequestHandler, RequestContext},
+        router::{ApiEntry, RequestContext},
     },
 };
 
-pub fn register_routes(router: &mut matchit::Router<ApiRequestHandler>) {
+pub fn register_routes(router: &mut matchit::Router<ApiEntry>) {
     router
-        .insert("/api/v1/command/{command_name}", do_command)
+        .insert(
+            "/api/v1/command/{command_name}",
+            ApiEntry {
+                handler: do_command,
+                threaded: true,
+            },
+        )
         .unwrap();
 }
 
@@ -53,8 +59,7 @@ fn do_command(
     match command {
         Ok(command) => {
             debug!("Got command: {:?}", command);
-            let mut m = context.project.lock().unwrap();
-            let command_result = CommandType::execute(command, &mut m);
+            let command_result = CommandType::execute(command, &context.project);
 
             match command_result {
                 Ok(value) => Some(ApiResult::Ok(value)),
