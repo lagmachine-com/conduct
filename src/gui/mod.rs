@@ -5,8 +5,8 @@ mod routes;
 
 use std::sync::{Arc, Mutex};
 
-use log::info;
-use router::RequestContext;
+use router::{ApiRequestHandler, RequestContext};
+use routes::register_routes;
 use tao::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
@@ -48,6 +48,9 @@ pub fn gui(project: crate::core::project::Project) {
 
     let project = Arc::new(Mutex::new(project.clone()));
 
+    let router = Arc::new(Mutex::new(matchit::Router::<ApiRequestHandler>::new()));
+    register_routes(router.lock().as_mut().unwrap());
+
     let builder = WebViewBuilder::new()
         .with_url(get_homepage_url())
         .with_devtools(true)
@@ -55,20 +58,13 @@ pub fn gui(project: crate::core::project::Project) {
         .with_asynchronous_custom_protocol(
             "conduct".into(),
             move |_webview_id, request, responder| {
-                // here you can use a tokio task, thread pool or anything
-                // to do heavy computation to resolve your request
-                // e.g. downloading files, opening the camera...
-
                 let project = project.clone();
 
-                std::thread::spawn(move || {
-                    let context = RequestContext {
-                        project: project.clone(),
-                    };
+                let context = RequestContext {
+                    project: project.clone(),
+                };
 
-                    let response = router::route(request, context);
-                    responder.respond(response);
-                });
+                router::route(request, router.clone(), context, responder);
             },
         );
 

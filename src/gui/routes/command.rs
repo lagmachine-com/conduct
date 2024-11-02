@@ -1,4 +1,4 @@
-use log::{debug, info};
+use log::debug;
 use matchit::Params;
 use serde_json::json;
 use url::Url;

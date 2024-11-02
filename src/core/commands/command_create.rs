@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use clap::{command, Args};
 
 use crate::core::project::Project;
@@ -17,9 +15,8 @@ pub struct CreateArgs {
 impl Command for CreateArgs {
     fn execute(
         self,
-        project: &mut Project,
+        _project: &mut Project,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
-        std::thread::sleep(Duration::from_secs(5));
         Ok(None)
     }
 }

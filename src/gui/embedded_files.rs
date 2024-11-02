@@ -2,11 +2,14 @@ use std::borrow::Cow;
 
 use include_directory::include_directory;
 use log::debug;
-use wry::http::{response::Builder, Response};
+use wry::{
+    http::{response::Builder, Response},
+    RequestAsyncResponder,
+};
 
 static UI_FILES: include_directory::Dir = include_directory!("$CARGO_MANIFEST_DIR/ui/dist");
 
-pub fn get(path: String, response_builder: Builder) -> Response<Cow<'static, [u8]>> {
+pub fn get(path: String, response_builder: Builder, responder: RequestAsyncResponder) {
     let path = match path.as_str() {
         "/" => "index.html",
         _ => path.as_str().trim_start_matches("/"),
@@ -17,7 +20,7 @@ pub fn get(path: String, response_builder: Builder) -> Response<Cow<'static, [u8
 
     let file = UI_FILES.get_file(path);
 
-    match file {
+    let response: Response<Cow<'static, [u8]>> = match file {
         Some(file) => {
             debug!("Found file! mime: {}", file.mimetype_as_string());
 
@@ -31,5 +34,7 @@ pub fn get(path: String, response_builder: Builder) -> Response<Cow<'static, [u8
             .status(404)
             .body(Cow::Owned("Not found".into()))
             .unwrap(),
-    }
+    };
+
+    responder.respond(response);
 }
