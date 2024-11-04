@@ -1,3 +1,4 @@
+import { ListAssetsResult } from "./bindings/list_assets_result"
 import { SummaryResponse } from "./bindings/summary_response"
 
 declare global {
@@ -30,4 +31,21 @@ export async function doCreate(): Promise<SummaryResponse> {
 export async function exitDialog(): Promise<SummaryResponse> {
     let result = await window.conduct.get("api/v1/dialog/exit")
     return await result.json() as SummaryResponse
+}
+
+export async function cancelDialog(): Promise<SummaryResponse> {
+    let result = await window.conduct.get("api/v1/dialog/cancel")
+    return await result.json() as SummaryResponse
+}
+
+export async function listAssets(department_filter: null | string = null): Promise<ListAssetsResult> {
+    let query: any = {}
+
+    if (department_filter != null)
+        query['department'] = department_filter
+
+
+
+    let result = await window.conduct.get("api/v1/command/list_assets?" + new URLSearchParams(query).toString())
+    return await result.json() as ListAssetsResult
 }

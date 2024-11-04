@@ -29,14 +29,10 @@ assets:
         departments: 
           model: 
             - mesh
-          lookdev:
-            - shader
       - defaultCubeB:
         departments: 
           model: 
             - mesh
-          lookdev:
-            - shader
 version_control:
   type: symlink
   relative: true

@@ -29,8 +29,8 @@ impl Command for DialogArgs {
             Some(DialogOptions {
                 path: "/dialogs/".to_string() + self.kind.as_str(),
                 title: "Conduct Dialogue".to_string(),
-                width: 400.0,
-                height: 200.0,
+                width: 600.0,
+                height: 300.0,
             }),
         );
 

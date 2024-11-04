@@ -1,6 +1,7 @@
 mod command_create;
 mod command_dialog;
 mod command_export;
+mod command_list_assets;
 mod command_summary;
 
 mod error;
@@ -19,6 +20,7 @@ use command_create::CreateArgs;
 use command_dialog::DialogArgs;
 pub use command_dialog::DialogOptions;
 use command_export::ExportArgs;
+use command_list_assets::ListAssetsArgs;
 use command_summary::SummaryArgs;
 use log::{info, warn};
 
@@ -49,6 +51,9 @@ pub enum CommandType {
 
     /// Display a dialog and get the result
     Dialog(DialogArgs),
+
+    /// Get a list of all assets, optionally filtered by department
+    ListAssets(ListAssetsArgs),
 }
 
 pub fn write_command_result(result: serde_json::Value) {

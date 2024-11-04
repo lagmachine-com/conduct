@@ -20,6 +20,16 @@ pub fn register_routes(router: &mut matchit::Router<ApiEntry>) {
             },
         )
         .unwrap();
+
+    router
+        .insert(
+            "/api/v1/dialog/cancel",
+            ApiEntry {
+                handler: cancel,
+                threaded: false,
+            },
+        )
+        .unwrap();
 }
 
 fn exit(
@@ -28,5 +38,14 @@ fn exit(
     _context: RequestContext,
 ) -> Option<ApiResult> {
     write_command_result(json!({"result": "ok"}));
+    Some(ApiResult::OkExit)
+}
+
+fn cancel(
+    _request: &Request<Vec<u8>>,
+    _params: Params,
+    _context: RequestContext,
+) -> Option<ApiResult> {
+    write_command_result(json!({"result": "cancelled"}));
     Some(ApiResult::OkExit)
 }

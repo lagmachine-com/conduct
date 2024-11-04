@@ -9,7 +9,7 @@ use log::{debug, info};
 use router::{ApiEntry, RequestContext};
 use routes::register_routes;
 use tao::{
-    dpi::{LogicalSize, Size},
+    dpi::{LogicalSize, PhysicalPosition, Position, Size},
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop, EventLoopBuilder},
     window::WindowBuilder,
@@ -61,20 +61,41 @@ pub fn gui(project: crate::core::project::Project, dialog_options: Option<Dialog
 
     let mut size = LogicalSize::<f64>::new(1280.0, 720.0);
 
+    let mut always_on_top = false;
+    let mut closable = true;
+    let mut minimizable = true;
+    let mut maximizable = true;
+
     if let Some(options) = dialog_options {
         page += options.path.as_str();
         title = options.title;
         size.height = options.height;
         size.width = options.width;
+        always_on_top = true;
+        closable = false;
+        minimizable = false;
+        maximizable = false
     }
 
     let window = WindowBuilder::new()
         .with_title(title)
         .with_inner_size(Size::Logical(size))
+        .with_always_on_top(always_on_top)
+        .with_closable(closable)
+        .with_minimizable(minimizable)
+        .with_maximizable(maximizable)
         .build(&event_loop)
         .unwrap();
 
     info!("Starting ui with page: {}", page);
+
+    let size = window.current_monitor().unwrap().size();
+    let window_size = window.outer_size();
+
+    window.set_outer_position(Position::Physical(PhysicalPosition::new(
+        i32::try_from((size.width / 2) - (window_size.width / 2)).unwrap(),
+        i32::try_from((size.height / 2) - (window_size.height / 2) - (size.height / 16)).unwrap(),
+    )));
 
     let builder = WebViewBuilder::new()
         .with_url(page)
