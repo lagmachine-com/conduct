@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::RwLock, vec};
+use std::sync::RwLock;
 
 use clap::Args;
 use log::info;

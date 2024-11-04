@@ -1,10 +1,9 @@
-use std::{sync::RwLock, thread, time::Duration};
+use std::sync::RwLock;
 
 use clap::{command, Args};
-use log::info;
 use ts_rs::TS;
 
-use crate::core::project::{self, Project};
+use crate::core::project::Project;
 use serde::{Deserialize, Serialize};
 
 use super::{args::CommonArgs, error::CommandError, Command};
