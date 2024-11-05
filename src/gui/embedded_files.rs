@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use include_directory::include_directory;
-use log::debug;
+use log::{debug, info};
 use wry::{
     http::{response::Builder, Response},
     RequestAsyncResponder,
@@ -19,6 +19,11 @@ pub fn get(path: String, response_builder: Builder, responder: RequestAsyncRespo
     debug!("Looking for file: {}", path);
 
     let file = UI_FILES.get_file(path);
+
+    let file = match file {
+        Some(file) => Some(file),
+        None => UI_FILES.get_file("index.html"),
+    };
 
     let response: Response<Cow<'static, [u8]>> = match file {
         Some(file) => {

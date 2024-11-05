@@ -2,6 +2,7 @@ mod command_create;
 mod command_dialog;
 mod command_export;
 mod command_list_assets;
+mod command_setup;
 mod command_summary;
 
 mod error;
@@ -21,6 +22,7 @@ use command_dialog::DialogArgs;
 pub use command_dialog::DialogOptions;
 use command_export::ExportArgs;
 use command_list_assets::ListAssetsArgs;
+use command_setup::SetupArgs;
 use command_summary::SummaryArgs;
 use log::{info, warn};
 
@@ -54,6 +56,9 @@ pub enum CommandType {
 
     /// Get a list of all assets, optionally filtered by department
     ListAssets(ListAssetsArgs),
+
+    /// Configure a new setup file
+    Setup(SetupArgs),
 }
 
 pub fn write_command_result(result: serde_json::Value) {

@@ -1,6 +1,11 @@
 mod args;
 mod result;
-use std::{fs::File, io::Read, path::PathBuf, sync::RwLock};
+use std::{
+    fs::File,
+    io::Read,
+    path::{self, PathBuf},
+    sync::RwLock,
+};
 
 use args::GlobalArgs;
 use clap::Parser;
@@ -20,23 +25,48 @@ struct CLI {
     pub global_args: GlobalArgs,
 }
 
-fn get_project_directory(cli: &CLI) -> PathBuf {
+fn get_project_manifest_path(cli: &CLI) -> PathBuf {
+    let mut paths = Vec::<PathBuf>::new();
+
     if let Some(project_dir) = &cli.global_args.project_dir {
         info!("Overriding project directory with: '{}'", project_dir);
         let path = PathBuf::from(project_dir);
-        return path;
+        paths.push(path);
     } else {
-        let mut path = std::env::current_exe().unwrap();
+        let arg = std::env::args().into_iter().next().unwrap();
+        let mut path = PathBuf::from(arg);
+
         path.pop();
-        return path;
+        paths.push(path);
+
+        let mut path = std::env::current_exe().unwrap();
+
+        path.pop();
+        paths.push(path);
+
+        let path = std::env::current_dir().unwrap();
+        paths.push(path);
     }
-}
 
-fn get_project_manifest_path(cli: &CLI) -> PathBuf {
-    let mut path = get_project_directory(cli);
-    path.push("manifest.yaml");
+    for path in paths.iter() {
+        let mut test_path = PathBuf::from(path);
+        test_path.push("manifest.yml");
 
-    return path;
+        let mut test_path_2 = PathBuf::from(path);
+        test_path_2.push("manifest.yaml");
+        for path in vec![test_path, test_path_2].iter() {
+            info!("Checking path: {}", path.to_str().unwrap());
+            match std::fs::exists(path.clone()) {
+                Ok(value) => match value {
+                    true => return path.clone(),
+                    false => continue,
+                },
+                Err(_) => continue,
+            };
+        }
+    }
+
+    panic!("Could not find project manifest")
 }
 
 pub fn cli() -> CliResult {

@@ -1,6 +1,6 @@
 import { createResource, type Component, Show, Switch, Match, createSignal } from 'solid-js';
 
-import { get, getSummary, doExport, doCreate, exitDialog, listAssets, cancelDialog } from '../../api';
+import { get, getSummary, doExport, doCreate, exitDialog, listAssets, cancelDialog, create_setup as createSetup } from '../../api';
 
 import { Button } from '../../components/ui/button';
 import { ColorModeProvider } from '@kobalte/core/color-mode';
@@ -14,6 +14,22 @@ const DialogCreateSetup: Component = () => {
 
     const [info] = createResource(getSummary);
     const [assets] = createResource(selectedDepartment, listAssets)
+
+    async function done() {
+        console.log("done!")
+
+        let department = selectedDepartment();
+        let asset = selectedAsset();
+
+        if (department == null || asset == null) {
+            return
+        }
+
+        let result = await createSetup(department!, asset!);
+        console.log("Got reuslt: ")
+        console.log(result)
+        await exitDialog(result);
+    }
 
 
     return (
@@ -59,7 +75,7 @@ const DialogCreateSetup: Component = () => {
 
                     </div>
                     <div class='flex space-x-3 justify-center'>
-                        <Button class='w-full' on: click={() => exitDialog()}>Done</Button>
+                        <Button class='w-full' on: click={done}>Done</Button>
                         <Button variant="outline" class='w-full' on: click={() => cancelDialog()}>Cancel</Button>
                     </div>
                 </div>

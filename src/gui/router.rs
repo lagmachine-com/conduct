@@ -38,7 +38,10 @@ pub fn route(
 ) -> Option<ApiControlFlowResult> {
     let path = request.uri().path();
 
-    info!("Received request: {}", request.uri().path());
+    info!(
+        "Received request: {}",
+        request.uri().path_and_query().unwrap().as_str()
+    );
 
     let response_builder = Response::builder();
 
@@ -51,11 +54,13 @@ pub fn route(
             let entry = router.at(path);
             match entry {
                 Ok(entry) => Some(entry.value.threaded),
-                Err(_) => Some(false),
+                Err(_) => None,
             }
         }
         Err(_) => None,
     };
+
+    info!("Use thread: {:?}", use_thread);
 
     match use_thread {
         Some(use_thread) => {
