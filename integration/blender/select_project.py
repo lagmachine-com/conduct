@@ -4,6 +4,7 @@ from bpy.props import StringProperty
 import bpy
 import json
 from . import utils
+import os
 
 class OT_SelectProject(Operator, ImportHelper):
 
@@ -30,9 +31,13 @@ class OT_SelectProject(Operator, ImportHelper):
         
         dialog_data = result['data']
 
-        data.project = self.filepath
         data.asset = dialog_data['asset']
         data.department = dialog_data['department']
+
+        path = os.path.join(dialog_data['path'], dialog_data['file_name'] + ".blend")
+        bpy.ops.wm.save_as_mainfile(filepath=path)
+        self.report({'INFO'}, "Saved Setup!")
+
         return {'FINISHED'}
 
 def register():

@@ -28,7 +28,7 @@ class ProjectBrowser(bpy.types.Panel):
 
         data = utils.get_conduct_data()
 
-        if data == None or data.project == None or data.project == "":
+        if data == None or data.asset == None or data.asset == "":
             layout.operator("conduct.select_project", icon='ADD', text="Select Project")
             return
 

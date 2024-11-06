@@ -4,7 +4,6 @@ import os
 import subprocess
 import json
 
-
 class Conduct:
     conduct_exe = ""
 
@@ -40,3 +39,36 @@ class Conduct:
         args = ["dialog", "create_setup"]
 
         return self.run_process(args)
+
+
+def get_from_manifest_path(manifest_path):
+    print("Getting exe from manifest path: " + manifest_path)
+
+    dir_path = os.path.dirname(manifest_path)
+    exe = "conduct"
+    if os.name == "nt":
+        exe += ".exe"
+
+    path = os.path.join(dir_path, exe)
+    return Conduct(path)
+
+def find_from_current_path(current_file):
+    print("Looking for conduct path for file: " + current_file)
+    path = os.path.dirname(current_file)
+    while path != "":
+        checks = [
+            os.path.join(path, "manifest.yaml"),
+            os.path.join(path, "manifest.yml")
+        ]
+
+        for check in checks:
+            if os.path.isfile(check):
+                print("found:" + check)
+                return get_from_manifest_path(check)
+            
+        path = os.path.dirname(path)
+
+            
+
+    
+    

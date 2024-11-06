@@ -55,14 +55,20 @@ fn get_project_manifest_path(cli: &CLI) -> PathBuf {
         let mut test_path_2 = PathBuf::from(path);
         test_path_2.push("manifest.yaml");
         for path in vec![test_path, test_path_2].iter() {
-            info!("Checking path: {}", path.to_str().unwrap());
-            match std::fs::exists(path.clone()) {
-                Ok(value) => match value {
-                    true => return path.clone(),
-                    false => continue,
-                },
+            let path = std::fs::canonicalize(path);
+            match path {
+                Ok(path) => {
+                    info!("Checking path: {}", path.to_str().unwrap());
+                    match std::fs::exists(path.clone()) {
+                        Ok(value) => match value {
+                            true => return path.clone(),
+                            false => continue,
+                        },
+                        Err(_) => continue,
+                    };
+                }
                 Err(_) => continue,
-            };
+            }
         }
     }
 
@@ -85,7 +91,7 @@ pub fn cli() -> CliResult {
     file.read_to_string(&mut contents)
         .expect("Unable to read file");
 
-    let project = crate::core::project::from_yaml(contents);
+    let project = crate::core::project::from_yaml(contents, dir.clone());
     let project = RwLock::new(project);
     info!("Project directory: {}", dir.to_str().unwrap());
 

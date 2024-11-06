@@ -1,6 +1,7 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
+use std::path::PathBuf;
 
-use log::{debug, info};
+use log::{debug, info, warn};
 
 use super::asset::{Asset, AssetCategory, AssetEntry};
 use super::department::Department;
@@ -10,6 +11,7 @@ use super::version_control::VersionControlConfig;
 pub struct Project {
     identifier: String,
     display_name: String,
+    manifest_file: PathBuf,
     pub departments: HashMap<String, Department>,
     pub assets: AssetCategory,
     pub version_control: VersionControlConfig,
@@ -28,6 +30,13 @@ impl Project {
         let mut result = HashMap::new();
         insert_assets_to_map(&self.assets, "".to_string(), &mut result);
         return result;
+    }
+
+    pub fn get_root_directory(&self) -> PathBuf {
+        let mut path = PathBuf::from(self.manifest_file.clone());
+        path.pop();
+
+        return path;
     }
 
     pub fn get_asset_by_path(&self, path: String) -> Option<&Asset> {
@@ -107,15 +116,23 @@ fn insert_assets_to_map<'a>(
 fn is_valid_project_structure(project: &Project) -> bool {
     let flat = project.get_assets_flattened();
 
+    let mut asset_names = HashSet::<String>::new();
+
     for entry in flat.iter() {
         debug!("Checking asset: {}", entry.0);
+        if asset_names.insert(entry.1.name.clone()) == false {
+            warn!("Invalid project structure, found duplicate asset entry");
+            return false;
+        }
     }
 
     return true;
 }
 
-pub fn from_yaml(content: String) -> Project {
+pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
     let value: serde_yaml::Value = serde_yaml::from_str(&content).expect("Unable to parse yaml");
+
+    info!("Parsing yaml from file: {}", file_path.to_str().unwrap());
 
     assert_eq!(value.is_mapping(), true);
 
@@ -163,6 +180,7 @@ pub fn from_yaml(content: String) -> Project {
     debug!("Using version control config: {:?}", config);
 
     let result = Project {
+        manifest_file: file_path,
         identifier: identifier.to_string(),
         display_name: display_name.to_string(),
         assets: assets,

@@ -137,7 +137,6 @@ class ExportDefinition(bpy.types.PropertyGroup):
     format: bpy.props.EnumProperty(name="Format", items=target_file_format_callback, get=target_file_format_getter, set=target_file_format_setter)
 
 class ConductProperties(bpy.types.PropertyGroup):
-    project: bpy.props.StringProperty(name="Project", subtype='FILE_PATH')
     department: bpy.props.StringProperty(name="Department")
     asset: bpy.props.StringProperty(name="Asset")
 
