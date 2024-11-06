@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use include_directory::include_directory;
-use log::{debug, info};
+use log::debug;
 use wry::{
     http::{response::Builder, Response},
     RequestAsyncResponder,

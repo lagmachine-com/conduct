@@ -1,5 +1,5 @@
-import { ListAssetsResult } from "./bindings/list_assets_result"
-import { SummaryResponse } from "./bindings/summary_response"
+import { ListAssetsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
+
 
 declare global {
     interface Window {
@@ -61,10 +61,10 @@ export async function listAssets(department_filter: null | string = null): Promi
     return await result.json() as ListAssetsResult
 }
 
-export async function create_setup(department: string, asset: string): Promise<ListAssetsResult> {
+export async function create_setup(department: string, asset: string): Promise<SetupResult> {
     let result = await get("api/v1/command/setup", {
         "department": department,
         "asset": asset
     })
-    return await result.json() as ListAssetsResult
+    return await result.json() as SetupResult
 }

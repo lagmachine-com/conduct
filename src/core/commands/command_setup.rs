@@ -1,11 +1,9 @@
-use std::{sync::RwLock, thread, time::Duration};
+use std::sync::RwLock;
 
 use clap::{command, Args};
-use log::info;
-use serde_json::json;
 use ts_rs::TS;
 
-use crate::core::project::{self, Project};
+use crate::core::project::Project;
 use serde::{Deserialize, Serialize};
 
 use super::{args::CommonArgs, error::CommandError, Command};
@@ -18,7 +16,7 @@ pub struct SetupArgs {
 }
 
 #[derive(Debug, Args, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../ui/src/bindings/list_assets_result.ts")]
+#[ts(export, export_to = "../ui/src/bindings/bindings_gen.ts")]
 pub struct SetupResult {
     pub asset: String,
     pub department: String,

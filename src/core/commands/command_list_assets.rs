@@ -16,7 +16,7 @@ pub struct ListAssetsArgs {
 }
 
 #[derive(Debug, Args, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../ui/src/bindings/list_assets_result.ts")]
+#[ts(export, export_to = "../ui/src/bindings/bindings_gen.ts")]
 pub struct ListAssetsResult {
     pub assets: Vec<String>,
 }

@@ -14,7 +14,7 @@ use super::{error::CommandError, Command};
 pub struct SummaryArgs {}
 
 #[derive(Debug, Args, Serialize, Deserialize, TS)]
-#[ts(export, export_to = "../ui/src/bindings/summary_response.ts")]
+#[ts(export, export_to = "../ui/src/bindings/bindings_gen.ts")]
 pub struct SummaryResponse {
     pub display_name: String,
     pub identifier: String,

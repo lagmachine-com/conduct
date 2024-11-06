@@ -1,11 +1,6 @@
 mod args;
 mod result;
-use std::{
-    fs::File,
-    io::Read,
-    path::{self, PathBuf},
-    sync::RwLock,
-};
+use std::{fs::File, io::Read, path::PathBuf, sync::RwLock};
 
 use args::GlobalArgs;
 use clap::Parser;
