@@ -1,10 +1,13 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashSet};
 use std::path::PathBuf;
 
 use log::{debug, info, warn};
+use serde_yaml::Mapping;
+
+use crate::core::asset;
 
 use super::asset::{Asset, AssetCategory, AssetEntry};
-use super::department::Department;
+use super::department::{self, Department};
 use super::version_control::VersionControlConfig;
 
 #[derive(Clone)]
@@ -12,7 +15,7 @@ pub struct Project {
     identifier: String,
     display_name: String,
     manifest_file: PathBuf,
-    pub departments: HashMap<String, Department>,
+    pub departments: BTreeMap<String, Department>,
     pub assets: AssetCategory,
     pub version_control: VersionControlConfig,
 }
@@ -26,8 +29,15 @@ impl Project {
         self.display_name.clone()
     }
 
-    pub fn get_assets_flattened(&self) -> HashMap<String, &Asset> {
-        let mut result = HashMap::new();
+    pub fn save(&self) {
+        let serialized = to_yaml(self);
+        let str = serde_yaml::to_string(&serialized).unwrap();
+        info!("Rewrote yaml file: \n{str}");
+        std::fs::write(&self.manifest_file, str).unwrap();
+    }
+
+    pub fn get_assets_flattened(&self) -> BTreeMap<String, &Asset> {
+        let mut result = BTreeMap::new();
         insert_assets_to_map(&self.assets, "".to_string(), &mut result);
         return result;
     }
@@ -83,7 +93,7 @@ impl Project {
 fn insert_assets_to_map<'a>(
     category: &'a AssetCategory,
     current_path: String,
-    current: &mut HashMap<String, &'a Asset>,
+    current: &mut BTreeMap<String, &'a Asset>,
 ) {
     let mut path = current_path.to_owned();
 
@@ -127,6 +137,33 @@ fn is_valid_project_structure(project: &Project) -> bool {
     }
 
     return true;
+}
+
+pub fn to_yaml(project: &Project) -> serde_yaml::Value {
+    let mut mapping = Mapping::new();
+    mapping.insert(
+        "identifier".into(),
+        serde_yaml::Value::String(project.get_identifier()),
+    );
+
+    mapping.insert(
+        "display_name".into(),
+        serde_yaml::Value::String(project.get_display_name()),
+    );
+
+    mapping.insert(
+        "departments".into(),
+        serde_yaml::Value::Mapping(department::to_yaml(project.departments.clone())),
+    );
+
+    mapping.insert("assets".into(), asset::to_yaml(&project.assets));
+
+    mapping.insert(
+        "version_control".into(),
+        serde_yaml::to_value(&project.version_control).unwrap(),
+    );
+
+    return serde_yaml::Value::Mapping(mapping);
 }
 
 pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
@@ -187,6 +224,7 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         departments: departments,
         version_control: config,
     };
+    to_yaml(&result);
 
     if is_valid_project_structure(&result) {
         return result;

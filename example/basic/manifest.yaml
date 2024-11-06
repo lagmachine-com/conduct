@@ -1,39 +1,41 @@
 identifier: bsc
 display_name: Basic Project
 departments:
-  model: 
-    exports:
-      .glb: scripts/export_glb_mesh.py
   lookdev:
-    imports:
-      .glb: scripts/import_glb_mesh.py
-    exports:
-      .blend: scripts/export_shader.py
+    blender:
+      exports:
+        .blend: scripts/export_shader.py
+      imports:
+        .glb: scripts/import_glb_mesh.py
+  model:
+    blender:
+      exports:
+        .glb: scripts/export_glb_mesh.py
 assets:
   3d:
     character:
-      - suzanneA:
+    - suzanneA:
         departments:
-          model: 
-            - mesh
           lookdev:
-            - shader
-      - suzanneB:
-        departments: 
-          model: 
-            - mesh
+          - shader
+          model:
+          - mesh
+    - suzanneB:
+        departments:
           lookdev:
-            - shader
+          - shader
+          model:
+          - mesh
     prop:
-      - defaultCubeA:
-        departments: 
-          model: 
-            - mesh
-      - defaultCubeB:
-        departments: 
-          model: 
-            - mesh
+    - defaultCubeA:
+        departments:
+          model:
+          - mesh
+    - defaultCubeB:
+        departments:
+          model:
+          - mesh
 version_control:
   type: symlink
   relative: true
-  pool: "POOL_DIR"
+  pool: POOL_DIR

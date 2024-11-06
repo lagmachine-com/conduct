@@ -1,4 +1,4 @@
-use std::{sync::RwLock, thread, time::Duration};
+use std::sync::RwLock;
 
 use clap::{command, Args};
 use log::info;
@@ -18,10 +18,12 @@ pub struct CreateArgs {
 impl Command for CreateArgs {
     fn execute(
         self,
-        _project: &RwLock<Project>,
+        project: &RwLock<Project>,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
-        thread::sleep(Duration::from_secs(5));
         info!("Returning result from command create!");
+
+        project.read().unwrap().save();
+
         Ok(None)
     }
 }
