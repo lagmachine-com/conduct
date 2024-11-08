@@ -4,7 +4,7 @@ use clap::{command, Args};
 use ts_rs::TS;
 
 use crate::core::project::Project;
-use serde::{de, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 use super::{args::CommonArgs, error::CommandError, Command};
 

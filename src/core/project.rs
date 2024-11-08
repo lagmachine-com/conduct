@@ -1,8 +1,6 @@
-use std::clone;
 use std::collections::{BTreeMap, HashSet};
 use std::path::PathBuf;
 
-use clap::builder::FalseyValueParser;
 use log::{debug, info, warn};
 use serde_yaml::Mapping;
 
