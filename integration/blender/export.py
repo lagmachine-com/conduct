@@ -86,6 +86,8 @@ class OT_RunSelectedExport(Operator):
                 extension=result['file_format'],
                 items = items
                 )
+        
+        self.report({'INFO'}, "Exported %s!" % name)
 
         return {'FINISHED'}
 
