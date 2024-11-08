@@ -4,26 +4,20 @@ departments:
   lookdev:
     blender:
       exports:
-        .blend: scripts/export_shader.py
+        .blend: export_blend_library.py
       imports:
-        .glb: scripts/import_glb_mesh.py
+        .glb: import_glb_mesh.py
   model:
     blender:
       exports:
-        .glb: scripts/export_glb_mesh.py
+        .blend: export_blend_library.py
 assets:
   3d:
     character:
     - suzanneA:
         departments:
           lookdev:
-          - shader
-          model:
-          - mesh
-    - suzanneB:
-        departments:
-          lookdev:
-          - shader
+          - shadergraph
           model:
           - mesh
     prop:
@@ -31,11 +25,5 @@ assets:
         departments:
           model:
           - mesh
-    - defaultCubeB:
-        departments:
-          model:
-          - mesh
 version_control:
-  type: symlink
-  relative: true
-  pool: POOL_DIR
+  type: direct

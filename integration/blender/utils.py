@@ -12,7 +12,7 @@ def get_conduct_data() -> properties.ConductProperties:
 
 def get_conduct_object(manifest_path = None) -> conduct.Conduct:
     if manifest_path != None:
-        return conduct.get_from_manifest_path(manifest_path)
+        return conduct.get_from_manifest_path(manifest_path, "blender")
     else:
-        return conduct.find_from_current_path(bpy.data.filepath)
+        return conduct.find_from_current_path(bpy.data.filepath, "blender")
     

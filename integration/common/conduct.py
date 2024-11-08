@@ -6,9 +6,11 @@ import json
 
 class Conduct:
     conduct_exe = ""
+    current_program = ""
 
-    def __init__(self, conduct_exe):
+    def __init__(self, conduct_exe, current_program):
         self.conduct_exe = conduct_exe
+        self.current_program = current_program
 
     def run_process(self, args):
         args = [self.conduct_exe] + args
@@ -39,9 +41,15 @@ class Conduct:
         args = ["dialog", "create_setup"]
 
         return self.run_process(args)
+    
+    def list_export_formats(self, department):
+        return self.run_process(["list-export-formats", "--from", self.current_program, "--department", department])
+    
+    def export(self, department, format, asset, element):
+        args = ["export", "--department", department, "--file-format", format, "--from", self.current_program, "--asset", asset, "--element", element]
+        return self.run_process(args)
 
-
-def get_from_manifest_path(manifest_path):
+def get_from_manifest_path(manifest_path, current_program):
     print("Getting exe from manifest path: " + manifest_path)
 
     dir_path = os.path.dirname(manifest_path)
@@ -50,9 +58,9 @@ def get_from_manifest_path(manifest_path):
         exe += ".exe"
 
     path = os.path.join(dir_path, exe)
-    return Conduct(path)
+    return Conduct(path, current_program)
 
-def find_from_current_path(current_file):
+def find_from_current_path(current_file, current_program):
     print("Looking for conduct path for file: " + current_file)
     path = os.path.dirname(current_file)
     while path != "":
@@ -64,7 +72,7 @@ def find_from_current_path(current_file):
         for check in checks:
             if os.path.isfile(check):
                 print("found:" + check)
-                return get_from_manifest_path(check)
+                return get_from_manifest_path(check, current_program)
             
         path = os.path.dirname(path)
 

@@ -3,24 +3,29 @@ from bpy.app.handlers import persistent
 import random
 import time
 
-data_cache = None
+conduct_export_formats = None
 
-formats = []
-
-formats.append("a")
-formats.append("b")
-formats.append("c")
-formats.append("d")
-formats.append("e")
-
-random.seed(time.process_time_ns())
-random.shuffle(formats)
 
 def get_formats():
-    return formats
+    from . import utils
+
+    global conduct_export_formats
+    if conduct_export_formats == None:
+        try:
+            conduct = utils.get_conduct_object()
+            data = utils.get_conduct_data()
+            result = conduct.list_export_formats(data.department)
+            conduct_export_formats = result['formats']
+        except:
+            # so that if there is an error, we dont keep creating new processes
+            conduct_export_formats = []
+
+    if conduct_export_formats == None:
+        return []
+
+    return conduct_export_formats
 
 def target_file_format_callback(self, context):
-    from . import utils
 
     file_formats = []
     for format in get_formats():
@@ -34,6 +39,8 @@ def target_file_format_getter(self):
     try:
         return items.index(self.format_str)
     except:
+        # if nothing is set, default to first item
+        self.format_str = items[0]
         return 0
 
 def target_file_format_setter(self, value):
@@ -147,8 +154,8 @@ class ConductProperties(bpy.types.PropertyGroup):
 @persistent
 def load_handler(dummy):
     print("Resetting conduct data cache")
-    global data_cache
-    data_cache = None
+    global conduct_export_formats
+    conduct_export_formats = None
 
 def register():
     bpy.app.handlers.load_post.append(load_handler)

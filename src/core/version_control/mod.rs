@@ -8,9 +8,31 @@ use serde::{Deserialize, Serialize};
 use symlink::VersionControlConfigSymlink;
 use versioned_directories::VersionControlConfigVersionedDirectories;
 
+use super::{commands::ExportArgs, project};
+
+#[derive(Debug)]
+pub enum ExportError {
+    NotImplemented,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ExportResult {
+    pub directory: String,
+
+    pub recommended_file_name: String,
+
+    pub file_format: String,
+
+    pub script: String,
+}
+
 #[enum_dispatch]
 pub trait VersionControl {
-    fn export(&self);
+    fn export(
+        &self,
+        project: &project::Project,
+        args: &ExportArgs,
+    ) -> Result<ExportResult, ExportError>;
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -2,6 +2,7 @@ mod command_create;
 mod command_dialog;
 mod command_export;
 mod command_list_assets;
+mod command_list_export_formats;
 mod command_setup;
 mod command_summary;
 
@@ -20,8 +21,10 @@ pub mod args;
 use command_create::CreateArgs;
 use command_dialog::DialogArgs;
 pub use command_dialog::DialogOptions;
-use command_export::ExportArgs;
+pub use command_export::ExportArgs;
+
 use command_list_assets::ListAssetsArgs;
+use command_list_export_formats::ListExportFormatsArgs;
 use command_setup::SetupArgs;
 use command_summary::SummaryArgs;
 use log::{info, warn};
@@ -59,6 +62,9 @@ pub enum CommandType {
 
     /// Configure a new setup file
     Setup(SetupArgs),
+
+    /// Lists all available export file formats for a given program and department
+    ListExportFormats(ListExportFormatsArgs),
 }
 
 pub fn write_command_result(result: serde_json::Value) {

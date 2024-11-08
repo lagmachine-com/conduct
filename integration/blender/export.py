@@ -2,6 +2,8 @@
 import bpy
 from bpy.types import Operator
 from . import utils
+import inspect
+
 class OT_AddObjectToPublish(Operator):
 
     bl_idname = "conduct.add_object_to_export"
@@ -64,20 +66,27 @@ class OT_RunSelectedExport(Operator):
 
         conduct = utils.get_conduct_object()
         result = conduct.export(data.department, export.format, data.asset, name)
-        
-        script_file = result["script"]
-        script_data = open(script_file).read()
-        local_scope = result
-        local_scope["items"] = items
-        local_scope["file_format"] = export.format
-        local_scope["asset"] = data.asset
-        local_scope["element"] = name
 
-        print(local_scope)
-        d = dict(local_scope, **globals())
-        exec(script_data, d, d)
-        
-        self.report({'INFO'}, "Exported!")
+        locals = {}
+        globals = {}
+        script = result['script']
+        exec(script, locals, globals)
+
+        for item in globals:
+            instance = globals[item]
+
+            if not inspect.isclass(instance):
+                continue
+
+            exporter_instance = instance()
+
+            exporter_instance.export(
+                directory=result['directory'], 
+                file_name=result['recommended_file_name'], 
+                extension=result['file_format'],
+                items = items
+                )
+
         return {'FINISHED'}
 
 def register():

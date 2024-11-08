@@ -1,6 +1,8 @@
+use std::clone;
 use std::collections::{BTreeMap, HashSet};
 use std::path::PathBuf;
 
+use clap::builder::FalseyValueParser;
 use log::{debug, info, warn};
 use serde_yaml::Mapping;
 
@@ -47,6 +49,45 @@ impl Project {
         path.pop();
 
         return path;
+    }
+
+    fn get_asset_child_by_name(
+        category: &AssetCategory,
+        name: String,
+        current_path: String,
+    ) -> Option<(&Asset, String)> {
+        for child in category.children.iter() {
+            let mut path = current_path.clone();
+            if path.is_empty() == false {
+                path += "/";
+            }
+
+            path += child.0;
+
+            match child.1 {
+                AssetEntry::Asset(asset) => {
+                    if asset.name == name {
+                        return Some((asset, current_path));
+                    } else {
+                        continue;
+                    }
+                }
+                AssetEntry::Category(asset_category) => {
+                    match Self::get_asset_child_by_name(&asset_category, name.clone(), path) {
+                        Some(result) => return Some(result),
+                        None => continue,
+                    }
+                }
+            }
+        }
+
+        None
+    }
+
+    pub fn get_asset_by_name(&self, name: String) -> Option<(&Asset, String)> {
+        let current = &self.assets;
+
+        Self::get_asset_child_by_name(current, name, "".to_string())
     }
 
     pub fn get_asset_by_path(&self, path: String) -> Option<&Asset> {

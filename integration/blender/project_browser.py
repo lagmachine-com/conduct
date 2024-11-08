@@ -1,5 +1,4 @@
 import bpy
-import textwrap
 
 from . import utils
 
@@ -38,16 +37,10 @@ class ProjectBrowser(bpy.types.Panel):
         if data.asset != "":
             layout.label(text="Asset: " + data.asset)
 
-        
-
-
-
 def register():
     bpy.utils.register_class(TaskItemSlot)
     
     bpy.utils.register_class(ProjectBrowser)
-
-
 
 def unregister():
     bpy.utils.unregister_class(ProjectBrowser)
