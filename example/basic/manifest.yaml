@@ -20,10 +20,24 @@ assets:
           - shadergraph
           model:
           - mesh
+          rigging:
+          - rig
+          anim:
+          - animbake
+          light:
+          - render
     prop:
     - defaultCubeA:
         departments:
           model:
           - mesh
+load_order:
+  /3d:
+  - mesh
+  - /character:
+    - department_switch:
+        anim: rig
+        '*': animbake
+  - shadergraph
 version_control:
   type: direct

@@ -1,7 +1,7 @@
 use clap::{Args, Parser};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Args, Serialize, Deserialize)]
+#[derive(Debug, Args, Clone, Serialize, Deserialize)]
 pub struct CommonArgs {
     #[arg(short, long)]
     pub department: Option<String>,

@@ -8,6 +8,7 @@ use crate::core::asset;
 
 use super::asset::{Asset, AssetCategory, AssetEntry};
 use super::department::{self, Department};
+use super::load::LoadConfig;
 use super::version_control::VersionControlConfig;
 
 #[derive(Clone)]
@@ -18,6 +19,7 @@ pub struct Project {
     pub departments: BTreeMap<String, Department>,
     pub assets: AssetCategory,
     pub version_control: VersionControlConfig,
+    pub load_config: LoadConfig,
 }
 
 impl Project {
@@ -255,6 +257,15 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
 
     debug!("Using version control config: {:?}", config);
 
+    info!(" --- Reading Load Order ---");
+    let load_order = map
+        .get("load_order")
+        .expect("Could not read load order config")
+        .as_mapping()
+        .expect("load order config was not a valid mapping");
+
+    let load_order = crate::core::load::from_yaml(load_order);
+
     let result = Project {
         manifest_file: file_path,
         identifier: identifier.to_string(),
@@ -262,7 +273,9 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         assets: assets,
         departments: departments,
         version_control: config,
+        load_config: load_order,
     };
+
     to_yaml(&result);
 
     if is_valid_project_structure(&result) {
