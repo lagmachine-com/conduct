@@ -42,11 +42,7 @@ impl Command for ListExportFormatsArgs {
             None => return Err(CommandError::InvalidArguments),
         };
 
-        if dept.programs.is_none() {
-            return Err(CommandError::InvalidArguments);
-        }
-
-        let program = dept.programs.as_ref().unwrap().get(&self.from);
+        let program = dept.programs.get(&self.from);
 
         let program = match program {
             Some(prog) => prog,
@@ -57,12 +53,7 @@ impl Command for ListExportFormatsArgs {
             formats: Vec::new(),
         };
 
-        match &program.exports {
-            Some(exports) => {
-                result.formats = exports.keys().map(|f| f.to_string()).collect();
-            }
-            None => (),
-        }
+        result.formats = program.exports.clone();
 
         result.formats.sort();
 

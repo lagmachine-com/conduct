@@ -9,6 +9,7 @@ use crate::core::asset;
 use super::asset::{Asset, AssetCategory, AssetEntry};
 use super::department::{self, Department};
 use super::load::LoadConfig;
+use super::program::Program;
 use super::version_control::VersionControlConfig;
 
 #[derive(Clone)]
@@ -16,6 +17,7 @@ pub struct Project {
     identifier: String,
     display_name: String,
     manifest_file: PathBuf,
+    pub programs: BTreeMap<String, Program>,
     pub departments: BTreeMap<String, Department>,
     pub assets: AssetCategory,
     pub version_control: VersionControlConfig,
@@ -40,7 +42,7 @@ impl Project {
 
     pub fn get_assets_flattened(&self) -> BTreeMap<String, &Asset> {
         let mut result = BTreeMap::new();
-        insert_assets_to_map(&self.assets, "".to_string(), &mut result);
+        insert_assets_to_map(&self.assets, "".to_string(), &mut result, false);
         return result;
     }
 
@@ -66,7 +68,7 @@ impl Project {
 
             match child.1 {
                 AssetEntry::Asset(asset) => {
-                    if asset.name == name {
+                    if child.0 == &name {
                         return Some((asset, current_path));
                     } else {
                         continue;
@@ -135,6 +137,7 @@ fn insert_assets_to_map<'a>(
     category: &'a AssetCategory,
     current_path: String,
     current: &mut BTreeMap<String, &'a Asset>,
+    full_path: bool,
 ) {
     let mut path = current_path.to_owned();
 
@@ -146,7 +149,7 @@ fn insert_assets_to_map<'a>(
         let mut path = path.clone();
 
         let name = match child.1 {
-            AssetEntry::Asset(asset) => &asset.name,
+            AssetEntry::Asset(_asset) => &child.0,
             AssetEntry::Category(asset_category) => &asset_category.name,
         };
 
@@ -154,10 +157,10 @@ fn insert_assets_to_map<'a>(
 
         match child.1 {
             AssetEntry::Asset(asset) => {
-                current.insert(path, asset);
+                current.insert(if full_path { path } else { child.0.clone() }, asset);
             }
             AssetEntry::Category(asset_category) => {
-                insert_assets_to_map(asset_category, path, current);
+                insert_assets_to_map(asset_category, path, current, full_path);
             }
         }
     }
@@ -171,7 +174,7 @@ fn is_valid_project_structure(project: &Project) -> bool {
 
     for entry in flat.iter() {
         debug!("Checking asset: {}", entry.0);
-        if asset_names.insert(entry.1.name.clone()) == false {
+        if asset_names.insert(entry.0.clone()) == false {
             warn!("Invalid project structure, found duplicate asset entry");
             return false;
         }
@@ -228,6 +231,14 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         .as_str()
         .expect("Display name was not a string");
 
+    let program_data = map
+        .get("programs")
+        .expect("Could not read programs")
+        .as_mapping()
+        .expect("Programs was not a valid mapping");
+
+    let programs = crate::core::program::from_yaml(program_data);
+
     info!(" --- Reading Departments --- ");
     let dept_data = map
         .get("departments")
@@ -274,6 +285,7 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         departments: departments,
         version_control: config,
         load_config: load_order,
+        programs: programs,
     };
 
     to_yaml(&result);

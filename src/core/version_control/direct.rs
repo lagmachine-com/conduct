@@ -15,13 +15,13 @@ impl VersionControl for VersionControlConfigDirect {
     ) -> Result<ExportResult, ExportError> {
         info!("Exporting using direct version control");
 
-        let asset = args.common.asset.clone().unwrap();
+        let asset_name = args.common.asset.clone().unwrap();
         let dept = args.common.department.clone().unwrap();
         let element = args.common.element.clone().unwrap();
 
-        let asset = project.get_asset_by_name(asset);
+        let asset = project.get_asset_by_name(asset_name.clone());
 
-        let (asset, path) = match &asset {
+        let (_asset, path) = match &asset {
             Some(asset) => asset,
             None => {
                 warn!("Could not find asset entry!");
@@ -39,11 +39,11 @@ impl VersionControl for VersionControlConfigDirect {
             dir.push(part);
         }
 
-        dir.push(&asset.name);
+        dir.push(&asset_name);
         dir.push(&dept);
         dir.push(&element);
 
-        let file_name = format!("{}_{}_{}", asset.name, dept, element);
+        let file_name = format!("{}_{}_{}", asset_name, dept, element);
         info!("Exporting to: {}", dir.to_str().unwrap());
         info!("Recommended file name: {}", file_name);
 

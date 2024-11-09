@@ -60,9 +60,23 @@ impl Command for ExportArgs {
             }
         };
 
-        let program = dept.programs.as_ref().unwrap().get(&self.from);
+        match dept.programs.get(&self.from) {
+            Some(_program) => {}
+            None => {
+                warn!("Could not find program");
+                return Err(CommandError::InvalidArguments);
+            }
+        }
 
-        let program = match program {
+        let program_entry = match dept.programs.get(&self.from) {
+            Some(entry) => entry,
+            None => {
+                warn!("Could not find program entry in department config");
+                return Err(CommandError::InvalidArguments);
+            }
+        };
+
+        let program = match project.programs.get(&self.from) {
             Some(program) => program,
             None => {
                 warn!("Could not find program");
@@ -70,16 +84,15 @@ impl Command for ExportArgs {
             }
         };
 
-        let script_name = match program.exports.as_ref() {
-            Some(exports) => match exports.get(&self.file_format) {
-                Some(script) => script,
-                None => {
-                    warn!("Could not find program export");
-                    return Err(CommandError::InvalidArguments);
-                }
-            },
+        if program_entry.exports.contains(&self.file_format) == false {
+            warn!("Department is not configured to export the specified format");
+            return Err(CommandError::InvalidArguments);
+        }
+
+        let script_name = match program.exports.get(&self.file_format) {
+            Some(script) => script,
             None => {
-                warn!("Program did not have any exports");
+                warn!("Program does not have a script for the specified file format");
                 return Err(CommandError::InvalidArguments);
             }
         };

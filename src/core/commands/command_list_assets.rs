@@ -38,7 +38,7 @@ impl Command for ListAssetsArgs {
                 }
             }
 
-            result.assets.push(pair.1.name.clone());
+            result.assets.push(pair.0.clone());
         }
 
         result.assets.sort();

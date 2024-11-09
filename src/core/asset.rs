@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use log::{debug, info};
 use serde::{Deserialize, Serialize};
-use serde_yaml::{Mapping, Value};
+use serde_yaml::Value;
 
 #[derive(Clone)]
 pub enum AssetEntry {
@@ -12,9 +12,6 @@ pub enum AssetEntry {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Asset {
-    #[serde(skip_serializing)]
-    pub name: String,
-
     pub departments: BTreeMap<String, Vec<String>>,
 }
 
@@ -47,21 +44,8 @@ pub fn parse_category_assets(value: &Vec<serde_yaml::Value>, key: String) -> Ass
         debug!("  Reading asset: {}", key);
 
         for entry in mapping.iter() {
-            let mut data = entry.1.as_mapping().unwrap().clone();
-            data.insert(
-                Value::String("name".to_string()),
-                Value::String(key.to_string()),
-            );
-
-            let asset = serde_yaml::from_value::<Asset>(Value::Mapping(data))
+            let asset = serde_yaml::from_value::<Asset>(entry.1.clone())
                 .expect("Unable to parse asset form yaml data");
-            for dept in asset.departments.iter() {
-                debug!("    Asset {} has department: {}", asset.name, dept.0);
-
-                for entry in dept.1.iter() {
-                    debug!("      - : {entry}");
-                }
-            }
 
             result
                 .children
@@ -107,12 +91,7 @@ pub fn parse_entry(value: &serde_yaml::Value, key: String) -> AssetEntry {
 }
 
 fn asset_to_yaml(value: &Asset) -> serde_yaml::Value {
-    let mut map = Mapping::new();
-    map.insert(
-        value.name.clone().into(),
-        serde_yaml::to_value(value).unwrap(),
-    );
-    return Value::Mapping(map);
+    serde_yaml::to_value(value).unwrap()
 }
 
 fn asset_category_items_to_yaml(value: &AssetCategory) -> serde_yaml::Value {

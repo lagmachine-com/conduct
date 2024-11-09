@@ -1,36 +1,56 @@
 identifier: bsc
 display_name: Basic Project
+programs:
+  blender:
+    exports:
+      .shadergraph.blend: export_blend_library.py
+      .mesh.blend: export_blend_library.py
+    imports:
+      .shadergraph.blend: import_blend_shadergraph.py
+      .animbake.abc: import_animbake_alembic.py
+      .glb: import_glb_mesh.py
 departments:
   lookdev:
-    blender:
-      exports:
-        .blend: export_blend_library.py
-      imports:
-        .glb: import_glb_mesh.py
+    default_elements:
+      - shadergraph
+    programs:
+      blender:
+        exports:
+          - .shadergraph.blend
+        imports:
+          - .glb
+          - .mesh.blend
   model:
-    blender:
-      exports:
-        .blend: export_blend_library.py
+    default_elements:
+      - mesh
+    programs:
+      blender:
+        exports:
+          - .mesh.blend
+  anim:
+    default_elements:
+      - animbake
+    programs:
+      blender:
+        exports:
+          - .animbake.abc
+  rigging:
+    default_elements:
+      - rig
 assets:
   3d:
     character:
     - suzanneA:
         departments:
-          lookdev:
-          - shadergraph
-          model:
-          - mesh
-          rigging:
-          - rig
-          anim:
-          - animbake
-          light:
-          - render
+          lookdev: []
+          model: []
+          rigging: []
+          anim: []
     prop:
     - defaultCubeA:
         departments:
-          model:
-          - mesh
+          model: []
+
 load_order:
   /3d:
   - mesh
