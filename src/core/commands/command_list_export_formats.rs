@@ -1,6 +1,7 @@
 use std::sync::RwLock;
 
 use clap::{command, Args};
+use log::warn;
 use ts_rs::TS;
 
 use crate::core::project::Project;
@@ -39,14 +40,20 @@ impl Command for ListExportFormatsArgs {
 
         let dept = match dept {
             Some(dept) => dept,
-            None => return Err(CommandError::InvalidArguments),
+            None => {
+                warn!("The specified department was not found");
+                return Err(CommandError::InvalidArguments);
+            }
         };
 
         let program = dept.programs.get(&self.from);
 
         let program = match program {
             Some(prog) => prog,
-            None => return Err(CommandError::InvalidArguments),
+            None => {
+                warn!("The specified program was not found in the department");
+                return Err(CommandError::InvalidArguments);
+            }
         };
 
         let mut result = ListExportFormatsResult {

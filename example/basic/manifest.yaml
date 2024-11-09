@@ -37,6 +37,8 @@ departments:
   rigging:
     default_elements:
       - rig
+    programs:
+      blender: {}
 assets:
   3d:
     character:
