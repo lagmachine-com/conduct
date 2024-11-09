@@ -2,7 +2,7 @@ use std::collections::BTreeMap;
 
 use log::{debug, info};
 use serde::{Deserialize, Serialize};
-use serde_yaml::Value;
+use serde_yaml::{Mapping, Value};
 
 #[derive(Clone)]
 pub enum AssetEntry {
@@ -90,8 +90,12 @@ pub fn parse_entry(value: &serde_yaml::Value, key: String) -> AssetEntry {
     result
 }
 
-fn asset_to_yaml(value: &Asset) -> serde_yaml::Value {
-    serde_yaml::to_value(value).unwrap()
+fn asset_to_yaml(value: &Asset, name: String) -> serde_yaml::Value {
+    let mut result = Mapping::new();
+
+    result.insert(Value::String(name), serde_yaml::to_value(value).unwrap());
+
+    return Value::Mapping(result);
 }
 
 fn asset_category_items_to_yaml(value: &AssetCategory) -> serde_yaml::Value {
@@ -99,7 +103,7 @@ fn asset_category_items_to_yaml(value: &AssetCategory) -> serde_yaml::Value {
 
     for entry in value.children.iter() {
         match entry.1 {
-            AssetEntry::Asset(asset) => result.push(asset_to_yaml(asset)),
+            AssetEntry::Asset(asset) => result.push(asset_to_yaml(asset, entry.0.clone())),
             AssetEntry::Category(_asset_category) => todo!(),
         }
     }

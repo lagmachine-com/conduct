@@ -8,8 +8,8 @@ use crate::core::asset;
 
 use super::asset::{Asset, AssetCategory, AssetEntry};
 use super::department::{self, Department};
-use super::load::LoadConfig;
-use super::program::Program;
+use super::load::{self, LoadConfig};
+use super::program::{self, Program};
 use super::version_control::VersionControlConfig;
 
 #[derive(Clone)]
@@ -37,7 +37,7 @@ impl Project {
         let serialized = to_yaml(self);
         let str = serde_yaml::to_string(&serialized).unwrap();
         info!("Rewrote yaml file: \n{str}");
-        std::fs::write(&self.manifest_file, str).unwrap();
+        //std::fs::write(&self.manifest_file, str).unwrap();
     }
 
     pub fn get_assets_flattened(&self) -> BTreeMap<String, &Asset> {
@@ -196,11 +196,18 @@ pub fn to_yaml(project: &Project) -> serde_yaml::Value {
     );
 
     mapping.insert(
+        "programs".into(),
+        serde_yaml::Value::Mapping(program::to_yaml(project.programs.clone())),
+    );
+
+    mapping.insert(
         "departments".into(),
         serde_yaml::Value::Mapping(department::to_yaml(project.departments.clone())),
     );
 
     mapping.insert("assets".into(), asset::to_yaml(&project.assets));
+
+    mapping.insert("load_order".into(), load::to_yaml(&project.load_config));
 
     mapping.insert(
         "version_control".into(),
@@ -271,9 +278,7 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
     info!(" --- Reading Load Order ---");
     let load_order = map
         .get("load_order")
-        .expect("Could not read load order config")
-        .as_mapping()
-        .expect("load order config was not a valid mapping");
+        .expect("Could not read load order config");
 
     let load_order = crate::core::load::from_yaml(load_order);
 

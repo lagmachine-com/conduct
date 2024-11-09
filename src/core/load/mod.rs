@@ -5,6 +5,8 @@ use load_operators::{
 };
 use log::{info, warn};
 use serde::{Deserialize, Serialize};
+use serde_json::map::Entry;
+use serde_yaml::{Mapping, Sequence, Value};
 
 use super::{commands::LoadArgs, project::Project};
 mod load_operators;
@@ -126,17 +128,95 @@ pub fn add_entries_from_yaml_value(
     }
 }
 
-pub fn from_yaml(map: &serde_yaml::Mapping) -> LoadConfig {
+pub fn from_yaml(map: &serde_yaml::Value) -> LoadConfig {
     let mut result = LoadConfig {
         entries: Vec::new(),
     };
 
-    for pair in map.into_iter() {
-        let path = "".to_string();
-        let entry: LoadConfigEntry = entry_from_yaml_pair(pair, path);
-        info!("Got entry: {:#?}", entry);
-        result.entries.push(entry);
-    }
+    add_entries_from_yaml_value(&mut result.entries, map, "".to_string());
+
+    info!("Got load config: {:#?}", result);
 
     return result;
+}
+
+fn operator_to_yaml(op: &LoadOperatorEntry, current_path: String) -> serde_yaml::Value {
+    let mut seq = Sequence::new();
+    for child in op.children.iter() {
+        let mut path = current_path.clone();
+
+        match &op.operator {
+            Some(op) => match op {
+                LoadOperator::CategoryFilter(load_op_category_filter) => {
+                    path += load_op_category_filter
+                        .path
+                        .trim_start_matches(&current_path)
+                }
+                _ => (),
+            },
+            None => (),
+        }
+
+        seq.push(load_config_entry_to_yaml(child, path));
+    }
+
+    match &op.operator {
+        Some(operator) => match operator {
+            LoadOperator::CategoryFilter(load_op_category_filter) => {
+                let mut res = Mapping::new();
+
+                let mut key = load_op_category_filter
+                    .path
+                    .trim_start_matches(&current_path)
+                    .to_string();
+
+                if key.starts_with("/") == false {
+                    key = "/".to_string() + &key;
+                }
+
+                res.insert(Value::String(key), Value::Sequence(seq));
+
+                Value::Mapping(res)
+            }
+            _ => {
+                let result = serde_yaml::to_value(operator).unwrap();
+
+                match result {
+                    Value::Mapping(mapping) => {
+                        let mut mapping = mapping.clone();
+                        let pair = mapping.remove_entry("type").unwrap();
+                        let t = pair.1.as_str().unwrap();
+
+                        let mut result = Mapping::new();
+                        result.insert(Value::String(t.to_string()), Value::Mapping(mapping));
+
+                        return Value::Mapping(result);
+                    }
+                    _ => (),
+                }
+
+                result
+            }
+        },
+        None => Value::Sequence(seq),
+    }
+}
+
+fn load_config_entry_to_yaml(entry: &LoadConfigEntry, current_path: String) -> serde_yaml::Value {
+    match entry {
+        LoadConfigEntry::Element(value) => serde_yaml::Value::String(value.clone()),
+        LoadConfigEntry::Operator(load_operator_entry) => {
+            operator_to_yaml(load_operator_entry, current_path.clone())
+        }
+    }
+}
+
+pub fn to_yaml(config: &LoadConfig) -> serde_yaml::Value {
+    let mut result = Sequence::new();
+
+    for entry in config.entries.iter() {
+        result.push(load_config_entry_to_yaml(entry, "".into()));
+    }
+
+    return serde_yaml::Value::Sequence(result);
 }

@@ -9,7 +9,7 @@ use crate::core::{
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LoadOpCategoryFilter {
-    path: String,
+    pub path: String,
 }
 
 impl LoadOp for LoadOpCategoryFilter {

@@ -26,3 +26,7 @@ tao = "0.30.3"
 ts-rs = { version = "10.0.0", features = ["serde-compat"] }
 url = "2.5.2"
 wry = { version = "0.46.3", features = ["linux-body"] }
+
+[dev-dependencies]
+similar = "2.6.0"
+colored = "2.1.0"
