@@ -52,29 +52,20 @@ assets:
           model: []
           rigging: []
     - suzanneA: {}
-    - suzanneB:
-        departments:
-          model:
-          - mesh_hat
     prop:
     - $template:
         departments:
           lookdev: []
-          model:
-            - cube
-    - defaultCubeA:
-        departments:
-          model:
-            - cubeA
+          model: []
+    - defaultCubeA: {}
 
 load_order:
 - /3d:
-  - mesh
-  - /character:
-    - department_switch:
-        anim: rig
-        '*': animbake
-  - shadergraph
+  - !department_load model
+  - !department_switch
+    _: animbake
+    anim: rig
+  - !department_load lookdev
 
 version_control:
   type: direct

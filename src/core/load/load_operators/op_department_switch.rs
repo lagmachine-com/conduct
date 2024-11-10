@@ -17,7 +17,7 @@ pub struct LoadOpDepartmentSwitch {
 impl LoadOp for LoadOpDepartmentSwitch {
     fn matches(&self, _project: &Project, args: &LoadArgs) -> bool {
         match &args.common.department {
-            Some(dept) => self.options.contains_key(dept) || self.options.contains_key("*"),
+            Some(dept) => self.options.contains_key(dept) || self.options.contains_key("_"),
             None => false,
         }
     }
@@ -27,7 +27,7 @@ impl LoadOp for LoadOpDepartmentSwitch {
             Some(dept) => {
                 let result: Option<&serde_yaml::Value> = match self.options.get(dept) {
                     Some(element) => Some(element),
-                    None => match self.options.get("*") {
+                    None => match self.options.get("_") {
                         Some(default_element) => Some(default_element),
                         None => None,
                     },

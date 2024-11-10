@@ -123,7 +123,7 @@ impl Project {
             let result = current.children.get(part);
             match result {
                 Some(result) => match result {
-                    AssetEntry::Asset(asset) => return None,
+                    AssetEntry::Asset(_) => return None,
                     AssetEntry::Category(asset_category) => current = asset_category,
                 },
                 None => return None,

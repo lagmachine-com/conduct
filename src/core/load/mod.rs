@@ -1,12 +1,12 @@
 use enum_dispatch::enum_dispatch;
 use load_operators::{
     op_category_filter::{self, LoadOpCategoryFilter},
+    op_department_load::LoadOpDepartmentLoad,
     op_department_switch::LoadOpDepartmentSwitch,
 };
 use log::{info, warn};
 use serde::{Deserialize, Serialize};
-use serde_json::map::Entry;
-use serde_yaml::{Mapping, Sequence, Value};
+use serde_yaml::{value::TaggedValue, Mapping, Sequence, Value};
 
 use super::{commands::LoadArgs, project::Project};
 mod load_operators;
@@ -23,11 +23,11 @@ pub trait LoadOp {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[enum_dispatch(LoadOp)]
-#[serde(tag = "type")]
 #[serde(rename_all = "snake_case")]
 pub enum LoadOperator {
     CategoryFilter(LoadOpCategoryFilter),
     DepartmentSwitch(LoadOpDepartmentSwitch),
+    DepartmentLoad(LoadOpDepartmentLoad),
 }
 
 #[derive(Debug, Clone)]
@@ -74,33 +74,21 @@ pub fn entry_from_yaml_pair(
         )));
     }
 
-    if entry.operator.is_none() {
-        let value = value.clone();
-        if let Some(mapping) = value.as_mapping() {
-            let mut mapping = mapping.clone();
-
-            mapping.insert(
-                serde_yaml::Value::String("type".to_string()),
-                serde_yaml::Value::String(key.to_string()),
-            );
-
-            let value =
-                serde_yaml::from_value::<LoadOperator>(serde_yaml::Value::Mapping(mapping.clone()));
-
-            match value {
-                Ok(op) => {
-                    entry.operator = Some(op);
-                }
-                Err(err) => warn!("Failed to automatically load operator: {:?}", err),
-            }
-        }
-    }
-
     if let Some(op) = &entry.operator {
         entry.children = LoadOperator::get_children(&op, value, path.clone())
     }
 
     return LoadConfigEntry::Operator(entry);
+}
+
+fn entry_from_tagged_value(tagged: &TaggedValue) -> LoadConfigEntry {
+    warn!("Converting from tagged value: {:#?}", tagged);
+    let op: LoadOperator = serde_yaml::from_value(Value::Tagged(Box::new(tagged.clone()))).unwrap();
+
+    return LoadConfigEntry::Operator(LoadOperatorEntry {
+        operator: Some(op),
+        children: Vec::new(),
+    });
 }
 
 pub fn add_entries_from_yaml_value(
@@ -121,6 +109,9 @@ pub fn add_entries_from_yaml_value(
             for pair in mapping.iter() {
                 current.push(entry_from_yaml_pair(pair, current_path.clone()));
             }
+        }
+        serde_yaml::Value::Tagged(tagged) => {
+            current.push(entry_from_tagged_value(tagged));
         }
         _ => {
             info!("Unknown yaml entry: {:#?}", value);
