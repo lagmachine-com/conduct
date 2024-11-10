@@ -2,7 +2,7 @@
 mod tests {
     use std::path::PathBuf;
 
-    use crate::core::project;
+    use crate::core::{format, project};
     use colored::Colorize;
     use similar::{ChangeTag, TextDiff};
 
@@ -14,13 +14,14 @@ mod tests {
         let parsed = project::from_yaml(manifest.clone(), p);
         let result = project::to_yaml(&parsed);
         let result = serde_yaml::to_string(&result).unwrap();
+        let result = format::pretty_format_yaml(result);
 
         let diff = TextDiff::from_lines(manifest.as_str(), result.as_str());
 
         for change in diff.iter_all_changes() {
             let sign = match change.tag() {
                 ChangeTag::Delete => " - ".white().bold().on_red(),
-                ChangeTag::Insert => " + ".white().bold().on_red(),
+                ChangeTag::Insert => " + ".white().bold().on_green(),
                 ChangeTag::Equal => " * ".white().on_white(),
             };
             print!("{}{}", sign, change);

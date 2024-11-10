@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
@@ -11,7 +11,7 @@ use crate::core::{
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct LoadOpDepartmentSwitch {
     #[serde(flatten)]
-    options: HashMap<String, serde_yaml::Value>,
+    options: BTreeMap<String, serde_yaml::Value>,
 }
 
 impl LoadOp for LoadOpDepartmentSwitch {

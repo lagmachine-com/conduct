@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use log::{debug, info, warn};
 use serde_yaml::Mapping;
 
-use crate::core::asset;
+use crate::core::{asset, format};
 
 use super::asset::{Asset, AssetCategory, AssetEntry};
 use super::department::{self, Department};
@@ -36,8 +36,9 @@ impl Project {
     pub fn save(&self) {
         let serialized = to_yaml(self);
         let str = serde_yaml::to_string(&serialized).unwrap();
+        let str = format::pretty_format_yaml(str);
         info!("Rewrote yaml file: \n{str}");
-        //std::fs::write(&self.manifest_file, str).unwrap();
+        std::fs::write(&self.manifest_file, str).unwrap();
     }
 
     pub fn get_assets_flattened(&self) -> BTreeMap<String, &Asset> {

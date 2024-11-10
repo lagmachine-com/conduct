@@ -1,5 +1,6 @@
 identifier: bsc
 display_name: Basic Project
+
 programs:
   blender:
     exports:
@@ -9,6 +10,7 @@ programs:
       .animbake.abc: import_animbake_alembic.py
       .glb: import_glb_mesh.py
       .shadergraph.blend: import_blend_shadergraph.py
+
 departments:
   anim:
     default_elements:
@@ -39,6 +41,7 @@ departments:
     - rig
     programs:
       blender: {}
+
 assets:
   3d:
     character:
@@ -52,6 +55,7 @@ assets:
     - defaultCubeA:
         departments:
           model: []
+
 load_order:
 - /3d:
   - mesh
@@ -60,5 +64,6 @@ load_order:
         anim: rig
         '*': animbake
   - shadergraph
+
 version_control:
   type: direct
