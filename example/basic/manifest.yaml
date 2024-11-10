@@ -45,16 +45,27 @@ departments:
 assets:
   3d:
     character:
-    - suzanneA:
+    - $template:
         departments:
           anim: []
           lookdev: []
           model: []
           rigging: []
+    - suzanneA: {}
+    - suzanneB:
+        departments:
+          model:
+          - mesh_hat
     prop:
+    - $template:
+        departments:
+          lookdev: []
+          model:
+            - cube
     - defaultCubeA:
         departments:
-          model: []
+          model:
+            - cubeA
 
 load_order:
 - /3d:

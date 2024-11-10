@@ -3,7 +3,7 @@ use std::sync::RwLock;
 use clap::{command, Args};
 use ts_rs::TS;
 
-use crate::core::project::Project;
+use crate::core::{department::DepartmentFinder, project::Project};
 use serde::{Deserialize, Serialize};
 
 use super::{args::CommonArgs, error::CommandError, Command};
@@ -33,7 +33,9 @@ impl Command for ListAssetsArgs {
 
         for pair in assets.iter() {
             if let Some(filter_dept) = self.common.department.clone() {
-                if pair.1.departments.contains_key(&filter_dept) == false {
+                let departments = project.get_departments_for_asset(pair.0.clone());
+
+                if departments.contains(&filter_dept) == false {
                     continue;
                 }
             }

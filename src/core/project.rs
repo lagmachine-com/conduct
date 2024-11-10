@@ -12,7 +12,7 @@ use super::load::{self, LoadConfig};
 use super::program::{self, Program};
 use super::version_control::VersionControlConfig;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Project {
     identifier: String,
     display_name: String,
@@ -111,6 +111,26 @@ impl Project {
         }
 
         None
+    }
+
+    pub fn get_category_by_path(&self, path: String) -> Option<&AssetCategory> {
+        let parts = path.split('/');
+
+        let mut current = &self.assets;
+
+        for part in parts.into_iter() {
+            info!("Looking for part: {}", part);
+            let result = current.children.get(part);
+            match result {
+                Some(result) => match result {
+                    AssetEntry::Asset(asset) => return None,
+                    AssetEntry::Category(asset_category) => current = asset_category,
+                },
+                None => return None,
+            }
+        }
+
+        Some(current)
     }
 
     pub fn get_mut_asset_by_path(&mut self, path: String) -> Option<&mut Asset> {

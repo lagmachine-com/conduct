@@ -12,6 +12,9 @@ mod tests {
         let manifest = std::fs::read_to_string(path).unwrap();
         let p = PathBuf::from(path);
         let parsed = project::from_yaml(manifest.clone(), p);
+
+        print!("Parsed project as: ${:#?}", parsed);
+
         let result = project::to_yaml(&parsed);
         let result = serde_yaml::to_string(&result).unwrap();
         let result = format::pretty_format_yaml(result);

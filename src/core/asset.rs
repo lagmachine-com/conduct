@@ -4,7 +4,7 @@ use log::{debug, info};
 use serde::{Deserialize, Serialize};
 use serde_yaml::{Mapping, Value};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum AssetEntry {
     Asset(Asset),
     Category(AssetCategory),
@@ -12,18 +12,21 @@ pub enum AssetEntry {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Asset {
+    #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
     pub departments: BTreeMap<String, Vec<String>>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct AssetCategory {
     pub name: String,
+    pub template: Option<Asset>,
     pub children: BTreeMap<String, AssetEntry>,
 }
 
 pub fn parse_category_assets(value: &Vec<serde_yaml::Value>, key: String) -> AssetEntry {
     let mut result = AssetCategory {
         name: key.clone(),
+        template: None,
         children: BTreeMap::new(),
     };
 
@@ -59,6 +62,7 @@ pub fn parse_category_assets(value: &Vec<serde_yaml::Value>, key: String) -> Ass
 pub fn parse_category(value: &serde_yaml::Mapping, key: String) -> AssetEntry {
     let mut result = AssetCategory {
         name: key.clone(),
+        template: None,
         children: BTreeMap::new(),
     };
 
@@ -74,7 +78,26 @@ pub fn parse_category(value: &serde_yaml::Mapping, key: String) -> AssetEntry {
 
         let data = entry.1;
 
-        result.children.insert(key.clone(), parse_entry(data, key));
+        println!("Parsign key: {}", key);
+
+        let mut entry = parse_entry(data, key.clone());
+        match entry {
+            AssetEntry::Category(asset_category) => {
+                let mut category = asset_category.clone();
+                if let Some(template) = category.children.remove("$template") {
+                    match template {
+                        AssetEntry::Asset(asset) => {
+                            category.template = Some(asset);
+                        }
+                        _ => (),
+                    }
+                }
+                entry = AssetEntry::Category(category)
+            }
+            _ => (),
+        }
+
+        result.children.insert(key.clone(), entry);
     }
 
     return AssetEntry::Category(result);
@@ -100,6 +123,10 @@ fn asset_to_yaml(value: &Asset, name: String) -> serde_yaml::Value {
 
 fn asset_category_items_to_yaml(value: &AssetCategory) -> serde_yaml::Value {
     let mut result = serde_yaml::Sequence::new();
+
+    if let Some(template) = &value.template {
+        result.push(asset_to_yaml(&template, "$template".to_string()));
+    }
 
     for entry in value.children.iter() {
         match entry.1 {
