@@ -5,7 +5,7 @@ parent: Assets
 nav_order: 2
 ---
 
-# Asset Load Order
+# Asset Load Configuration
 
 {: .no_toc }
 
@@ -17,8 +17,8 @@ nav_order: 2
 
 ---
 
-## Configuring Load Order
-The asset load order is an important part of configuration, as it determines which asset elements are available to eachother
+## Configuring Load
+The asset load config is an important part of configuration, as it determines the behaviour of how assets are loaded
 
 The simplest form of a load order configuration is like so:
 
@@ -31,13 +31,15 @@ load_order:
 
 Here, each element is explictly ordered, and are loaded from top to bottom. 
 
-This allows `anim_cache` to affect `model`, and `shader_graph` to affect both, `model` and `anim_cache`.
+{: .note }
+> While the asset load order is deterministic, it is considered best practice for scripts to work in a order-independent way.
 
-While this is a simple configuration, it doesn't allow us to change load order based on the current context, such as specifying different elements to load based on which department is loading the asset. In order to do this, we need Load Order Operators
 
-## Load Order Operators
+While this is a simple configuration, it doesn't allow us to change the load order based on the current context, such as specifying different elements to load based on which department is loading the asset. In order to do this, we need Load Operators
 
-A load order operator is simply a piece of extra configuration in the load order, which allows us to have a bit more logic in determining which assets are loaded
+## Load Operators
+
+A load operator is simply a piece of extra configuration in the load order, which allows us to have a bit more logic in determining which assets are loaded
 
 One possible use case for this, is in a 3D animation context. When the `animation` department loads an asset, they likely want to load the rig required for animating the character, however most other departments likely dont want the rig, and just want to load the final animation provided by the `animation` department
 

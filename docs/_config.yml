@@ -6,3 +6,23 @@ url: https://just-the-docs.github.io
 
 aux_links:
   Source: https://github.com/lagmachinery/conduct
+
+mermaid:
+  version: "11.4.0"
+
+callouts_level: quiet
+callouts:
+  highlight:
+    color: yellow
+  important:
+    title: Important
+    color: blue
+  new:
+    title: New
+    color: green
+  note:
+    title: Note
+    color: purple
+  warning:
+    title: Warning
+    color: red

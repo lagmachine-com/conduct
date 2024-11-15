@@ -50,6 +50,19 @@ assets:
 
 This configuration clearly shows which departments are contributing which elements to the asset, and is easy to understand at a glance.
 
+```mermaid
+classDiagram
+    SuzanneA_Config --|> SuzanneA_Elements
+
+    SuzanneA_Config: model/mesh
+    SuzanneA_Config: anim/anim_cache
+    SuzanneA_Config: lookdev/shader_graph
+
+    SuzanneA_Elements: model/mesh
+    SuzanneA_Elements: anim/anim_cache
+    SuzanneA_Elements: lookdev/shader_graph
+```
+
 However, in practice many assets will end up sharing a similar structure, and having to explicitly specify every element for every asset will quickly end up with a significant amount of extra configuration. To avoid this, an asset can also inherit elements based on their category, as well as departments
 
 ### Category Template Asset
@@ -74,6 +87,34 @@ assets:
 ```
 
 In this example, we have 3 `suzanne` asset variants, `A`, `B`, and `C`. Although each of these assets do not explicitly specify their departments or elements, all of them have `anim`, `lookdev`, and `model` departments, and the associated elements, as they are inherited from the category `3d/character`'s template.
+
+
+```mermaid
+classDiagram
+    SuzanneA_Config --|> SuzanneA_Elements
+    SuzanneB_Config --|> SuzanneB_Elements
+    SuzanneC_Config --|> SuzanneC_Elements
+    CategoryTemplate --|> SuzanneA_Elements
+    CategoryTemplate --|> SuzanneB_Elements
+    CategoryTemplate --|> SuzanneC_Elements
+
+    CategoryTemplate: model/mesh
+    CategoryTemplate: anim/anim_cache
+    CategoryTemplate: lookdev/shader_graph
+
+    SuzanneA_Elements: model/mesh
+    SuzanneA_Elements: anim/anim_cache
+    SuzanneA_Elements: lookdev/shader_graph
+
+    SuzanneB_Elements: model/mesh
+    SuzanneB_Elements: anim/anim_cache
+    SuzanneB_Elements: lookdev/shader_graph
+
+    SuzanneC_Elements: model/mesh
+    SuzanneC_Elements: anim/anim_cache
+    SuzanneC_Elements: lookdev/shader_graph
+```
+
 
 ### Department Default Elements
 
@@ -104,6 +145,26 @@ assets:
 
 In this example, default elements are specified as part of the department configuration. This allows any element which this department contributes to, to inherit these elements.
 
+```mermaid
+classDiagram
+    SuzanneA_Config --|> SuzanneA_Elements
+    anim --|> SuzanneA_Config
+    model --|> SuzanneA_Config
+    lookdev --|> SuzanneA_Config
+
+    anim: anim_cache
+    model: mesh
+    lookdev: shader_graph
+
+    SuzanneA_Config: @model
+    SuzanneA_Config: @anim
+    SuzanneA_Config: @lookdev
+
+    SuzanneA_Elements: model/mesh
+    SuzanneA_Elements: anim/anim_cache
+    SuzanneA_Elements: lookdev/shader_graph
+```
+
 ### Combining Inheritance
 
 It is also worth noting, that these methods of inheritance can be combined, meaning you can specify a default set of elements on a per-department basis, and then also specify a default set of departments which contribute to an asset on a category asset template
@@ -113,9 +174,7 @@ departments:
   anim:
     default_elements:
     - anim_cache
-  lookdev:
-    default_elements:
-    - shader_graph
+  lookdev: {}
   model:
     default_elements:
     - mesh
@@ -126,7 +185,8 @@ assets:
     - $template:
         departments:
           anim: []
-          lookdev: []
+          lookdev:
+            - shader_graph
           model: []
     - suzanneA: {}
     - suzanneB: {}
@@ -139,3 +199,37 @@ assets:
 Here, all 3 `suzanne` assets will be contributed to by the departments specified in the template, and each of these departments will contribute their default set of elements.
 
 We can also still specify changes to both, individial elements, or the template in order to insert additional elements on top of the defaults. Note that `suzanneC` is also specifying an additional `lod` element from the `model` department
+
+```mermaid
+classDiagram
+    anim --|> CategoryTemplate
+    model --|> CategoryTemplate
+    CategoryTemplate --|> SuzanneA_Elements
+    CategoryTemplate --|> SuzanneB_Elements
+
+
+    CategoryTemplate --|> SuzanneC_Elements
+    SuzanneC_Config --|> SuzanneC_Elements
+
+    anim : anim_cache 
+    model: mesh
+
+    CategoryTemplate:   @anim
+    CategoryTemplate:   @model
+    CategoryTemplate: + lookdev/shader_graph
+
+    SuzanneC_Config: + model/lod
+
+    SuzanneA_Elements: anim/anim_cache
+    SuzanneA_Elements: lookdev/shader_graph
+    SuzanneA_Elements: model/mesh
+
+    SuzanneB_Elements: anim/anim_cache
+    SuzanneB_Elements: lookdev/shader_graph
+    SuzanneB_Elements: model/mesh
+
+    SuzanneC_Elements: anim/anim_cache
+    SuzanneC_Elements: lookdev/shader_graph
+    SuzanneC_Elements: model/mesh
+    SuzanneC_Elements: model/lod
+```
