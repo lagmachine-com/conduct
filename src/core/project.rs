@@ -8,7 +8,6 @@ use crate::core::{asset, format};
 
 use super::asset::{Asset, AssetCategory, AssetEntry};
 use super::department::{self, Department};
-use super::load::{self, LoadConfig};
 use super::program::{self, Program};
 use super::version_control::VersionControlConfig;
 
@@ -21,7 +20,6 @@ pub struct Project {
     pub departments: BTreeMap<String, Department>,
     pub assets: AssetCategory,
     pub version_control: VersionControlConfig,
-    pub load_config: LoadConfig,
 }
 
 impl Project {
@@ -41,6 +39,11 @@ impl Project {
         std::fs::write(&self.manifest_file, str).unwrap();
     }
 
+    pub fn get_department(&self, name: &String) -> Option<&Department> {
+        let dept = self.departments.get(name);
+        return dept;
+    }
+
     pub fn get_assets_flattened(&self) -> BTreeMap<String, &Asset> {
         let mut result = BTreeMap::new();
         insert_assets_to_map(&self.assets, "".to_string(), &mut result, false);
@@ -52,6 +55,10 @@ impl Project {
         path.pop();
 
         return path;
+    }
+
+    pub fn get_backing_file(&self) -> PathBuf {
+        PathBuf::from(self.manifest_file.clone())
     }
 
     fn get_asset_child_by_name(
@@ -228,8 +235,6 @@ pub fn to_yaml(project: &Project) -> serde_yaml::Value {
 
     mapping.insert("assets".into(), asset::to_yaml(&project.assets));
 
-    mapping.insert("load_order".into(), load::to_yaml(&project.load_config));
-
     mapping.insert(
         "version_control".into(),
         serde_yaml::to_value(&project.version_control).unwrap(),
@@ -296,13 +301,6 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
 
     debug!("Using version control config: {:?}", config);
 
-    info!(" --- Reading Load Order ---");
-    let load_order = map
-        .get("load_order")
-        .expect("Could not read load order config");
-
-    let load_order = crate::core::load::from_yaml(load_order);
-
     let result = Project {
         manifest_file: file_path,
         identifier: identifier.to_string(),
@@ -310,7 +308,6 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         assets: assets,
         departments: departments,
         version_control: config,
-        load_config: load_order,
         programs: programs,
     };
 

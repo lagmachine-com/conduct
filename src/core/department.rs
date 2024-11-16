@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 use log::info;
 use serde::{Deserialize, Serialize};
 
-use super::project::Project;
+use super::{element::element::Element, project::Project};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DepartmentProgramEntry {
@@ -16,7 +16,8 @@ pub struct DepartmentProgramEntry {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Department {
-    pub default_elements: Vec<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub default_elements: Vec<Element>,
     #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
     pub programs: BTreeMap<String, DepartmentProgramEntry>,
 }

@@ -13,15 +13,14 @@ programs:
 
 departments:
   anim:
-    default_elements:
-    - animbake
     programs:
       blender:
         exports:
         - .animbake.abc
-  lookdev:
+  light:
     default_elements:
-    - shadergraph
+    - default_light_rig
+  lookdev:
     programs:
       blender:
         exports:
@@ -30,42 +29,32 @@ departments:
         - .glb
         - .mesh.blend
   model:
-    default_elements:
-    - mesh
     programs:
       blender:
         exports:
         - .mesh.blend
-  rigging:
-    default_elements:
-    - rig
-    programs:
-      blender: {}
 
 assets:
   3d:
-    character:
-    - $template:
+    layout:
+    - cubeInstancer:
         departments:
-          anim: []
-          lookdev: []
-          model: []
-          rigging: []
-    - suzanneA: {}
+          layout:
+          - !depends(defaultCubeA)
+            - !department_is(light) instancer
     prop:
     - $template:
         departments:
-          lookdev: []
-          model: []
-    - defaultCubeA: {}
-
-load_order:
-- /3d:
-  - !department_load model
-  - !department_switch
-    _: animbake
-    anim: rig
-  - !department_load lookdev
+          light:
+          - prop_light_rig
+    - defaultCubeA:
+        departments:
+          light:
+          - light_rig
+          model:
+          - mesh
 
 version_control:
-  type: direct
+  type: symlink
+  relative: true
+  pool: POOL_DIR

@@ -1,10 +1,13 @@
 use std::sync::RwLock;
 
 use clap::{command, Args};
-use log::warn;
 use ts_rs::TS;
 
-use crate::core::{element::ElementFinder, project::Project};
+use crate::core::{
+    context::{Context, ContextMode},
+    element::element_resolver::ElementResolver,
+    project::Project,
+};
 use serde::{Deserialize, Serialize};
 
 use super::{args::CommonArgs, error::CommandError, Command};
@@ -14,6 +17,15 @@ pub struct ListElementsArgs {
     #[command(flatten)]
     #[serde(flatten)]
     common: CommonArgs,
+
+    #[clap(
+        help = "List elements in load context instead of export",
+        long,
+        short,
+        action,
+        default_value_t = false
+    )]
+    load: bool,
 }
 
 #[derive(Debug, Args, Serialize, Deserialize, TS)]
@@ -27,27 +39,25 @@ impl Command for ListElementsArgs {
         self,
         project: &RwLock<Project>,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
+        if self.common.asset.is_none() {
+            return Err(CommandError::InvalidArguments);
+        }
+
+        let context = Context {
+            department: self.common.department,
+            mode: if self.load {
+                ContextMode::Load
+            } else {
+                ContextMode::Export
+            },
+        };
+
         let project = project.read().unwrap();
-
-        let asset_name = match self.common.asset {
-            Some(asset) => asset,
-            None => {
-                warn!("No asset specified");
-                return Err(CommandError::InvalidArguments);
-            }
+        let mut result = ListElementsResult {
+            elements: project.get_elements(self.common.asset.unwrap(), &context),
         };
 
-        let _asset = match project.get_asset_by_name(asset_name.clone()) {
-            Some(asset) => asset,
-            None => {
-                warn!("Asset does not exist");
-                return Err(CommandError::InvalidArguments);
-            }
-        };
-
-        let result = ListElementsResult {
-            elements: project.get_elements_for_asset(asset_name, self.common.department),
-        };
+        result.elements.sort();
 
         Ok(Some(serde_json::to_value(result).unwrap()))
     }

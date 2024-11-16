@@ -1,8 +1,10 @@
 use std::collections::BTreeMap;
 
-use log::{debug, info};
+use log::{debug, info, warn};
 use serde::{Deserialize, Serialize};
 use serde_yaml::{Mapping, Value};
+
+use super::element::element_collection::ElementCollection;
 
 #[derive(Clone, Debug)]
 pub enum AssetEntry {
@@ -12,8 +14,7 @@ pub enum AssetEntry {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Asset {
-    #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
-    pub departments: BTreeMap<String, Vec<String>>,
+    pub departments: BTreeMap<String, ElementCollection>,
 }
 
 #[derive(Clone, Debug)]
@@ -47,6 +48,9 @@ pub fn parse_category_assets(value: &Vec<serde_yaml::Value>, key: String) -> Ass
         debug!("  Reading asset: {}", key);
 
         for entry in mapping.iter() {
+            warn!("Reading asset from yaml");
+
+            warn!("Entry: {:?}", entry);
             let asset = serde_yaml::from_value::<Asset>(entry.1.clone())
                 .expect("Unable to parse asset form yaml data");
 
@@ -78,7 +82,7 @@ pub fn parse_category(value: &serde_yaml::Mapping, key: String) -> AssetEntry {
 
         let data = entry.1;
 
-        println!("Parsign key: {}", key);
+        println!("Parsing key: {}", key);
 
         let mut entry = parse_entry(data, key.clone());
         match entry {
