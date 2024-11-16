@@ -1,7 +1,13 @@
-use crate::core::{commands::ExportArgs, project};
+use crate::core::{
+    commands::ExportArgs,
+    context::Context,
+    element::{self, element_resolver::ElementResolver},
+    project,
+    version_control::common::resolve_element_path,
+};
 
 use super::{ExportError, ExportResult, VersionControl};
-use log::{info, warn};
+use log::{error, info, warn};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -17,33 +23,20 @@ impl VersionControl for VersionControlConfigDirect {
 
         let asset_name = args.common.asset.clone().unwrap();
         let dept = args.common.department.clone().unwrap();
-        let element = args.common.element.clone().unwrap();
+        let element_name = args.common.element.clone().unwrap();
 
-        let asset = project.get_asset_by_name(asset_name.clone());
-
-        let (_asset, path) = match &asset {
-            Some(asset) => asset,
-            None => {
-                warn!("Could not find asset entry!");
-                return Err(ExportError::NotImplemented);
+        let (path, file_name) = match resolve_element_path(project, dept, asset_name, element_name)
+        {
+            Ok(val) => val,
+            Err(err) => {
+                error!("Failed to resolve path");
+                return Err(err);
             }
         };
 
-        info!("Found asset at path: {}", path);
-
         let mut dir = project.get_root_directory();
-        dir.push("export");
-        dir.push("asset");
+        dir.push(path);
 
-        for part in path.split("/").into_iter() {
-            dir.push(part);
-        }
-
-        dir.push(&asset_name);
-        dir.push(&dept);
-        dir.push(&element);
-
-        let file_name = format!("{}_{}_{}", asset_name, dept, element);
         info!("Exporting to: {}", dir.to_str().unwrap());
         info!("Recommended file name: {}", file_name);
 

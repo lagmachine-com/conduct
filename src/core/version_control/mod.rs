@@ -1,3 +1,4 @@
+mod common;
 mod direct;
 mod symlink;
 mod versioned_directories;

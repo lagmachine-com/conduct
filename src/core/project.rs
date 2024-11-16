@@ -2,6 +2,7 @@ use std::collections::{BTreeMap, HashSet};
 use std::path::PathBuf;
 
 use log::{debug, info, warn};
+use path_absolutize::Absolutize;
 use serde_yaml::Mapping;
 
 use crate::core::{asset, format};
@@ -55,6 +56,27 @@ impl Project {
         path.pop();
 
         return path;
+    }
+
+    pub fn path_absolutize(&self, path: PathBuf) -> PathBuf {
+        let mut path = path;
+        if path.is_relative() {
+            let mut root = self.get_root_directory();
+            root.push(path);
+
+            path = root
+        };
+
+        path = path.absolutize().unwrap().to_path_buf();
+
+        path
+    }
+
+    pub fn path_absolutize_string(&self, path: String) -> PathBuf {
+        let path = path.replace("\\", "/");
+        let path = path.replace("/", std::path::MAIN_SEPARATOR_STR);
+
+        self.path_absolutize(PathBuf::from(path))
     }
 
     pub fn get_backing_file(&self) -> PathBuf {

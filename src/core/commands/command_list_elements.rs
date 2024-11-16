@@ -54,7 +54,12 @@ impl Command for ListElementsArgs {
 
         let project = project.read().unwrap();
         let mut result = ListElementsResult {
-            elements: project.get_elements(self.common.asset.unwrap(), &context),
+            elements: project
+                .get_elements(self.common.asset.unwrap(), &context)
+                .keys()
+                .into_iter()
+                .map(|f| f.to_string())
+                .collect(),
         };
 
         result.elements.sort();

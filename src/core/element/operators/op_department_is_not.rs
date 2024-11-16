@@ -3,8 +3,10 @@ use serde::{Deserialize, Serialize};
 use crate::core::{
     context::Context,
     element::{
-        element::Element,
         element_or_collection::{ElementOrCollection, GetElements},
+        element_resolver::ResolvedElement,
+        resolved_element_data::ResolvedElementData,
+        util::ResolveListWithContext,
     },
 };
 
@@ -19,8 +21,12 @@ pub struct ElementOpDepartmentIsNot {
 }
 
 impl ElementOperation for ElementOpDepartmentIsNot {
-    fn get_elements(&self, context: &Context) -> Vec<Element> {
-        match context.mode {
+    fn get_elements(
+        &self,
+        context: &Context,
+        element_data: ResolvedElementData,
+    ) -> Vec<ResolvedElement> {
+        let result = match context.mode {
             crate::core::context::ContextMode::Export => self.elements.get_elements(),
             crate::core::context::ContextMode::Load => match &context.department {
                 Some(dept) => {
@@ -32,6 +38,8 @@ impl ElementOperation for ElementOpDepartmentIsNot {
                 }
                 None => self.elements.get_elements(),
             },
-        }
+        };
+
+        result.with_context(element_data.clone())
     }
 }

@@ -15,7 +15,7 @@ use crate::core::{
 use super::ElementOperation;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ElementOpDepends {
+pub struct ElementOpSceneLocal {
     #[serde(flatten)]
     args: BTreeMap<String, serde_yaml::Value>,
 
@@ -23,22 +23,14 @@ pub struct ElementOpDepends {
     elements: Box<ElementOrCollection>,
 }
 
-impl ElementOperation for ElementOpDepends {
+impl ElementOperation for ElementOpSceneLocal {
     fn get_elements(
         &self,
         _context: &Context,
         element_data: ResolvedElementData,
     ) -> Vec<ResolvedElement> {
         let mut element_data = element_data.clone();
-
-        for (_idx, asset) in self.args.iter() {
-            match asset {
-                serde_yaml::Value::String(name) => {
-                    element_data.add_dependency(name);
-                }
-                _ => (),
-            }
-        }
+        element_data.set_scene_local(true);
 
         return self
             .elements

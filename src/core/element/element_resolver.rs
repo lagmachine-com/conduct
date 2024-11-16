@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use log::{info, warn};
 
 use crate::core::{
@@ -6,15 +8,49 @@ use crate::core::{
     project::Project,
 };
 
-use super::{element::Element, operators::ElementOperation};
+use super::{
+    element::Element, operators::ElementOperation, resolved_element_data::ResolvedElementData,
+    util::ResolveListWithContext,
+};
 
 pub trait ElementResolver {
-    fn get_elements(&self, asset_name: String, context: &Context) -> Vec<String>;
+    fn get_elements(
+        &self,
+        asset_name: String,
+        context: &Context,
+    ) -> BTreeMap<String, ResolvedElementData>;
+
+    fn get_element(
+        &self,
+        asset_name: String,
+        element_name: String,
+        context: &Context,
+    ) -> Option<ResolvedElementData>;
+}
+
+pub struct ResolvedElement {
+    pub element: Element,
+    pub context: ResolvedElementData,
 }
 
 impl ElementResolver for Project {
+    fn get_element(
+        &self,
+        asset_name: String,
+        element_name: String,
+        context: &Context,
+    ) -> Option<ResolvedElementData> {
+        let result = self.get_elements(asset_name, context);
+
+        return result.get(&element_name).cloned();
+    }
+
     // Resolve the list of elements for a given asset
-    fn get_elements(&self, asset_name: String, context: &Context) -> Vec<String> {
+    fn get_elements(
+        &self,
+        asset_name: String,
+        context: &Context,
+    ) -> BTreeMap<String, ResolvedElementData> {
         let asset = self.get_asset_by_name(asset_name.clone());
 
         info!("Getting assets with context: {:#?}", context);
@@ -27,21 +63,31 @@ impl ElementResolver for Project {
             }
         };
 
-        let mut result = Vec::new();
+        let mut result = BTreeMap::<String, ResolvedElementData>::new();
 
-        add_elements_from_asset(&mut result, asset, context);
-        add_elements_from_category_template(&mut result, &category_path, self, context);
-        add_elements_from_department_default(&mut result, self, asset, context);
+        let mut element_data = ResolvedElementData::new();
+        element_data.set_asset(&asset_name);
+
+        add_elements_from_asset(&mut result, asset, context, element_data.clone());
+        add_elements_from_category_template(
+            &mut result,
+            &category_path,
+            self,
+            context,
+            element_data.clone(),
+        );
+        add_elements_from_department_default(&mut result, self, asset, context, element_data);
 
         result
     }
 }
 
 fn add_elements_from_department_default(
-    list: &mut Vec<String>,
+    result: &mut BTreeMap<String, ResolvedElementData>,
     project: &Project,
     asset: &Asset,
     context: &Context,
+    element_data: ResolvedElementData,
 ) {
     info!("Adding elements from default departments");
     match context.mode {
@@ -49,7 +95,12 @@ fn add_elements_from_department_default(
             for (dept, _elements) in asset.departments.iter() {
                 match project.get_department(dept) {
                     Some(dept) => {
-                        add_elements(list, &dept.default_elements, context);
+                        add_elements_with_context(
+                            result,
+                            &dept.default_elements,
+                            context,
+                            element_data.clone(),
+                        );
                     }
                     None => (),
                 }
@@ -71,7 +122,12 @@ fn add_elements_from_department_default(
                 let dept = project.get_department(&department_name);
 
                 match dept {
-                    Some(dept) => add_elements(list, &dept.default_elements, context),
+                    Some(dept) => add_elements_with_context(
+                        result,
+                        &dept.default_elements,
+                        context,
+                        element_data.clone(),
+                    ),
                     None => (),
                 }
             }
@@ -80,23 +136,29 @@ fn add_elements_from_department_default(
 }
 
 fn add_elements_from_category_template(
-    list: &mut Vec<String>,
+    result: &mut BTreeMap<String, ResolvedElementData>,
     category_path: &String,
     project: &Project,
     context: &Context,
+    element_data: ResolvedElementData,
 ) {
     info!("Adding elements from category template");
     let category = project.get_category_by_path(category_path.clone());
     match category {
         Some(category) => match &category.template {
-            Some(asset) => add_elements_from_asset(list, &asset, context),
+            Some(asset) => add_elements_from_asset(result, &asset, context, element_data),
             None => (),
         },
         None => (),
     }
 }
 
-fn add_elements_from_asset(list: &mut Vec<String>, asset: &Asset, context: &Context) {
+fn add_elements_from_asset(
+    result: &mut BTreeMap<String, ResolvedElementData>,
+    asset: &Asset,
+    context: &Context,
+    element_data: ResolvedElementData,
+) {
     info!("Adding elements from asset");
     for (name, elements) in asset.departments.iter() {
         match context.mode {
@@ -109,20 +171,38 @@ fn add_elements_from_asset(list: &mut Vec<String>, asset: &Asset, context: &Cont
             _ => (),
         };
 
-        add_elements(list, &elements.elements, context);
+        add_elements_with_context(result, &elements.elements, context, element_data.clone());
     }
 }
 
-fn add_elements(list: &mut Vec<String>, elements: &Vec<Element>, context: &Context) {
+fn add_elements_with_context(
+    result: &mut BTreeMap<String, ResolvedElementData>,
+    elements: &Vec<Element>,
+    context: &Context,
+    element_data: ResolvedElementData,
+) {
+    let data = elements.with_context(element_data);
+    add_elements(result, &data, context);
+}
+
+fn add_elements(
+    result: &mut BTreeMap<String, ResolvedElementData>,
+    elements: &Vec<ResolvedElement>,
+    context: &Context,
+) {
     for element in elements.iter() {
-        match element {
+        match &element.element {
             Element::Value(name) => {
                 info!(" - got element: {}", name);
-                list.push(name.clone());
+                result.insert(name.clone(), element.context.clone());
             }
             Element::Operator(element_operator) => {
-                let elements = ElementOperation::get_elements(element_operator, context);
-                add_elements(list, &elements, context);
+                let elements = ElementOperation::get_elements(
+                    element_operator,
+                    context,
+                    element.context.clone(),
+                );
+                add_elements(result, &elements, context);
             }
         }
     }
