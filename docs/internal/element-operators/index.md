@@ -35,9 +35,9 @@ assets:
           model:
             - mesh
           rigging:
-            - !department_is anim: rig
+            - !department_is(anim) rig
           anim:
-            - !department_is_not anim: anim_cache
+            - !department_is_not(anim) anim_cache
 ```
 
 {: .note }

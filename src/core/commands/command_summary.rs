@@ -50,6 +50,16 @@ impl Command for SummaryArgs {
                 .collect(),
         };
 
+        for asset in project.get_assets_flattened().iter() {
+            info!("Listing asset {} elements: ", asset.0);
+
+            for dept in asset.1.departments.iter() {
+                for element in dept.1.elements.iter() {
+                    info!("{} - {:?}", dept.0, element)
+                }
+            }
+        }
+
         result.assets_flat.sort();
         result.departments.sort();
 

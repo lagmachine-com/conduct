@@ -28,5 +28,5 @@ url = "2.5.2"
 wry = { version = "0.46.3", features = ["linux-body"] }
 
 [dev-dependencies]
-similar = "2.6.0"
 colored = "2.1.0"
+similar = "2.6.0"

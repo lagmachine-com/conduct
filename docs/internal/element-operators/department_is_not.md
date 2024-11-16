@@ -16,7 +16,7 @@ assets:
     - suzanneA: 
         departments:
           rigging:
-            - !department_is_not anim: anim_cache
+            - !department_is_not(anim) anim_cache
 ```
 
 The `department_is_not` operator will only return it's element if the current department does not match it's key, which in this case is `anim`.
@@ -31,7 +31,7 @@ assets:
     - suzanneA: 
         departments:
           rigging:
-            - !department_is_not anim: 
+            - !department_is_not(anim) 
               - anim_cache
               - anim_cacheB
               - anim_cacheC

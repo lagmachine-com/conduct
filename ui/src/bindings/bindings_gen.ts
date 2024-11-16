@@ -2,8 +2,6 @@
 
 export type ListAssetsResult = { assets: Array<string>, };
 
-export type ListElementsResult = { elements: Array<string>, };
-
 export type ListExportFormatsResult = { formats: Array<string>, };
 
 export type SetupResult = { asset: string, department: string, path: string, file_name: string, };

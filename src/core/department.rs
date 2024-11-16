@@ -16,6 +16,7 @@ pub struct DepartmentProgramEntry {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Department {
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub default_elements: Vec<String>,
     #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
     pub programs: BTreeMap<String, DepartmentProgramEntry>,

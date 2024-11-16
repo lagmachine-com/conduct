@@ -2,9 +2,7 @@ mod command_create;
 mod command_dialog;
 mod command_export;
 mod command_list_assets;
-mod command_list_elements;
 mod command_list_export_formats;
-mod command_load;
 mod command_setup;
 mod command_summary;
 
@@ -26,9 +24,7 @@ pub use command_dialog::DialogOptions;
 pub use command_export::ExportArgs;
 
 use command_list_assets::ListAssetsArgs;
-use command_list_elements::ListElementsArgs;
 use command_list_export_formats::ListExportFormatsArgs;
-pub use command_load::LoadArgs;
 use command_setup::SetupArgs;
 use command_summary::SummaryArgs;
 use log::{info, warn};
@@ -67,14 +63,8 @@ pub enum CommandType {
     /// Get a list of all assets, optionally filtered by department
     ListAssets(ListAssetsArgs),
 
-    /// Lists all available elements for a given asset, optionally filtered by department
-    ListElements(ListElementsArgs),
-
     /// Lists all available export file formats for a given program and department
     ListExportFormats(ListExportFormatsArgs),
-
-    /// Resolves which elements to load for an asset given a current context
-    Load(LoadArgs),
 }
 
 pub fn write_command_result(result: serde_json::Value) {

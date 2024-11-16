@@ -16,7 +16,7 @@ assets:
     - suzanneA: 
         departments:
           rigging:
-            - !department_is anim: rig
+            - !department_is(anim) rig
 ```
 
 The `department_is` operator will only return it's element if the current department matches it's key, which in this case is `anim`.
@@ -30,7 +30,7 @@ assets:
     - suzanneA: 
         departments:
           rigging:
-            - !department_is anim: 
+            - !department_is(anim) 
               - rig
               - rigB
               - rigC
