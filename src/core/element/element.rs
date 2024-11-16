@@ -1,3 +1,4 @@
+use enum_dispatch::enum_dispatch;
 use log::warn;
 use serde::{Deserialize, Serialize};
 use serde_yaml::{
@@ -5,14 +6,7 @@ use serde_yaml::{
     Mapping, Value,
 };
 
-use super::operators::{op_department_is::ElementOpIsDepartment, op_depends::ElementOpDepends};
-
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "snake_case")]
-pub enum ElementOperator {
-    DepartmentIs(ElementOpIsDepartment),
-    Depends(ElementOpDepends),
-}
+use super::operators::ElementOperator;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(untagged)]

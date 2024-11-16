@@ -39,6 +39,11 @@ impl Project {
         std::fs::write(&self.manifest_file, str).unwrap();
     }
 
+    pub fn get_department(&self, name: &String) -> Option<&Department> {
+        let dept = self.departments.get(name);
+        return dept;
+    }
+
     pub fn get_assets_flattened(&self) -> BTreeMap<String, &Asset> {
         let mut result = BTreeMap::new();
         insert_assets_to_map(&self.assets, "".to_string(), &mut result, false);

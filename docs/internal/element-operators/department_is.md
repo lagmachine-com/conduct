@@ -7,6 +7,9 @@ nav_order: 1
 
 # Department Is (Element Operator)
 
+{: .note }
+> The `department_is` filter only filters elements during asset *load*
+
 ## Example Configuration
 
 ```yaml
@@ -35,3 +38,4 @@ assets:
               - rigB
               - rigC
 ```
+

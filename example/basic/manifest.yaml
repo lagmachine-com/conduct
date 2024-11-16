@@ -17,6 +17,9 @@ departments:
       blender:
         exports:
         - .animbake.abc
+  light:
+    default_elements:
+    - default_light_rig
   lookdev:
     programs:
       blender:
@@ -40,12 +43,16 @@ assets:
           - !depends(defaultCubeA)
             - !department_is(light) instancer
     prop:
+    - $template:
+        departments:
+          light:
+          - prop_light_rig
     - defaultCubeA:
         departments:
+          light:
+          - light_rig
           model:
           - mesh
-          rigging:
-          - !department_is(model) rig
 
 version_control:
   type: symlink

@@ -7,6 +7,9 @@ nav_order: 2
 
 # Department Is Not (Element Operator)
 
+{: .note }
+> The `department_is_not` filter only filters elements during asset *load*
+
 ## Example Configuration
 
 ```yaml

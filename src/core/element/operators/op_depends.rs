@@ -2,7 +2,15 @@ use std::collections::BTreeMap;
 
 use serde::{Deserialize, Serialize};
 
-use crate::core::element::element_or_collection::ElementOrCollection;
+use crate::core::{
+    context::Context,
+    element::{
+        element::Element,
+        element_or_collection::{ElementOrCollection, GetElements},
+    },
+};
+
+use super::ElementOperation;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ElementOpDepends {
@@ -11,4 +19,10 @@ pub struct ElementOpDepends {
 
     #[serde(rename = "value")]
     elements: Box<ElementOrCollection>,
+}
+
+impl ElementOperation for ElementOpDepends {
+    fn get_elements(&self, _context: &Context) -> Vec<Element> {
+        return self.elements.get_elements();
+    }
 }
