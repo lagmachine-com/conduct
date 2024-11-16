@@ -1,5 +1,5 @@
 ---
-title: depends
+title: depend
 layout: default
 parent: Element Operators
 nav_order: 3
