@@ -1,18 +1,13 @@
-use std::{
-    path::{self, PathBuf},
-    result,
-};
+use std::path::PathBuf;
 
 use crate::core::{
     commands::ExportArgs,
-    context::Context,
-    element::{self, element_resolver::ElementResolver},
     project,
     version_control::{common::resolve_element_path, versioned_directories::get_next_version},
 };
 
 use super::{ExportError, ExportResult, VersionControl};
-use log::{error, info, warn};
+use log::{error, info};
 use path_absolutize::Absolutize;
 use serde::{Deserialize, Serialize};
 

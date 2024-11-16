@@ -1,6 +1,3 @@
-use clap::builder::Str;
-use log::warn;
-
 #[derive(Clone, Debug)]
 pub struct ResolvedElementData {
     scene_local: bool,

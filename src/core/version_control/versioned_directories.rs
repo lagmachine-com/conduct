@@ -1,9 +1,8 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use crate::core::{commands::ExportArgs, project, version_control::common::resolve_element_path};
 
 use super::{ExportError, ExportResult, VersionControl};
-use clap::error;
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 

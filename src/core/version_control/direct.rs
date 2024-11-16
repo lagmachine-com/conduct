@@ -1,13 +1,7 @@
-use crate::core::{
-    commands::ExportArgs,
-    context::Context,
-    element::{self, element_resolver::ElementResolver},
-    project,
-    version_control::common::resolve_element_path,
-};
+use crate::core::{commands::ExportArgs, project, version_control::common::resolve_element_path};
 
 use super::{ExportError, ExportResult, VersionControl};
-use log::{error, info, warn};
+use log::{error, info};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -7,9 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::context::Context;
 
-use super::{
-    element::Element, element_resolver::ResolvedElement, resolved_element_data::ResolvedElementData,
-};
+use super::{element_resolver::ResolvedElement, resolved_element_data::ResolvedElementData};
 
 pub mod op_department_is;
 pub mod op_department_is_not;
