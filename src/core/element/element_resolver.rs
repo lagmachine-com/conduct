@@ -3,7 +3,6 @@ use log::{info, warn};
 use crate::core::{
     asset::Asset,
     context::{Context, ContextMode},
-    department::DepartmentFinder,
     project::Project,
 };
 
