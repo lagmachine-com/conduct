@@ -46,3 +46,26 @@ assets:
 Here we are using the [department_is](./department_is) and [department_is_not](./department_is_not) element operators, which will filter their element based on the current department.
 
 Loading this config from the `anim` department will result in elements `mesh` and `rig`, wheras any other department will receive `mesh` and `anim_cache`
+
+
+### Nested Operators
+
+Element operators can also be nested to apply multiple operations to a single element:
+
+```yaml
+assets:
+  3d:
+    environment:
+    - cubeWorld:
+        departments:
+          layout:
+          - !department_is(light)
+            - !depend(defaultCubeA) cube_instancer
+    prop:
+    - defaultCubeA:
+        departments:
+          model:
+          - mesh
+```
+
+Here, we are creating an element `cube_instancer` which has a dependency on asset `defaultCubeA`. However, due to the `department_is` operator, this instancer will only be loaded by the `light` department.

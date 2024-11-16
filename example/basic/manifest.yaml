@@ -37,7 +37,8 @@ assets:
     - cubeInstancer:
         departments:
           layout:
-          - !depends(defaultCubeA) instancer
+          - !depends(defaultCubeA)
+            - !department_is(light) instancer
     prop:
     - defaultCubeA:
         departments:

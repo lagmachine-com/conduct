@@ -20,7 +20,7 @@ assets:
     - suzanneInstancer: 
         departments:
           layout: 
-            - !depend(suzanneA): instancer
+            - !depend(suzanneA) instancer
 ```
 
 The `depend` operator allows you to define a dependency from one asset to another, where the key is the element name, and the values are the asset's it depends on. This dependency will ensure that the `suzanneA` asset is loaded before `suzanneInstancer`.
@@ -42,5 +42,5 @@ assets:
     - suzanneInstancer: 
         departments:
           layout: 
-            - !depend(suzanneA;suzanneB): instancer
+            - !depend(suzanneA;suzanneB) instancer
 ```
