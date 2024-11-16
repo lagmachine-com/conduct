@@ -53,6 +53,7 @@ assets:
           - light_rig
           model:
           - mesh
+          - !department_is_not(light) lod
 
 version_control:
   type: symlink

@@ -1,5 +1,6 @@
 use enum_dispatch::enum_dispatch;
 use op_department_is::ElementOpDepartmentIs;
+use op_department_is_not::ElementOpDepartmentIsNot;
 use op_depends::ElementOpDepends;
 use serde::{Deserialize, Serialize};
 
@@ -21,5 +22,6 @@ pub trait ElementOperation {
 #[enum_dispatch(ElementOperation)]
 pub enum ElementOperator {
     DepartmentIs(ElementOpDepartmentIs),
+    DepartmentIsNot(ElementOpDepartmentIsNot),
     Depends(ElementOpDepends),
 }
