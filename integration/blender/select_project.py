@@ -33,6 +33,9 @@ class OT_SelectProject(Operator, ImportHelper):
 
         data.asset = dialog_data['asset']
         data.department = dialog_data['department']
+        
+        if dialog_data['shot'] is not None:
+            data.shot = dialog_data['shot']
 
         path = os.path.join(dialog_data['path'], dialog_data['file_name'] + ".blend")
         bpy.ops.wm.save_as_mainfile(filepath=path)

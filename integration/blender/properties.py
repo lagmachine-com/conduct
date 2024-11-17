@@ -146,6 +146,7 @@ class ExportDefinition(bpy.types.PropertyGroup):
 class ConductProperties(bpy.types.PropertyGroup):
     department: bpy.props.StringProperty(name="Department")
     asset: bpy.props.StringProperty(name="Asset")
+    shot: bpy.props.StringProperty(name="Shot")
 
     exports: bpy.props.CollectionProperty(type = ExportDefinition)
     export_index: bpy.props.IntProperty()

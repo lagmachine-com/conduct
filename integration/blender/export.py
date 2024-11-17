@@ -65,7 +65,7 @@ class OT_RunSelectedExport(Operator):
         items = [c.value for c in export.items]
 
         conduct = utils.get_conduct_object()
-        result = conduct.export(data.department, export.format, data.asset, name)
+        result = conduct.export(data.department, export.format, data.asset, name, data.shot)
 
         locals = {}
         globals = {}

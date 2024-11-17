@@ -45,8 +45,12 @@ class Conduct:
     def list_export_formats(self, department):
         return self.run_process(["list-export-formats", "--from", self.current_program, "--department", department])
     
-    def export(self, department, format, asset, element):
+    def export(self, department, format, asset, element, shot=None):
         args = ["export", "--department", department, "--file-format", format, "--from", self.current_program, "--asset", asset, "--element", element]
+        if shot != None and shot != "":
+            args.append("--shot")
+            args.append(shot)
+
         return self.run_process(args)
 
 def get_from_manifest_path(manifest_path, current_program):

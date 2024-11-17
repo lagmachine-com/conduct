@@ -6,7 +6,7 @@ programs:
     exports:
       .mesh.blend: export_blend_library.py
       .shadergraph.blend: export_blend_library.py
-      .animbake.abc: export_blend_library.py
+      .animbake.abc: export_alembic.py
     imports:
       .animbake.abc: import_animbake_alembic.py
       .glb: import_glb_mesh.py
@@ -37,26 +37,15 @@ departments:
 
 assets:
   3d:
-    layout:
-    - cubeInstancer:
-        departments:
-          layout:
-          - !depends(defaultCubeA)
-            - !department_is(light) instancer
-    prop:
+    character:
     - $template:
         departments:
-          light:
-          - prop_light_rig
-    - defaultCubeA:
+          model:
+          - mesh
+    - suzanneA:
         departments:
           anim:
           - !shot_local anim_cache
-          light:
-          - light_rig
-          model:
-          - mesh
-          - !department_is_not(light) lod
 
 shots:
   '103':
@@ -77,4 +66,4 @@ shots:
     - '0040'
 
 version_control:
-  type: direct
+  type: versioned_directories

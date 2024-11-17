@@ -37,6 +37,9 @@ class ProjectBrowser(bpy.types.Panel):
         if data.asset != "":
             layout.label(text="Asset: " + data.asset)
 
+        if data.shot != "":
+            layout.label(text="Shot: " + data.shot)
+
 def register():
     bpy.utils.register_class(TaskItemSlot)
     
