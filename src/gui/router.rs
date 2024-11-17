@@ -5,6 +5,7 @@ use std::{
 
 use log::{info, warn};
 use matchit::{Params, Router};
+use serde_json::json;
 use wry::{
     http::{response::Builder, Request, Response},
     RequestAsyncResponder,
@@ -123,10 +124,13 @@ fn handle_api(
                             .unwrap(),
                     },
                     ApiResult::Error(msg) => {
+                        let result = json!({"error": serde_json::Value::String(msg.clone())});
                         warn!("Api Error: {}", msg);
                         response_builder
                             .status(400)
-                            .body(Cow::Owned(msg.into()))
+                            .body(Cow::Owned::<[u8]>(
+                                serde_json::to_string(&result).unwrap().into(),
+                            ))
                             .unwrap()
                     }
                     ApiResult::OkExit => {

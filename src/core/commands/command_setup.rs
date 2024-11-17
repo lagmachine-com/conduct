@@ -1,9 +1,10 @@
 use std::sync::RwLock;
 
 use clap::{command, Args};
+use log::warn;
 use ts_rs::TS;
 
-use crate::core::project::Project;
+use crate::core::{project::Project, shot::shot_resolver::ShotResolver};
 use serde::{Deserialize, Serialize};
 
 use super::{args::CommonArgs, error::CommandError, Command};
@@ -13,6 +14,9 @@ pub struct SetupArgs {
     #[command(flatten)]
     #[serde(flatten)]
     common: CommonArgs,
+
+    #[arg(short, long)]
+    pub dry: bool,
 }
 
 #[derive(Debug, Args, Serialize, Deserialize, TS)]
@@ -22,6 +26,7 @@ pub struct SetupResult {
     pub department: String,
     pub path: String,
     pub file_name: String,
+    pub shot: Option<String>,
 }
 
 impl Command for SetupArgs {
@@ -37,12 +42,78 @@ impl Command for SetupArgs {
         let asset = self.common.asset.clone().unwrap();
         let mut dir_path = project.read().unwrap().get_root_directory();
         dir_path.push("setup");
+
+        match &self.common.shot {
+            Some(shot) => {
+                if project.read().unwrap().shot_exists(shot) {
+                    dir_path.push("shot");
+                    for part in shot.split("/").into_iter() {
+                        dir_path.push(part);
+                    }
+                } else {
+                    warn!("Invalid shot: {}", shot);
+                    return Err(CommandError::InvalidArguments);
+                }
+            }
+            None => {
+                dir_path.push("asset");
+            }
+        }
+
+        let mut shot_code: Option<String> = None;
+
+        let file_name = match &self.common.shot {
+            Some(shot) => {
+                shot_code = project.read().unwrap().get_shot_formatted(shot);
+                format!(
+                    "{}_{}_{}",
+                    asset,
+                    department,
+                    shot_code.clone().unwrap().replace("/", "-")
+                )
+            }
+            None => format!("{}_{}", asset, department),
+        };
+
         dir_path.push(&department);
         dir_path.push(&asset);
 
-        _ = std::fs::create_dir_all(&dir_path);
+        if self.dry == false {
+            _ = std::fs::create_dir_all(&dir_path);
+        }
 
-        let file_name = format!("{}_{}", asset, department);
+        let files = std::fs::read_dir(&dir_path);
+
+        if self.dry {
+            match files {
+                Ok(files) => {
+                    for file in files.into_iter() {
+                        match file {
+                            Ok(file) => {
+                                let name = file
+                                    .path()
+                                    .file_stem()
+                                    .unwrap()
+                                    .to_str()
+                                    .unwrap()
+                                    .to_string();
+
+                                let file_name_with_ext =
+                                    file.file_name().to_str().unwrap().to_string();
+
+                                if name == file_name {
+                                    return Err(CommandError::Message(format!(
+                                    "File {file_name_with_ext} already exists! Continuing may overwrite this file and result in a loss of work"
+                                )));
+                                }
+                            }
+                            Err(_) => (),
+                        }
+                    }
+                }
+                Err(_) => (),
+            }
+        }
 
         Ok(Some(
             serde_json::to_value(SetupResult {
@@ -50,6 +121,7 @@ impl Command for SetupArgs {
                 department: self.common.department.unwrap(),
                 path: dir_path.to_str().unwrap().to_string(),
                 file_name: file_name,
+                shot: shot_code,
             })
             .unwrap(),
         ))

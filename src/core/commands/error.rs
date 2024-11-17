@@ -8,6 +8,7 @@ pub enum CommandError {
     InvalidArguments,
     Unknown,
     ScriptNotFound,
+    Message(String),
 }
 
 impl Error for CommandError {}
@@ -20,6 +21,7 @@ impl fmt::Display for CommandError {
             CommandError::ScriptNotFound => {
                 write!(f, "Script file not found, or could not be read")
             }
+            CommandError::Message(msg) => write!(f, "{}", msg),
         }
     }
 }

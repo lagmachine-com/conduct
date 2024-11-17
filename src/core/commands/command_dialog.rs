@@ -30,7 +30,7 @@ impl Command for DialogArgs {
                 path: "/dialogs/".to_string() + self.kind.as_str(),
                 title: "Conduct Dialogue".to_string(),
                 width: 600.0,
-                height: 300.0,
+                height: 350.0,
             }),
         );
 

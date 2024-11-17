@@ -1,4 +1,4 @@
-use log::debug;
+use log::{debug, error};
 use matchit::Params;
 use serde_json::json;
 use url::Url;
@@ -46,10 +46,18 @@ fn do_command(
 
     for pair in url.query_pairs().into_iter() {
         let obj = value.as_object_mut().unwrap();
-        match obj.insert(
-            pair.0.to_string(),
-            serde_json::Value::String(pair.1.to_string()),
-        ) {
+
+        let mut value = serde_json::Value::String(pair.1.to_string());
+
+        if pair.1 == "true" {
+            value = serde_json::Value::Bool(true)
+        }
+
+        if pair.1 == "false" {
+            value = serde_json::Value::Bool(false)
+        }
+
+        match obj.insert(pair.0.to_string(), value) {
             Some(_) => return Some(ApiResult::Error("Conflicting arguments".to_string())),
             None => (),
         }
@@ -66,8 +74,9 @@ fn do_command(
                 Err(err) => Some(ApiResult::Error(err.to_string())),
             }
         }
-        Err(_) => {
+        Err(err) => {
             debug!("Missing command type: {}", id);
+            error!("{:?}", err);
             Some(ApiResult::Error("Unknown command".to_string()))
         }
     }

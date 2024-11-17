@@ -333,7 +333,6 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
     info!(" --- Reading shots ---");
     let shot_data = map.get("shots");
 
-    println!("{:#?}", shot_data);
     let shots: ShotEntry = match shot_data {
         Some(scenes_data) => serde_yaml::from_value::<ShotEntry>(scenes_data.clone())
             .expect("Failed to parse scene data"),

@@ -82,8 +82,6 @@ pub fn parse_category(value: &serde_yaml::Mapping, key: String) -> AssetEntry {
 
         let data = entry.1;
 
-        println!("Parsing key: {}", key);
-
         let mut entry = parse_entry(data, key.clone());
         match entry {
             AssetEntry::Category(asset_category) => {

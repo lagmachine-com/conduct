@@ -1,4 +1,4 @@
-import { ListAssetsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
+import { ListAssetsResult, ListShotsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
 
 
 declare global {
@@ -10,7 +10,18 @@ declare global {
     }
 }
 
-export function get(path: string, args: Record<string, string | null> | null = null) {
+export interface ErrorResponse { error: string };
+
+export function isError(object: any): object is ErrorResponse {
+
+    if (object == undefined) {
+        return false;
+    }
+
+    return object.hasOwnProperty("error")
+}
+
+export function get(path: string, args: Record<string, any> | null = null) {
     if (args != null) {
         let args_clean = Object.fromEntries(Object.entries(args).filter(([_, v]) => v != null)) as Record<string, string>;
         let params = new URLSearchParams(args_clean).toString()
@@ -61,10 +72,18 @@ export async function listAssets(department_filter: null | string = null): Promi
     return await result.json() as ListAssetsResult
 }
 
-export async function create_setup(department: string, asset: string): Promise<SetupResult> {
+export async function create_setup(department: string, asset: string, shot: null | string = null, dry_run: boolean = false): Promise<SetupResult | ErrorResponse> {
     let result = await get("api/v1/command/setup", {
         "department": department,
-        "asset": asset
+        "asset": asset,
+        "shot": shot,
+        "dry": dry_run,
     })
-    return await result.json() as SetupResult
+    return await result.json() as SetupResult | ErrorResponse
+}
+
+
+export async function listShots(): Promise<ListShotsResult> {
+    let result = await get("api/v1/command/list_shots")
+    return await result.json() as ListShotsResult
 }

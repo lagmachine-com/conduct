@@ -1,9 +1,13 @@
+use std::ops::Index;
+
 use crate::core::project::Project;
 
 use super::ShotEntry;
 
 pub trait ShotResolver {
     fn get_shots(&self) -> Vec<String>;
+
+    fn get_shot_formatted(&self, shot: &String) -> Option<String>;
 
     fn shot_exists(&self, shot: &String) -> bool;
 }
@@ -19,7 +23,21 @@ impl ShotResolver for Project {
 
     fn shot_exists(&self, shot: &String) -> bool {
         let shots: Vec<String> = self.get_shots().iter().map(|s| s.to_lowercase()).collect();
-        return shots.contains(&shot);
+        return shots.contains(&shot.to_lowercase());
+    }
+
+    fn get_shot_formatted(&self, shot: &String) -> Option<String> {
+        let shots = self.get_shots();
+        let index = shots
+            .iter()
+            .position(|s| s.to_lowercase() == shot.to_lowercase());
+
+        let formatted: Option<String> = match index {
+            Some(i) => Some(shots.index(i).clone()),
+            None => None,
+        };
+
+        formatted
     }
 }
 fn add_shot(list: &mut Vec<String>, entry: &ShotEntry, current_path: String) {
