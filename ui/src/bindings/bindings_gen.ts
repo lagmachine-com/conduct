@@ -6,6 +6,8 @@ export type ListElementsResult = { elements: Array<string>, };
 
 export type ListExportFormatsResult = { formats: Array<string>, };
 
+export type ListShotsResult = { shots: Array<string>, };
+
 export type SetupResult = { asset: string, department: string, path: string, file_name: string, };
 
 export type SummaryResponse = { display_name: string, identifier: string, assets_flat: Array<string>, departments: Array<string>, };

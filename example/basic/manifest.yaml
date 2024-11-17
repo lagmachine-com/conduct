@@ -49,32 +49,31 @@ assets:
           - prop_light_rig
     - defaultCubeA:
         departments:
+          anim:
+          - !scene_local anim_cache
           light:
           - light_rig
           model:
           - mesh
           - !department_is_not(light) lod
-          anim:
-          - !scene_local anim_cache
 
 shots:
-  "103": 
+  '103':
     DE:
-      - "0010"
-      - "0020"
-      - "0030"
-  "104":
-    TCC:
-      - "0010"
-      - "0020"
-      - "0030"
-      - "0040"
+    - '0010'
+    - '0020'
+    - '0030'
+  '104':
     GK:
-      - "0010"
-      - "0020"
-      - "0030"
-      - "0040"
-
+    - '0010'
+    - '0020'
+    - '0030'
+    - '0040'
+    TCC:
+    - '0010'
+    - '0020'
+    - '0030'
+    - '0040'
 
 version_control:
   type: versioned_directories

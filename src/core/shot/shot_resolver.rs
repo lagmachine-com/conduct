@@ -10,15 +10,15 @@ impl ShotResolver for Project {
     fn get_shots(&self) -> Vec<String> {
         let mut result = Vec::new();
 
-        add_shot(&mut result, &self.scenes, "".to_string());
+        add_shot(&mut result, &self.shots, "".to_string());
 
         result
     }
 }
 fn add_shot(list: &mut Vec<String>, entry: &ShotEntry, current_path: String) {
     match entry {
-        ShotEntry::Subcategory(btree_map) => {
-            for (key, value) in btree_map.iter() {
+        ShotEntry::Subcategory(category) => {
+            for (key, value) in category.iter() {
                 let path = if current_path.is_empty() {
                     key.to_string()
                 } else {
@@ -28,7 +28,7 @@ fn add_shot(list: &mut Vec<String>, entry: &ShotEntry, current_path: String) {
                 add_shot(list, value, path);
             }
         }
-        ShotEntry::Scenes(vec) => {
+        ShotEntry::ShotList(vec) => {
             for entry in vec.iter() {
                 let path = if current_path.is_empty() {
                     entry.to_string()

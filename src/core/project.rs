@@ -1,6 +1,7 @@
 use std::collections::{BTreeMap, HashSet};
 use std::path::PathBuf;
 
+use indexmap::IndexMap;
 use log::{debug, info, warn};
 use path_absolutize::Absolutize;
 use serde_yaml::Mapping;
@@ -22,7 +23,7 @@ pub struct Project {
     pub departments: BTreeMap<String, Department>,
     pub assets: AssetCategory,
     pub version_control: VersionControlConfig,
-    pub scenes: ShotEntry,
+    pub shots: ShotEntry,
 }
 
 impl Project {
@@ -260,6 +261,11 @@ pub fn to_yaml(project: &Project) -> serde_yaml::Value {
     mapping.insert("assets".into(), asset::to_yaml(&project.assets));
 
     mapping.insert(
+        "shots".into(),
+        serde_yaml::to_value(&project.shots).unwrap(),
+    );
+
+    mapping.insert(
         "version_control".into(),
         serde_yaml::to_value(&project.version_control).unwrap(),
     );
@@ -321,17 +327,18 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         .as_mapping()
         .expect("Version control config was not a valid mapping");
 
-    info!(" --- Reading Scenes ---");
+    let config = crate::core::version_control::from_yaml(config);
+    debug!("Using version control config: {:?}", config);
+
+    info!(" --- Reading shots ---");
     let shot_data = map.get("shots");
-    let scenes: ShotEntry = match shot_data {
+
+    println!("{:#?}", shot_data);
+    let shots: ShotEntry = match shot_data {
         Some(scenes_data) => serde_yaml::from_value::<ShotEntry>(scenes_data.clone())
             .expect("Failed to parse scene data"),
-        None => ShotEntry::Subcategory(BTreeMap::new()),
+        None => ShotEntry::Subcategory(IndexMap::new()),
     };
-
-    let config = crate::core::version_control::from_yaml(config);
-
-    debug!("Using version control config: {:?}", config);
 
     let result = Project {
         manifest_file: file_path,
@@ -341,7 +348,7 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         departments: departments,
         version_control: config,
         programs: programs,
-        scenes: scenes,
+        shots: shots,
     };
 
     to_yaml(&result);

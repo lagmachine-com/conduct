@@ -16,6 +16,7 @@ strip = true # Remove debug symbols
 clap = { version = "4.5.20", features=["derive"] }
 enum_dispatch = "0.3.13"
 include_directory = "0.1.1"
+indexmap = { version = "2.6.0", features = ["serde"] }
 log = "0.4.22"
 matchit = "0.8.4"
 path-absolutize = "3.1.1"
