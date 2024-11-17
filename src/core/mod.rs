@@ -6,5 +6,6 @@ pub mod element;
 pub mod format;
 pub mod program;
 pub mod project;
+pub mod shot;
 mod tests;
 pub mod version_control;

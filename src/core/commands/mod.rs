@@ -4,6 +4,7 @@ mod command_export;
 mod command_list_assets;
 mod command_list_elements;
 mod command_list_export_formats;
+mod command_list_shots;
 mod command_setup;
 mod command_summary;
 
@@ -27,6 +28,7 @@ pub use command_export::ExportArgs;
 use command_list_assets::ListAssetsArgs;
 use command_list_elements::ListElementsArgs;
 use command_list_export_formats::ListExportFormatsArgs;
+use command_list_shots::ListShotsArgs;
 use command_setup::SetupArgs;
 use command_summary::SummaryArgs;
 use log::{info, warn};
@@ -70,6 +72,9 @@ pub enum CommandType {
 
     /// List all elements of an asset, optionally filtering by department
     ListElements(ListElementsArgs),
+
+    /// List all shots
+    ListShots(ListShotsArgs),
 }
 
 pub fn write_command_result(result: serde_json::Value) {

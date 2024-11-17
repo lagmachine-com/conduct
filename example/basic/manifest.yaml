@@ -57,5 +57,24 @@ assets:
           anim:
           - !scene_local anim_cache
 
+shots:
+  "103": 
+    DE:
+      - "0010"
+      - "0020"
+      - "0030"
+  "104":
+    TCC:
+      - "0010"
+      - "0020"
+      - "0030"
+      - "0040"
+    GK:
+      - "0010"
+      - "0020"
+      - "0030"
+      - "0040"
+
+
 version_control:
   type: versioned_directories

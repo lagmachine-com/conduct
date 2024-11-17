@@ -5,6 +5,7 @@ use log::{debug, info, warn};
 use path_absolutize::Absolutize;
 use serde_yaml::Mapping;
 
+use crate::core::shot::ShotEntry;
 use crate::core::{asset, format};
 
 use super::asset::{Asset, AssetCategory, AssetEntry};
@@ -21,6 +22,7 @@ pub struct Project {
     pub departments: BTreeMap<String, Department>,
     pub assets: AssetCategory,
     pub version_control: VersionControlConfig,
+    pub scenes: ShotEntry,
 }
 
 impl Project {
@@ -319,6 +321,14 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         .as_mapping()
         .expect("Version control config was not a valid mapping");
 
+    info!(" --- Reading Scenes ---");
+    let shot_data = map.get("shots");
+    let scenes: ShotEntry = match shot_data {
+        Some(scenes_data) => serde_yaml::from_value::<ShotEntry>(scenes_data.clone())
+            .expect("Failed to parse scene data"),
+        None => ShotEntry::Subcategory(BTreeMap::new()),
+    };
+
     let config = crate::core::version_control::from_yaml(config);
 
     debug!("Using version control config: {:?}", config);
@@ -331,6 +341,7 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         departments: departments,
         version_control: config,
         programs: programs,
+        scenes: scenes,
     };
 
     to_yaml(&result);
