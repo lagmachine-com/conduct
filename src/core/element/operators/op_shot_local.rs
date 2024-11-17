@@ -15,7 +15,7 @@ use crate::core::{
 use super::ElementOperation;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct ElementOpSceneLocal {
+pub struct ElementOpShotLocal {
     #[serde(flatten)]
     args: BTreeMap<String, serde_yaml::Value>,
 
@@ -23,14 +23,14 @@ pub struct ElementOpSceneLocal {
     elements: Box<ElementOrCollection>,
 }
 
-impl ElementOperation for ElementOpSceneLocal {
+impl ElementOperation for ElementOpShotLocal {
     fn get_elements(
         &self,
         _context: &Context,
         element_data: ResolvedElementData,
     ) -> Vec<ResolvedElement> {
         let mut element_data = element_data.clone();
-        element_data.set_scene_local(true);
+        element_data.set_shot_local(true);
 
         return self
             .elements

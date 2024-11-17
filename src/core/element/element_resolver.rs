@@ -67,6 +67,9 @@ impl ElementResolver for Project {
 
         let mut element_data = ResolvedElementData::new();
         element_data.set_asset(&asset_name);
+        if let Some(shot) = &context.shot {
+            element_data.set_shot(shot);
+        }
 
         add_elements_from_asset(&mut result, asset, context, element_data.clone());
         add_elements_from_category_template(

@@ -6,6 +6,7 @@ programs:
     exports:
       .mesh.blend: export_blend_library.py
       .shadergraph.blend: export_blend_library.py
+      .animbake.abc: export_blend_library.py
     imports:
       .animbake.abc: import_animbake_alembic.py
       .glb: import_glb_mesh.py
@@ -50,7 +51,7 @@ assets:
     - defaultCubeA:
         departments:
           anim:
-          - !scene_local anim_cache
+          - !shot_local anim_cache
           light:
           - light_rig
           model:
@@ -76,4 +77,4 @@ shots:
     - '0040'
 
 version_control:
-  type: versioned_directories
+  type: direct

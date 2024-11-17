@@ -3,6 +3,7 @@ pub struct ResolvedElementData {
     scene_local: bool,
     dependencies: Option<Vec<String>>,
     asset: Option<String>,
+    shot: Option<String>,
 }
 
 impl ResolvedElementData {
@@ -11,15 +12,24 @@ impl ResolvedElementData {
             scene_local: false,
             dependencies: None,
             asset: None,
+            shot: None,
         }
     }
 
-    pub fn set_scene_local(&mut self, value: bool) {
+    pub fn set_shot_local(&mut self, value: bool) {
         self.scene_local = value;
     }
 
-    pub fn is_scene_local(&self) -> bool {
+    pub fn is_shot_local(&self) -> bool {
         self.scene_local
+    }
+
+    pub fn set_shot(&mut self, value: &String) {
+        self.shot = Some(value.to_lowercase());
+    }
+
+    pub fn get_shot(&self) -> Option<String> {
+        self.shot.clone()
     }
 
     pub fn set_asset(&mut self, asset_name: &String) {

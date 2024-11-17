@@ -45,6 +45,7 @@ impl Command for ListElementsArgs {
 
         let context = Context {
             department: self.common.department,
+            shot: self.common.shot,
             mode: if self.load {
                 ContextMode::Load
             } else {

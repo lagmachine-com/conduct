@@ -2,7 +2,7 @@ use enum_dispatch::enum_dispatch;
 use op_department_is::ElementOpDepartmentIs;
 use op_department_is_not::ElementOpDepartmentIsNot;
 use op_depends::ElementOpDepends;
-use op_scene_local::ElementOpSceneLocal;
+use op_shot_local::ElementOpShotLocal;
 use serde::{Deserialize, Serialize};
 
 use crate::core::context::Context;
@@ -12,7 +12,7 @@ use super::{element_resolver::ResolvedElement, resolved_element_data::ResolvedEl
 pub mod op_department_is;
 pub mod op_department_is_not;
 pub mod op_depends;
-pub mod op_scene_local;
+pub mod op_shot_local;
 
 #[enum_dispatch]
 pub trait ElementOperation {
@@ -30,5 +30,5 @@ pub enum ElementOperator {
     DepartmentIs(ElementOpDepartmentIs),
     DepartmentIsNot(ElementOpDepartmentIsNot),
     Depends(ElementOpDepends),
-    SceneLocal(ElementOpSceneLocal),
+    ShotLocal(ElementOpShotLocal),
 }

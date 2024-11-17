@@ -13,7 +13,7 @@ pub struct CommonArgs {
     pub element: Option<String>,
 
     #[arg(short, long)]
-    pub scene: Option<String>,
+    pub shot: Option<String>,
 }
 
 #[derive(Debug, Parser)]

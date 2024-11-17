@@ -28,15 +28,16 @@ impl VersionControl for VersionControlConfigSymlink {
         let asset_name = args.common.asset.clone().unwrap();
         let dept = args.common.department.clone().unwrap();
         let element_name = args.common.element.clone().unwrap();
+        let shot = args.common.shot.clone();
 
-        let (path, file_name) = match resolve_element_path(project, dept, asset_name, element_name)
-        {
-            Ok(val) => val,
-            Err(err) => {
-                error!("Failed to resolve path");
-                return Err(err);
-            }
-        };
+        let (path, file_name) =
+            match resolve_element_path(project, dept, asset_name, element_name, shot) {
+                Ok(val) => val,
+                Err(err) => {
+                    error!("Failed to resolve path");
+                    return Err(err);
+                }
+            };
 
         let pool_path = project.path_absolutize_string(self.pool.clone());
         let pool_path = pool_path.absolutize().unwrap();

@@ -4,6 +4,8 @@ use super::ShotEntry;
 
 pub trait ShotResolver {
     fn get_shots(&self) -> Vec<String>;
+
+    fn shot_exists(&self, shot: &String) -> bool;
 }
 
 impl ShotResolver for Project {
@@ -13,6 +15,11 @@ impl ShotResolver for Project {
         add_shot(&mut result, &self.shots, "".to_string());
 
         result
+    }
+
+    fn shot_exists(&self, shot: &String) -> bool {
+        let shots: Vec<String> = self.get_shots().iter().map(|s| s.to_lowercase()).collect();
+        return shots.contains(&shot);
     }
 }
 fn add_shot(list: &mut Vec<String>, entry: &ShotEntry, current_path: String) {

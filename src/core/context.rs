@@ -8,4 +8,5 @@ pub enum ContextMode {
 pub struct Context {
     pub department: Option<String>,
     pub mode: ContextMode,
+    pub shot: Option<String>,
 }
