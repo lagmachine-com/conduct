@@ -57,8 +57,6 @@ pub fn resolve_element_path(
             }
         };
 
-        warn!("TODO: Implement scene local file path handling");
-
         if project.shot_exists(&shot) == false {
             warn!("Resolved shot {} does not exist", shot);
             return Err(ExportError::NotImplemented);
