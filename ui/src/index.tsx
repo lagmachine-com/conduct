@@ -3,8 +3,11 @@ import { render } from 'solid-js/web';
 
 import './app.css';
 import App from './App';
-import { Route, Router } from '@solidjs/router';
+import { Route, Router, RouteSectionProps } from '@solidjs/router';
 import DialogCreateSetup from './pages/dialogs/create_setup';
+import DialogLoadAsset from './pages/dialogs/load_asset';
+import { ColorModeProvider } from '@kobalte/core/color-mode';
+import { Component } from 'solid-js';
 
 const root = document.getElementById('root');
 
@@ -14,7 +17,16 @@ if (!(root instanceof HTMLElement)) {
   );
 }
 
-render(() => (<Router>
+const rootComponent: Component<RouteSectionProps> = (props) => {
+  return (
+    <ColorModeProvider initialColorMode='light'>
+      {props.children}
+    </ColorModeProvider>
+  )
+}
+
+render(() => (<Router root={rootComponent}>
   <Route path="/" component={App} />
   <Route path="/dialogs/create_setup" component={DialogCreateSetup} />
+  <Route path="/dialogs/load_asset" component={DialogLoadAsset} />
 </Router>), root!);

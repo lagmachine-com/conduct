@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use crate::core::{
     commands::ExportArgs,
+    element::resolved_element_data::ResolvedElementData,
     project,
     version_control::{common::resolve_element_path, versioned_directories::get_next_version},
 };
@@ -103,5 +104,14 @@ impl VersionControl for VersionControlConfigSymlink {
             file_format: args.file_format.clone(),
             script: "".to_string(),
         })
+    }
+
+    fn get_element_files(
+        &self,
+        _project: &project::Project,
+        _element_name: String,
+        _element_data: &ResolvedElementData,
+    ) -> Vec<String> {
+        todo!()
     }
 }

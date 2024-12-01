@@ -4,6 +4,7 @@ pub struct ResolvedElementData {
     dependencies: Option<Vec<String>>,
     asset: Option<String>,
     shot: Option<String>,
+    owning_department: Option<String>,
 }
 
 impl ResolvedElementData {
@@ -13,6 +14,7 @@ impl ResolvedElementData {
             dependencies: None,
             asset: None,
             shot: None,
+            owning_department: None,
         }
     }
 
@@ -49,5 +51,17 @@ impl ResolvedElementData {
 
     pub fn get_asset_name(&self) -> Option<String> {
         self.asset.clone()
+    }
+
+    pub fn set_owning_department(&mut self, value: String) {
+        self.owning_department = Some(value);
+    }
+
+    pub fn get_owning_department(&self) -> Option<String> {
+        self.owning_department.clone()
+    }
+
+    pub fn get_dependencies(&self) -> Option<Vec<String>> {
+        self.dependencies.clone()
     }
 }

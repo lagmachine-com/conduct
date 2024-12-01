@@ -11,6 +11,7 @@ programs:
       .animbake.abc: import_animbake_alembic.py
       .glb: import_glb_mesh.py
       .shadergraph.blend: import_blend_shadergraph.py
+      .mesh.blend: import_blend_library_mesh.py
 
 departments:
   anim:
@@ -21,6 +22,19 @@ departments:
   light:
     default_elements:
     - default_light_rig
+    programs:
+      blender:
+        imports:
+          - .glb
+          - .mesh.blend
+          - .animbake.abc
+  layout:
+    programs:
+      blender:
+        exports:
+          - .instancer.blend
+        imports:
+          - .mesh.blend
   lookdev:
     programs:
       blender:
@@ -37,15 +51,20 @@ departments:
 
 assets:
   3d:
-    character:
+    prop:
     - $template:
         departments:
           model:
           - mesh
-    - suzanneA:
+    - defaultCubeA:
+        departments: {}
+    - defaultCubeB:
+        departments: {}
+    environment:
+    - cubeWorldA:
         departments:
-          anim:
-          - !shot_local anim_cache
+          layout:
+            - !depends(defaultCubeA;defaultCubeB) cubeInstancer
 
 shots:
   '103':

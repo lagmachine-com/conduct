@@ -1,4 +1,4 @@
-import { ListAssetsResult, ListShotsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
+import { AssetTreeCategory, ListAssetsResult, ListShotsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
 
 
 declare global {
@@ -71,6 +71,15 @@ export async function listAssets(department_filter: null | string = null): Promi
     })
     return await result.json() as ListAssetsResult
 }
+
+export async function getAssetTree(department_filter: null | string = null): Promise<AssetTreeCategory> {
+    let result = await get("api/v1/command/get_asset_tree", {
+        "department": department_filter
+    })
+    let json = await result.json()
+    return json as AssetTreeCategory
+}
+
 
 export async function create_setup(department: string, asset: string, shot: null | string = null, dry_run: boolean = false): Promise<SetupResult | ErrorResponse> {
     let result = await get("api/v1/command/setup", {
