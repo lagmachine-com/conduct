@@ -28,6 +28,7 @@ departments:
           - .glb
           - .mesh.blend
           - .animbake.abc
+          - .shadergraph.blend
   layout:
     programs:
       blender:
@@ -56,6 +57,8 @@ assets:
         departments:
           model:
           - mesh
+          lookdev:
+          - shadergraph
     - defaultCubeA:
         departments: {}
     - defaultCubeB:

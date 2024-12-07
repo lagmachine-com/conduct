@@ -15,6 +15,9 @@ pub struct DialogArgs {
     pub common: CommonArgs,
 
     kind: String,
+
+    #[arg(short, long)]
+    program: Option<String>,
 }
 
 pub struct DialogOptions {
@@ -32,7 +35,8 @@ impl Command for DialogArgs {
         let args = QueryString::dynamic()
             .with_opt_value("department", self.common.department)
             .with_opt_value("asset", self.common.asset)
-            .with_opt_value("shot", self.common.shot);
+            .with_opt_value("shot", self.common.shot)
+            .with_opt_value("program", self.program);
 
         gui::gui(
             project.read().unwrap().clone(),

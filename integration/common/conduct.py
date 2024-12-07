@@ -39,6 +39,17 @@ class Conduct:
 
     def setup(self):
         args = ["dialog", "create_setup"]
+        return self.run_process(args)
+
+    def dialog_load_asset(self, department, shot=None, asset=None ):
+        args = ["dialog", "load_asset", "--program", self.current_program, "--department", department]
+        if shot != None and shot != "":
+            args.append("--shot")
+            args.append(shot)
+        
+        if asset != None and asset != "":
+            args.append("--asset")
+            args.append(asset)
 
         return self.run_process(args)
     

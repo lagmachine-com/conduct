@@ -1,6 +1,6 @@
 import { createResource, type Component, Show, Switch, Match, createSignal, For } from 'solid-js';
 
-import { get, getSummary, doExport, doCreate, exitDialog, listAssets, cancelDialog, create_setup as createSetup, listShots, ErrorResponse, isError, getAssetTree } from '../../api';
+import { get, getSummary, doExport, doCreate, exitDialog, listAssets, cancelDialog, create_setup as createSetup, listShots, ErrorResponse, isError, getAssetTree, loadAssets } from '../../api';
 
 import { Button } from '../../components/ui/button';
 import { ColorModeProvider } from '@kobalte/core/color-mode';
@@ -15,16 +15,34 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { ToggleGroup } from '@kobalte/core/toggle-group';
 import { ToggleGroupItem } from '~/components/ui/toggle-group';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
+import { useSearchParams } from '@solidjs/router';
 
 const DialogLoadAsset: Component = () => {
     const [selectedAssets, setSelectedAssets] = createSignal<string[]>([])
 
     const [info] = createResource(getSummary);
     const [assets] = createResource(() => getAssetTree(null));
+    const [searchParams, setSearchParams] = useSearchParams();
 
     let closedPaths: string[] = [];
 
     const loadedAssetsList = () => selectedAssets().join(",");
+
+    const department = () => searchParams.department;
+    const shot = () => searchParams.shot;
+    const program = () => searchParams.program;
+    const asset = () => searchParams.asset;
+
+    const contextLabel = () => {
+        return [shot(), department(), asset()].filter((x) => !!x).join(' / ')
+    }
+
+    async function done() {
+
+        let result = await loadAssets(program() as string, department() as string, shot() as string, selectedAssets());
+
+        await exitDialog(result);
+    }
 
     const assetEntry: Component<{ entry_name: string, entry: AssetTreeEntry, current_path: string }> = (props) => {
         let path = props.current_path + "/" + props.entry_name;
@@ -85,6 +103,7 @@ const DialogLoadAsset: Component = () => {
             <div class='h-full flex flex-col '>
 
 
+                <Label class='text-xs'>{program()}: {contextLabel()}</Label>
                 <div class='flex-1 text-left p-1 overflow-x-clip overflow-y-scroll w-full '>
                     <Show when={assets() != null}>
                         <ToggleGroup multiple>
@@ -108,7 +127,7 @@ const DialogLoadAsset: Component = () => {
                 </div>
 
                 <div class=' flex-row flex mt-2'>
-                    <Button disabled={selectedAssets().length == 0} class="w-full mx-1"> {
+                    <Button disabled={selectedAssets().length == 0} on:click={done} class="w-full mx-1"> {
                         selectedAssets().length > 0 ? `Import ${selectedAssets().length} Asset(s)` : "Import Assets"
                     }
                     </Button>

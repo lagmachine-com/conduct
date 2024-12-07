@@ -80,6 +80,17 @@ export async function getAssetTree(department_filter: null | string = null): Pro
     return json as AssetTreeCategory
 }
 
+export async function loadAssets(program: string, department: string, shot: null | string = null, assets: string[]): Promise<AssetTreeCategory> {
+    let result = await get("api/v1/command/load_assets", {
+        "program": program,
+        "department": department,
+        "shot": shot,
+        "assets_list": assets.join(',')
+    })
+    let json = await result.json()
+    return json as AssetTreeCategory
+}
+
 
 export async function create_setup(department: string, asset: string, shot: null | string = null, dry_run: boolean = false): Promise<SetupResult | ErrorResponse> {
     let result = await get("api/v1/command/setup", {

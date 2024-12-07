@@ -11,6 +11,8 @@ shell = pkgs.mkShell {
     cudaSupport = true;
     })
   ];
+
+  WEBKIT_DISABLE_COMPOSITING_MODE=1;
 };
 
 in shell

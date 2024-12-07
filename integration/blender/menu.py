@@ -9,8 +9,10 @@ class ConductMenu(bpy.types.Menu):
         layout = self.layout
         data = utils.get_conduct_data()
 
-        if data == None or data.project == None or data.project == "":
+        if data == None:
             layout.operator("conduct.select_project", icon='ADD', text="Select Project")
+        else:
+            layout.operator("conduct.load_asset", icon='IMPORT', text="Load Asset(s)")
 
 def draw_item(self, context):
     layout = self.layout
