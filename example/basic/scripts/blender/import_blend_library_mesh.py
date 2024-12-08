@@ -1,5 +1,7 @@
 
 class BlenderDataImport():
+    asset_library = True
+
     def load(self, file):
         import bpy
         
