@@ -91,14 +91,11 @@ impl VersionControl for VersionControlConfigSymlink {
 
         let _ = std::fs::create_dir_all(link_parent);
 
-        #[cfg(not(any(target_os = "windows", target_os = "android")))]
+        #[cfg(not(target_os = "windows"))]
         std::os::unix::fs::symlink(relative, &links_path).unwrap();
 
-        #[cfg(any(target_os = "windows", target_os = "android"))]
-        {
-            warn!("TODO: Implement symlinks on windows");
-            panic!()
-        }
+        #[cfg(target_os = "windows")]
+        std::os::windows::fs::symlink_dir(relative, &links_path);
 
         Ok(ExportResult {
             directory: links_path.to_str().unwrap().to_string(),
