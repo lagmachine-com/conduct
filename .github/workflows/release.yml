@@ -44,11 +44,21 @@ jobs:
           cd ui
           npm run build
 
-      - name: build
+
+      - name: Set environment variable
+        if: runner.os != 'Windows'
         run: |
-          export CONDUCT_BUILD_DESCRIPTION=${{ github.event.release.tag_name || 'v0.0.0' }}
-          export CONDUCT_BRANCH=${{ github.sha }}
-          cargo build -r
+          echo "var=${{ github.event.release.tag_name || 'v0.0.0' }}" >> "$CONDUCT_BUILD_DESCRIPTION"
+          echo "var=${{ github.sha }}" >> "$CONDUCT_BRANCH"
+
+      - name: Set environment variable on Windows
+        if: runner.os == 'Windows'
+        run: |
+          echo "var=${{ github.event.release.tag_name || 'v0.0.0' }}" | Out-File -FilePath $env:CONDUCT_BUILD_DESCRIPTION -Append
+          echo "var=${{ github.sha }}" | Out-File -FilePath $env:CONDUCT_BRANCH -Append
+
+      - name: build
+        run: cargo build -r
 
       - name: Upload to release (Linux)
         if: github.event_name == 'release' && matrix.platform == 'ubuntu-latest'
