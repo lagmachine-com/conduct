@@ -1,0 +1,94 @@
+name: release
+on:
+  release:
+    types:
+      - created
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'ubuntu-latest'
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+
+      - name: install dependencies (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev
+
+      - name: install frontend dependencies
+        run: |
+          cd ui
+          npm install
+
+      - name: build frontend
+        run: |
+          cd ui
+          npm run build
+
+      - name: build
+        run: |
+          cd ui
+          cargo build -r
+
+      - name: Upload to release (Linux)
+        if: github.event_name == 'release' && matrix.platform == 'ubuntu-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: target/release/conduct
+          asset_name: conduct
+          asset_content_type: application/octet-stream
+
+      - name: Upload to release (Windows)
+        if: github.event_name == 'release' && matrix.platform == 'ubuntu-latest'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: target/release/conduct.exe
+          asset_name: conduct.exe
+          asset_content_type: application/octet-stream
+
+  release-integrations:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Zip Blender Integration
+      run: |
+        cd integration
+        mv blender conduct-blender
+        zip -r conduct-blender.zip conduct-blender
+
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: integration/conduct-blender.zip
+        asset_name: conduct-blender.zip
+        asset_content_type: application/zip
