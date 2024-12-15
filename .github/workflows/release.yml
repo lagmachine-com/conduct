@@ -46,7 +46,6 @@ jobs:
 
       - name: build
         run: |
-          cd ui
           cargo build -r
 
       - name: Upload to release (Linux)
