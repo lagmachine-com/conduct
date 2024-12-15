@@ -61,7 +61,7 @@ jobs:
           asset_content_type: application/octet-stream
 
       - name: Upload to release (Windows)
-        if: github.event_name == 'release' && matrix.platform == 'ubuntu-latest'
+        if: github.event_name == 'release' && matrix.platform == 'windows-latest'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
