@@ -57,6 +57,11 @@ jobs:
           echo "CONDUCT_BUILD_DESCRIPTION=${{ github.event.release.tag_name || 'v0.0.0' }}" | Out-File -FilePath $env:GITHUB_ENV -Append
           echo "CONDUCT_BRANCH=${{ github.sha }}" | Out-File -FilePath $env:GITHUB_ENV -Append
 
+      - name: Show environment variable
+        run: |
+          echo ${{ env.CONDUCT_BUILD_DESCRIPTION }}
+          echo ${{ env.CONDUCT_BRANCH }}
+
       - name: build
         run: cargo build -r
 
