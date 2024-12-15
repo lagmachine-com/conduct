@@ -46,6 +46,8 @@ jobs:
 
       - name: build
         run: |
+          export CONDUCT_BUILD_DESCRIPTION=${{ github.event.release.tag_name || 'v0.0.0' }}
+          export CONDUCT_BRANCH=${{ github.sha }}
           cargo build -r
 
       - name: Upload to release (Linux)

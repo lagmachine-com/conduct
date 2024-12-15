@@ -1,6 +1,16 @@
-use std::process::Command;
+use std::{env, process::Command};
 
 fn get_git_description() {
+    let desc = env::var("CONDUCT_BUILD_DESCRIPTION");
+
+    match desc {
+        Ok(branch) => {
+            println!("cargo:rustc-env=GIT_DESCRIPTION={}", branch);
+            return;
+        }
+        Err(_) => (),
+    }
+
     let output = Command::new("git").args(&["describe", "--dirty"]).output();
 
     match output {
@@ -18,6 +28,16 @@ fn get_git_description() {
 }
 
 fn get_git_branch() {
+    let branch: Result<String, env::VarError> = env::var("CONDUCT_BRANCH");
+
+    match branch {
+        Ok(branch) => {
+            println!("cargo:rustc-env=GIT_BRANCH={}", branch);
+            return;
+        }
+        Err(_) => (),
+    }
+
     let output = Command::new("git")
         .args(&["branch", "--show-current"])
         .output();
