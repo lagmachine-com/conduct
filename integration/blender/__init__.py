@@ -21,7 +21,7 @@ bl_info = {
     "warning" : "",
     "category" : "Generic"
 }
-from . import properties, menu, project_browser, select_project, export, export_menu
+from . import properties, menu, project_browser, select_project, export, export_menu, load_asset
 
 
 def register():
@@ -31,12 +31,14 @@ def register():
     menu.register()
     export_menu.register()
     project_browser.register()
+    load_asset.register()
 
 
 def unregister():
+    load_asset.unregister()
     project_browser.unregister()
     export_menu.unregister()
     menu.unregister()
     select_project.unregister()
-    export.register()
+    export.unregister()
     properties.unregister()

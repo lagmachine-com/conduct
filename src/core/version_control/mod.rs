@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use symlink::VersionControlConfigSymlink;
 use versioned_directories::VersionControlConfigVersionedDirectories;
 
-use super::{commands::ExportArgs, project};
+use super::{commands::ExportArgs, element::resolved_element_data::ResolvedElementData, project};
 
 #[derive(Debug)]
 pub enum ExportError {
@@ -34,6 +34,13 @@ pub trait VersionControl {
         project: &project::Project,
         args: &ExportArgs,
     ) -> Result<ExportResult, ExportError>;
+
+    fn get_element_files(
+        &self,
+        project: &project::Project,
+        element_name: String,
+        element_data: &ResolvedElementData,
+    ) -> Vec<String>;
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

@@ -55,100 +55,98 @@ const DialogCreateSetup: Component = () => {
 
 
     return (
-        <ColorModeProvider initialColorMode="system" >
-            <div class='h-lvh border-spacing-10 p-3'>
-                <div class='h-full flex flex-col gap-2'>
-                    <div class='h-100 flex-1 gap-2'>
-                        Create Setup
+        <div class='h-lvh border-spacing-10 p-3'>
+            <div class='h-full flex flex-col gap-2'>
+                <div class='h-100 flex-1 gap-2'>
+                    Create Setup
 
-                        <div class='flex justify-center'>
-                            <div class='w-full'>
-                                <Show when={info()}>
-                                    <Select class='p-1'
-                                        value={selectedDepartment()}
-                                        onChange={setSelectedDepartment}
-                                        options={info()!.departments}
-                                        placeholder="Select department"
-                                        itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
-                                        <SelectTrigger aria-label="Asset">
-                                            <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
-                                        </SelectTrigger>
-                                        <SelectContent class=' overflow-y-auto max-h-[50vh]' />
-                                    </Select>
-                                </Show>
-                            </div>
-
-                            <div class='w-full'>
-                                <Select disabled={selectedDepartment() == null}
-                                    value={selectedAsset()}
-                                    onChange={setSelectedAsset}
-                                    options={assets()?.assets ?? []}
-                                    placeholder="Select asset"
-                                    class='p-1'
+                    <div class='flex justify-center'>
+                        <div class='w-full'>
+                            <Show when={info()}>
+                                <Select class='p-1'
+                                    value={selectedDepartment()}
+                                    onChange={setSelectedDepartment}
+                                    options={info()!.departments}
+                                    placeholder="Select department"
                                     itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
                                     <SelectTrigger aria-label="Asset">
                                         <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
                                     </SelectTrigger>
                                     <SelectContent class=' overflow-y-auto max-h-[50vh]' />
                                 </Select>
-                            </div>
+                            </Show>
                         </div>
 
-                        <Show when={shots()}>
-                            <Combobox class='p-1' options={shots()!.shots}
-                                itemComponent={(props) => (
-                                    <ComboboxItem item={props.item}>
-                                        <ComboboxItemLabel>{props.item.textValue}</ComboboxItemLabel>
-                                        <ComboboxItemIndicator />
-                                    </ComboboxItem>
-                                )}
-                                sectionComponent={(props) => (
-                                    <ComboboxSection>{props.section.rawValue}</ComboboxSection>
-                                )}
-                                placeholder="Select a shot (optional)"
-
-                                onChange={setSelectedShot}>
-
-                                <ComboboxControl aria-label="Food">
-                                    <ComboboxInput />
-                                    <ComboboxTrigger />
-                                </ComboboxControl>
-                                <ComboboxContent class=' overflow-y-auto max-h-[50vh]' />
-                            </Combobox>
-                        </Show>
-
+                        <div class='w-full'>
+                            <Select disabled={selectedDepartment() == null}
+                                value={selectedAsset()}
+                                onChange={setSelectedAsset}
+                                options={assets()?.assets ?? []}
+                                placeholder="Select asset"
+                                class='p-1'
+                                itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
+                                <SelectTrigger aria-label="Asset">
+                                    <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
+                                </SelectTrigger>
+                                <SelectContent class=' overflow-y-auto max-h-[50vh]' />
+                            </Select>
+                        </div>
                     </div>
 
-                    <div class="flex flex-col">
-                        <Show when={isError(result())} >
-                            <Callout variant="warning">
-                                <CalloutTitle>Warning</CalloutTitle>
-                                <CalloutContent>
-                                    {(result() as ErrorResponse).error}
-                                </CalloutContent>
-                            </Callout>
-                        </Show>
+                    <Show when={shots()}>
+                        <Combobox class='p-1' options={shots()!.shots}
+                            itemComponent={(props) => (
+                                <ComboboxItem item={props.item}>
+                                    <ComboboxItemLabel>{props.item.textValue}</ComboboxItemLabel>
+                                    <ComboboxItemIndicator />
+                                </ComboboxItem>
+                            )}
+                            sectionComponent={(props) => (
+                                <ComboboxSection>{props.section.rawValue}</ComboboxSection>
+                            )}
+                            placeholder="Select a shot (optional)"
 
-                        <Show when={result() != null && (isError(result()) == false)} >
-                            <Callout variant={null}>
-                                <CalloutTitle>{(result() as SetupResult).file_name}</CalloutTitle>
-                                <CalloutContent>
-                                    <div class=' text-xs break-words ' >
-                                        {(result() as SetupResult).path}
-                                    </div>
+                            onChange={setSelectedShot}>
 
-                                </CalloutContent>
-                            </Callout>
-                        </Show>
-                    </div>
+                            <ComboboxControl aria-label="Food">
+                                <ComboboxInput />
+                                <ComboboxTrigger />
+                            </ComboboxControl>
+                            <ComboboxContent class=' overflow-y-auto max-h-[50vh]' />
+                        </Combobox>
+                    </Show>
 
-                    <div class='flex space-x-3 justify-center'>
-                        <Button class='w-full' on:click={done} disabled={selectedDepartment() == null || selectedAsset() == null} >Done</Button>
-                        <Button variant="outline" class='w-full' on:click={() => cancelDialog()}>Cancel</Button>
-                    </div>
+                </div>
+
+                <div class="flex flex-col">
+                    <Show when={isError(result())} >
+                        <Callout variant="warning">
+                            <CalloutTitle>Warning</CalloutTitle>
+                            <CalloutContent>
+                                {(result() as ErrorResponse).error}
+                            </CalloutContent>
+                        </Callout>
+                    </Show>
+
+                    <Show when={result() != null && (isError(result()) == false)} >
+                        <Callout variant={null}>
+                            <CalloutTitle>{(result() as SetupResult).file_name}</CalloutTitle>
+                            <CalloutContent>
+                                <div class=' text-xs break-words ' >
+                                    {(result() as SetupResult).path}
+                                </div>
+
+                            </CalloutContent>
+                        </Callout>
+                    </Show>
+                </div>
+
+                <div class='flex space-x-3 justify-center'>
+                    <Button class='w-full' on:click={done} disabled={selectedDepartment() == null || selectedAsset() == null} >Done</Button>
+                    <Button variant="outline" class='w-full' on:click={() => cancelDialog()}>Cancel</Button>
                 </div>
             </div>
-        </ColorModeProvider >
+        </div>
     );
 };
 

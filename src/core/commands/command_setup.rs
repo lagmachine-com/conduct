@@ -15,7 +15,7 @@ pub struct SetupArgs {
     #[serde(flatten)]
     common: CommonArgs,
 
-    #[arg(short, long)]
+    #[arg(long)]
     pub dry: bool,
 }
 

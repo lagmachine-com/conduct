@@ -334,6 +334,7 @@ dependencies = [
  "matchit",
  "path-absolutize",
  "pathdiff",
+ "query-string-builder",
  "serde",
  "serde_json",
  "serde_yaml",
@@ -1857,6 +1858,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c3a7fc5db1e57d5a779a352c8cdb57b29aa4c40cc69c3a68a7fedc815fbf2f9"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "query-string-builder"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4b71ad2010fcd6b911a2efb67fead507f6dd847301c1f77c870499e46b3768c"
+dependencies = [
+ "percent-encoding",
 ]
 
 [[package]]

@@ -1,15 +1,23 @@
 use std::sync::RwLock;
 
 use clap::Args;
+use query_string_builder::QueryString;
 
 use crate::{core::project::Project, gui};
 use serde::{Deserialize, Serialize};
 
-use super::{error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct DialogArgs {
+    #[command(flatten)]
+    #[serde(flatten)]
+    pub common: CommonArgs,
+
     kind: String,
+
+    #[arg(short, long)]
+    program: Option<String>,
 }
 
 pub struct DialogOptions {
@@ -24,10 +32,16 @@ impl Command for DialogArgs {
         self,
         project: &RwLock<Project>,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
+        let args = QueryString::dynamic()
+            .with_opt_value("department", self.common.department)
+            .with_opt_value("asset", self.common.asset)
+            .with_opt_value("shot", self.common.shot)
+            .with_opt_value("program", self.program);
+
         gui::gui(
             project.read().unwrap().clone(),
             Some(DialogOptions {
-                path: "/dialogs/".to_string() + self.kind.as_str(),
+                path: "/dialogs/".to_string() + self.kind.as_str() + args.to_string().as_str(),
                 title: "Conduct Dialogue".to_string(),
                 width: 600.0,
                 height: 350.0,

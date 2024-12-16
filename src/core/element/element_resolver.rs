@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use log::{info, warn};
+use log::{debug, info, warn};
 
 use crate::core::{
     asset::Asset,
@@ -53,7 +53,7 @@ impl ElementResolver for Project {
     ) -> BTreeMap<String, ResolvedElementData> {
         let asset = self.get_asset_by_name(asset_name.clone());
 
-        info!("Getting assets with context: {:#?}", context);
+        debug!("Getting assets with context: {:#?}", context);
 
         let (asset, category_path) = match asset {
             Some(asset) => asset,
@@ -92,12 +92,14 @@ fn add_elements_from_department_default(
     context: &Context,
     element_data: ResolvedElementData,
 ) {
-    info!("Adding elements from default departments");
+    debug!("Adding elements from default departments");
     match context.mode {
         ContextMode::Load => {
-            for (dept, _elements) in asset.departments.iter() {
-                match project.get_department(dept) {
+            for (dept_name, _elements) in asset.departments.iter() {
+                match project.get_department(dept_name) {
                     Some(dept) => {
+                        let mut element_data = element_data.clone();
+                        element_data.set_owning_department(dept_name.clone());
                         add_elements_with_context(
                             result,
                             &dept.default_elements,
@@ -124,6 +126,9 @@ fn add_elements_from_department_default(
             for department_name in depts {
                 let dept = project.get_department(&department_name);
 
+                let mut element_data = element_data.clone();
+                element_data.set_owning_department(department_name);
+
                 match dept {
                     Some(dept) => add_elements_with_context(
                         result,
@@ -145,7 +150,7 @@ fn add_elements_from_category_template(
     context: &Context,
     element_data: ResolvedElementData,
 ) {
-    info!("Adding elements from category template");
+    debug!("Adding elements from category template");
     let category = project.get_category_by_path(category_path.clone());
     match category {
         Some(category) => match &category.template {
@@ -162,7 +167,7 @@ fn add_elements_from_asset(
     context: &Context,
     element_data: ResolvedElementData,
 ) {
-    info!("Adding elements from asset");
+    debug!("Adding elements from asset");
     for (name, elements) in asset.departments.iter() {
         match context.mode {
             // If we are in export context, we only want to see the elements this department owns
@@ -174,6 +179,8 @@ fn add_elements_from_asset(
             _ => (),
         };
 
+        let mut element_data = element_data.clone();
+        element_data.set_owning_department(name.clone());
         add_elements_with_context(result, &elements.elements, context, element_data.clone());
     }
 }
@@ -196,7 +203,7 @@ fn add_elements(
     for element in elements.iter() {
         match &element.element {
             Element::Value(name) => {
-                info!(" - got element: {}", name);
+                debug!(" - got element: {}", name);
                 result.insert(name.clone(), element.context.clone());
             }
             Element::Operator(element_operator) => {

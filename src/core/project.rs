@@ -131,7 +131,7 @@ impl Project {
         let mut current = &self.assets;
 
         for part in parts.into_iter() {
-            info!("Looking for part: {}", part);
+            debug!("Looking for part: {}", part);
             let result = current.children.get(part);
             match result {
                 Some(result) => match result {
@@ -151,7 +151,7 @@ impl Project {
         let mut current = &self.assets;
 
         for part in parts.into_iter() {
-            info!("Looking for part: {}", part);
+            debug!("Looking for part: {}", part);
             let result = current.children.get(part);
             match result {
                 Some(result) => match result {
@@ -171,7 +171,7 @@ impl Project {
         let mut current = &mut self.assets;
 
         for part in parts.into_iter() {
-            info!("Looking for part: {}", part);
+            debug!("Looking for part: {}", part);
             let result = current.children.get_mut(part);
             match result {
                 Some(result) => match result {
