@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mainMenu>
+    <menuBar>
+
+        <subMenu id="conduct_menu">
+            <label>Conduct</label>
+            <scriptItem id="conduct_select">
+                <label>Select Project</label>
+                <insertAtIndex>0</insertAtIndex>
+                <scriptCode><![CDATA[
+import ConductPlugin.select_project as select_project
+select_project.create_setup()
+
+                    ]]>
+                </scriptCode>
+            </scriptItem>
+        </subMenu>
+    </menuBar>
+</mainMenu>
