@@ -33,6 +33,7 @@ impl VersionControl for VersionControlConfigDirect {
             };
 
         let mut dir = project.get_root_directory();
+        dir.push("export");
         dir.push(path);
 
         info!("Exporting to: {}", dir.to_str().unwrap());
