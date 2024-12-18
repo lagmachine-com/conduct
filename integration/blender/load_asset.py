@@ -135,7 +135,7 @@ def load(results):
                 data.asset_data.tags.new('element:' + element)
 
 
-class OT_ImportAsset(Operator):
+class OT_ImportAsset(bpy.types.Operator):
 
     bl_idname = "conduct.load_asset"
     bl_label = "Import Asset(s)"
