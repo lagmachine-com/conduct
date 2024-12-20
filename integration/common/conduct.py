@@ -37,8 +37,8 @@ class Conduct:
         summary = self.run_process(["summary"])
         return summary
 
-    def setup(self):
-        args = ["dialog", "create_setup"]
+    def setup(self, file_format):
+        args = ["dialog", "create_setup", "--file-format", file_format]
         return self.run_process(args)
 
     def dialog_load_asset(self, department, shot=None, asset=None ):

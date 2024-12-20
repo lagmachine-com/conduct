@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~
 import { Combobox, ComboboxContent, ComboboxControl, ComboboxInput, ComboboxItem, ComboboxItemIndicator, ComboboxItemLabel, ComboboxSection, ComboboxTrigger } from '~/components/ui/combobox';
 import { Callout, CalloutContent, CalloutTitle } from '~/components/ui/callout';
 import { SetupResult } from '~/bindings/bindings_gen';
+import { useSearchParams } from '@solidjs/router';
 
 const DialogCreateSetup: Component = () => {
     const [selectedDepartment, setSelectedDepartment] = createSignal<string | null>()
@@ -18,6 +19,9 @@ const DialogCreateSetup: Component = () => {
     const [info] = createResource(getSummary);
     const [assets] = createResource(selectedDepartment, listAssets)
     const [shots] = createResource(listShots);
+
+    const [searchParams, setSearchParams] = useSearchParams();
+    const fileFormat = () => searchParams.file_format;
 
     const derivedState = () => {
         return { department: selectedDepartment(), asset: selectedAsset(), shot: selectedShot() }
@@ -35,7 +39,7 @@ const DialogCreateSetup: Component = () => {
             return
         }
 
-        return createSetup(department!, asset!, selectedShot(), true);
+        return createSetup(department!, asset!, fileFormat() as string, selectedShot(), true);
     }
 
     async function done() {
@@ -48,7 +52,7 @@ const DialogCreateSetup: Component = () => {
             return
         }
 
-        let result = await createSetup(department!, asset!, selectedShot(), false);
+        let result = await createSetup(department!, asset!, fileFormat() as string, selectedShot(), false);
 
         await exitDialog(result);
     }
