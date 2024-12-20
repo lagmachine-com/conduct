@@ -49,6 +49,9 @@ departments:
       blender:
         exports:
         - .mesh.blend
+  design:
+    programs:
+      inkscape: {}
 
 assets:
   3d:
@@ -68,6 +71,12 @@ assets:
         departments:
           layout:
             - !depends(defaultCubeA;defaultCubeB) cubeInstancer
+  2d:
+    icons:
+    - iconA:
+        departments:
+          design:
+          - vector 
 
 shots:
   '103':
