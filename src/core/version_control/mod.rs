@@ -27,6 +27,12 @@ pub struct ExportResult {
     pub script: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct VersionControlFile {
+    pub path: String,
+    pub version: String,
+}
+
 #[enum_dispatch]
 pub trait VersionControl {
     fn export(
@@ -40,7 +46,7 @@ pub trait VersionControl {
         project: &project::Project,
         element_name: String,
         element_data: &ResolvedElementData,
-    ) -> Vec<String>;
+    ) -> Vec<VersionControlFile>;
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

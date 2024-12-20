@@ -7,7 +7,7 @@ use crate::core::{
     version_control::{common::resolve_element_path, versioned_directories::get_next_version},
 };
 
-use super::{ExportError, ExportResult, VersionControl};
+use super::{ExportError, ExportResult, VersionControl, VersionControlFile};
 use log::{error, info};
 use path_absolutize::Absolutize;
 use serde::{Deserialize, Serialize};
@@ -111,7 +111,7 @@ impl VersionControl for VersionControlConfigSymlink {
         _project: &project::Project,
         _element_name: String,
         _element_data: &ResolvedElementData,
-    ) -> Vec<String> {
+    ) -> Vec<VersionControlFile> {
         todo!()
     }
 }

@@ -3,7 +3,7 @@ use crate::core::{
     version_control::common::resolve_element_path,
 };
 
-use super::{ExportError, ExportResult, VersionControl};
+use super::{ExportError, ExportResult, VersionControl, VersionControlFile};
 use log::{error, info};
 use serde::{Deserialize, Serialize};
 
@@ -54,7 +54,7 @@ impl VersionControl for VersionControlConfigDirect {
         _project: &project::Project,
         _element_name: String,
         _element_data: &ResolvedElementData,
-    ) -> Vec<String> {
+    ) -> Vec<VersionControlFile> {
         todo!()
     }
 }

@@ -5,7 +5,7 @@ use crate::core::{
     version_control::common::resolve_element_path,
 };
 
-use super::{ExportError, ExportResult, VersionControl};
+use super::{ExportError, ExportResult, VersionControl, VersionControlFile};
 use log::{error, info, warn};
 use serde::{Deserialize, Serialize};
 
@@ -63,7 +63,7 @@ impl VersionControl for VersionControlConfigVersionedDirectories {
         project: &project::Project,
         element_name: String,
         element_data: &ResolvedElementData,
-    ) -> Vec<String> {
+    ) -> Vec<VersionControlFile> {
         let asset_name = element_data.get_asset_name().unwrap();
         let dept = element_data.get_owning_department().unwrap();
         let shot = element_data.get_shot();
@@ -104,10 +104,19 @@ impl VersionControl for VersionControlConfigVersionedDirectories {
             let files = std::fs::read_dir(path.path());
             match files {
                 Ok(files) => {
-                    let files: Vec<String> = files
+                    let files: Vec<VersionControlFile> = files
                         .into_iter()
                         .filter(|e| e.is_ok())
-                        .map(|e| e.unwrap().path().to_str().unwrap().to_string())
+                        .map(|e| {
+                            let mut path = e.unwrap().path();
+                            let file = path.to_str().unwrap().to_string();
+                            path.pop();
+                            let version = path.file_name().unwrap().to_str().unwrap().to_string();
+                            VersionControlFile {
+                                path: file,
+                                version,
+                            }
+                        })
                         .collect();
                     info!("Found files: {:?}", files);
 
