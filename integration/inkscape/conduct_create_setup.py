@@ -10,15 +10,14 @@ class ConductCreateSetup(inkex.EffectExtension):
         pars.add_argument("-m", "--manifest", default="", help="Manifest File Path")
 
     def effect(self):
-        path = self.options.manifest
-        c = conduct.get_from_manifest_path(path, "inkscape")
-        result = c.setup()
+        manifest_path = self.options.manifest
+        c = conduct.get_from_manifest_path(manifest_path, "inkscape")
+        result = c.setup('.svg')
 
         if result['result'] != 'ok':
             return
         
         dialog_data = result['data']
-        path = os.path.join(dialog_data['path'], dialog_data['file_name'] + ".svg")
 
         self.svg.set("com.lagmachine.conduct.asset", dialog_data['asset'])
         self.svg.set("com.lagmachine.conduct.department", dialog_data['department'])
@@ -29,6 +28,7 @@ class ConductCreateSetup(inkex.EffectExtension):
         # this is the best i can do, there is no function for changing the current file to a different location
         data = self.svg.tostring().decode('utf-8')
 
+        path = dialog_data['path']
         with open(path, mode='w') as f:
             f.write(data)
 
