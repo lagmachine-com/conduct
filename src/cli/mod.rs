@@ -50,7 +50,7 @@ fn get_project_manifest_path(cli: &CLI) -> PathBuf {
         let mut test_path_2 = PathBuf::from(path);
         test_path_2.push("manifest.yaml");
         for path in vec![test_path, test_path_2].iter() {
-            let path = std::fs::canonicalize(path);
+            let path = dunce::canonicalize(path);
             match path {
                 Ok(path) => {
                     info!("Checking path: {}", path.to_str().unwrap());

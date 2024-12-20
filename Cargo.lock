@@ -327,6 +327,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "colored",
+ "dunce",
  "enum_dispatch",
  "include_directory",
  "indexmap 2.6.0",
