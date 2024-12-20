@@ -15,6 +15,9 @@ pub struct SetupArgs {
     #[serde(flatten)]
     common: CommonArgs,
 
+    #[arg(short, long)]
+    file_format: String,
+
     #[arg(long)]
     pub dry: bool,
 }
@@ -24,8 +27,9 @@ pub struct SetupArgs {
 pub struct SetupResult {
     pub asset: String,
     pub department: String,
-    pub path: String,
+    pub folder: String,
     pub file_name: String,
+    pub path: String,
     pub shot: Option<String>,
 }
 
@@ -82,35 +86,20 @@ impl Command for SetupArgs {
             _ = std::fs::create_dir_all(&dir_path);
         }
 
-        let files = std::fs::read_dir(&dir_path);
+        let file_name_with_ext = file_name.clone() + &self.file_format;
+
+        let mut path = dir_path.clone();
+        path.push(&file_name_with_ext);
 
         if self.dry {
-            match files {
-                Ok(files) => {
-                    for file in files.into_iter() {
-                        match file {
-                            Ok(file) => {
-                                let name = file
-                                    .path()
-                                    .file_stem()
-                                    .unwrap()
-                                    .to_str()
-                                    .unwrap()
-                                    .to_string();
-
-                                let file_name_with_ext =
-                                    file.file_name().to_str().unwrap().to_string();
-
-                                if name == file_name {
-                                    return Err(CommandError::Message(format!(
-                                    "File {file_name_with_ext} already exists! Continuing may overwrite this file and result in a loss of work"
-                                )));
-                                }
-                            }
-                            Err(_) => (),
-                        }
+            let exists = std::fs::exists(&path);
+            match exists {
+                Ok(exists) => match exists {
+                    true => {
+                        return Err(CommandError::Message(format!("{file_name_with_ext} already exists! Continuing may result in loss of work")));
                     }
-                }
+                    false => (),
+                },
                 Err(_) => (),
             }
         }
@@ -119,7 +108,8 @@ impl Command for SetupArgs {
             serde_json::to_value(SetupResult {
                 asset: self.common.asset.unwrap(),
                 department: self.common.department.unwrap(),
-                path: dir_path.to_str().unwrap().to_string(),
+                folder: dir_path.to_str().unwrap().to_string(),
+                path: path.to_str().unwrap().to_string(),
                 file_name: file_name,
                 shot: shot_code,
             })

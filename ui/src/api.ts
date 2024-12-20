@@ -92,12 +92,13 @@ export async function loadAssets(program: string, department: string, shot: null
 }
 
 
-export async function create_setup(department: string, asset: string, shot: null | string = null, dry_run: boolean = false): Promise<SetupResult | ErrorResponse> {
+export async function create_setup(department: string, asset: string, file_format: string, shot: null | string = null, dry_run: boolean = false): Promise<SetupResult | ErrorResponse> {
     let result = await get("api/v1/command/setup", {
         "department": department,
         "asset": asset,
         "shot": shot,
         "dry": dry_run,
+        "file_format": file_format
     })
     return await result.json() as SetupResult | ErrorResponse
 }

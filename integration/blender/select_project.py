@@ -25,7 +25,7 @@ class OT_SelectProject(Operator, ImportHelper):
 
         conduct = utils.get_conduct_object(self.filepath)
         
-        result = conduct.setup()
+        result = conduct.setup(".blend")
         if result['result'] != 'ok':
             return {'FINISHED'}
         
@@ -37,8 +37,7 @@ class OT_SelectProject(Operator, ImportHelper):
         if dialog_data['shot'] is not None:
             data.shot = dialog_data['shot']
 
-        path = os.path.join(dialog_data['path'], dialog_data['file_name'] + ".blend")
-        bpy.ops.wm.save_as_mainfile(filepath=path)
+        bpy.ops.wm.save_as_mainfile(filepath=dialog_data['path'])
         self.report({'INFO'}, "Saved Setup!")
 
         return {'FINISHED'}

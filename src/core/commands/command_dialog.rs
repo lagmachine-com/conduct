@@ -18,6 +18,9 @@ pub struct DialogArgs {
 
     #[arg(short, long)]
     program: Option<String>,
+
+    #[arg(short, long)]
+    file_format: Option<String>,
 }
 
 pub struct DialogOptions {
@@ -36,7 +39,8 @@ impl Command for DialogArgs {
             .with_opt_value("department", self.common.department)
             .with_opt_value("asset", self.common.asset)
             .with_opt_value("shot", self.common.shot)
-            .with_opt_value("program", self.program);
+            .with_opt_value("program", self.program)
+            .with_opt_value("file_format", self.file_format);
 
         gui::gui(
             project.read().unwrap().clone(),
