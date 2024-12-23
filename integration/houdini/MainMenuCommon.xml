@@ -5,13 +5,16 @@
 
         <subMenu id="conduct_menu">
             <label>Conduct</label>
-            <scriptItem id="conduct_select">
-                <label>Select Project</label>
+            <scriptItem id="conduct">
+                <labelExpression><![CDATA["Select Project" if not getattr(hou.session, "projectImported", False) else "Load Asset(s)"]]></labelExpression>
                 <insertAtIndex>0</insertAtIndex>
                 <scriptCode><![CDATA[
-import ConductPlugin.select_project as select_project
-select_project.create_setup()
-
+if not getattr(hou.session, "projectImported", False):
+    import ConductPlugin.select_project as select_project
+    select_project.create_setup()
+else:
+    import ConductPlugin.load_asset as load_asset
+    load_asset.load()
                     ]]>
                 </scriptCode>
             </scriptItem>

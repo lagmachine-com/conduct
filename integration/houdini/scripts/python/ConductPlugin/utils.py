@@ -1,19 +1,30 @@
-import os
 import hou
 from . import conduct
 
 
+# Not sure about the efficiency
 def get_conduct_data_node() -> hou.Node:
-    return hou.node("/obj/setup/conduct")
+    all_nodes = hou.node("/obj").allNodes()
+    data_node = None
+    for node in all_nodes:
+        if node.type().name() == "LAGMACHINE::Conduct" and node.name() == "Conduct":
+            data_node = node
+            break
+
+    if data_node is None:
+        data_node: hou.Node = hou.node(
+            "/obj").createNode("LAGMACHINE::Conduct")
+        data_node.setName("Conduct")
+        data_node.setPosition((0, 0))
+
+    return data_node
 
 
-def get_conduct_object() -> conduct.Conduct:
-    data = get_conduct_data_node()
-    projectParm: hou.Parm = data.parm("project")
-    dir = os.path.dirname(projectParm.evalAsString())
-    exe = os.path.join(dir, "conduct.exe")
-
-    return conduct.Conduct(exe, "houdini")
+def get_conduct_object(manifest_path=None) -> conduct.Conduct:
+    if manifest_path != None:
+        return conduct.get_from_manifest_path(manifest_path, "houdini")
+    else:
+        return conduct.find_from_current_path(hou.hipFile.path(), "houdini")
 
 
 def select_project():
