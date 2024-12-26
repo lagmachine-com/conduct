@@ -51,10 +51,37 @@ impl VersionControl for VersionControlConfigDirect {
 
     fn get_element_files(
         &self,
-        _project: &project::Project,
-        _element_name: String,
-        _element_data: &ResolvedElementData,
+        project: &project::Project,
+        element_name: String,
+        element_data: &ResolvedElementData,
     ) -> Vec<String> {
-        todo!()
+        let asset_name = element_data.get_asset_name().unwrap();
+        let dept = element_data.get_owning_department().unwrap();
+        let shot = element_data.get_shot();
+
+        let (path, _file_name) =
+            match resolve_element_path(project, dept, asset_name, element_name, shot) {
+                Ok(val) => val,
+                Err(err) => {
+                    error!("Failed to resolve path {:?}", err);
+                    return Vec::new();
+                }
+            };
+
+        let mut dir = project.get_root_directory();
+        dir.push("export");
+        dir.push(path);
+
+        let files = std::fs::read_dir(dir);
+        match files {
+            Ok(files) => {
+                return files
+                    .into_iter()
+                    .filter(|e| e.is_ok())
+                    .map(|e| e.unwrap().path().to_str().unwrap().to_string())
+                    .collect()
+            }
+            Err(_) => return Vec::new(),
+        }
     }
 }
