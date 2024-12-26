@@ -61,6 +61,10 @@ def load(results):
             
         asset_to_files[asset].append(file)
         importer = scripts[entry['script']]
+        
+        importer.asset = asset
+        importer.element = element
+
         result = importer.load(file)
 
         result = {
