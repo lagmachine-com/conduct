@@ -117,6 +117,9 @@ def load(results):
                 importer.apply(this_element, element)
         
     print("Finished Applications")
+    
+    # Workaround for https://github.com/lagmachinery/conduct/issues/18
+    bpy.ops.file.make_paths_absolute()
 
     for entry in file_to_element.values():
         data = entry['data']
