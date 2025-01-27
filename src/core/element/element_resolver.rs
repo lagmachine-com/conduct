@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use log::{debug, info, warn};
+use log::{debug, warn};
 
 use crate::core::{
     asset::Asset,
