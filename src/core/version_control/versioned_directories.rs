@@ -5,12 +5,18 @@ use crate::core::{
     version_control::common::resolve_element_path,
 };
 
-use super::{ExportError, ExportResult, VersionControl, VersionControlFile};
+use super::{
+    common::CommonVersionControlConfig, ExportError, ExportResult, VersionControl,
+    VersionControlFile,
+};
 use log::{error, info, warn};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VersionControlConfigVersionedDirectories {}
+pub struct VersionControlConfigVersionedDirectories {
+    #[serde(flatten)]
+    common: CommonVersionControlConfig,
+}
 
 impl VersionControl for VersionControlConfigVersionedDirectories {
     fn export(
@@ -26,7 +32,8 @@ impl VersionControl for VersionControlConfigVersionedDirectories {
         let shot = args.common.shot.clone();
 
         let (path, file_name) =
-            match resolve_element_path(project, dept, asset_name, element_name, shot) {
+            match resolve_element_path(project, dept, asset_name, element_name, shot, &self.common)
+            {
                 Ok(val) => val,
                 Err(err) => {
                     error!("Failed to resolve path");
@@ -69,7 +76,8 @@ impl VersionControl for VersionControlConfigVersionedDirectories {
         let shot = element_data.get_shot();
 
         let (path, _file_name) =
-            match resolve_element_path(project, dept, asset_name, element_name, shot) {
+            match resolve_element_path(project, dept, asset_name, element_name, shot, &self.common)
+            {
                 Ok(val) => val,
                 Err(err) => {
                     error!("Failed to resolve path {:?}", err);

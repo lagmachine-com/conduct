@@ -3,12 +3,9 @@ use std::sync::RwLock;
 use clap::{command, Args};
 use log::{debug, info, warn};
 use ts_rs::TS;
-use wry::http::request;
 
 use crate::core::{
-    context::Context,
-    element::{self, element_resolver::ElementResolver},
-    project::Project,
+    context::Context, element::element_resolver::ElementResolver, project::Project,
     version_control::VersionControl,
 };
 use serde::{Deserialize, Serialize};

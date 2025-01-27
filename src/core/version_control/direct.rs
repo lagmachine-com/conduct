@@ -1,4 +1,3 @@
-use core::fmt;
 use std::{collections::BTreeMap, path::PathBuf};
 
 use crate::core::{
@@ -6,7 +5,10 @@ use crate::core::{
     version_control::common::resolve_element_path,
 };
 
-use super::{ExportError, ExportResult, VersionControl, VersionControlFile};
+use super::{
+    common::CommonVersionControlConfig, ExportError, ExportResult, VersionControl,
+    VersionControlFile,
+};
 use log::{error, info};
 use path_absolutize::Absolutize;
 use serde::{Deserialize, Serialize};
@@ -15,6 +17,9 @@ use serde::{Deserialize, Serialize};
 pub struct VersionControlConfigDirect {
     #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
     export_overrides: BTreeMap<String, String>,
+
+    #[serde(flatten)]
+    common: CommonVersionControlConfig,
 }
 
 impl VersionControl for VersionControlConfigDirect {
@@ -31,7 +36,8 @@ impl VersionControl for VersionControlConfigDirect {
         let shot = args.common.shot.clone();
 
         let (path, file_name) =
-            match resolve_element_path(project, dept, asset_name, element_name, shot) {
+            match resolve_element_path(project, dept, asset_name, element_name, shot, &self.common)
+            {
                 Ok(val) => val,
                 Err(err) => {
                     error!("Failed to resolve path");
@@ -89,7 +95,8 @@ impl VersionControl for VersionControlConfigDirect {
         let shot = element_data.get_shot();
 
         let (path, _file_name) =
-            match resolve_element_path(project, dept, asset_name, element_name, shot) {
+            match resolve_element_path(project, dept, asset_name, element_name, shot, &self.common)
+            {
                 Ok(val) => val,
                 Err(err) => {
                     error!("Failed to resolve path {:?}", err);
