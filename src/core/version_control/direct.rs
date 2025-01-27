@@ -1,3 +1,6 @@
+use core::fmt;
+use std::{collections::BTreeMap, path::PathBuf};
+
 use crate::core::{
     commands::ExportArgs, element::resolved_element_data::ResolvedElementData, project,
     version_control::common::resolve_element_path,
@@ -5,10 +8,14 @@ use crate::core::{
 
 use super::{ExportError, ExportResult, VersionControl};
 use log::{error, info};
+use path_absolutize::Absolutize;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VersionControlConfigDirect {}
+pub struct VersionControlConfigDirect {
+    #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
+    export_overrides: BTreeMap<String, String>
+}
 
 impl VersionControl for VersionControlConfigDirect {
     fn export(
@@ -31,10 +38,35 @@ impl VersionControl for VersionControlConfigDirect {
                     return Err(err);
                 }
             };
+        
+        info!("Resolved path: {}", &path.to_str().unwrap());
 
         let mut dir = project.get_root_directory();
-        dir.push("export");
-        dir.push(path);
+
+        match self.export_overrides.get(&args.file_format) {
+            Some(override_str) => {
+                info!("Found override path: {}", override_str);
+                let override_path = PathBuf::from(override_str);
+                if override_path.is_relative() {
+                    info!("Override path is relative");
+                    dir.push(override_str);
+                    dir = dir.absolutize().unwrap().to_path_buf();
+
+                    info!("dir after relative override: {}", dir.to_str().unwrap());
+
+                } else {
+                    info!("Override path is absolute")
+                }
+
+                dir.push(path);
+            },
+            None => {
+                dir.push("export");
+                dir.push(path);
+            },
+        }
+
+
 
         info!("Exporting to: {}", dir.to_str().unwrap());
         info!("Recommended file name: {}", file_name);
