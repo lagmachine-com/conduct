@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct VersionControlConfigDirect {
     #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
-    export_overrides: BTreeMap<String, String>
+    export_overrides: BTreeMap<String, String>,
 }
 
 impl VersionControl for VersionControlConfigDirect {
@@ -38,7 +38,7 @@ impl VersionControl for VersionControlConfigDirect {
                     return Err(err);
                 }
             };
-        
+
         info!("Resolved path: {}", &path.to_str().unwrap());
 
         let mut dir = project.get_root_directory();
@@ -53,20 +53,17 @@ impl VersionControl for VersionControlConfigDirect {
                     dir = dir.absolutize().unwrap().to_path_buf();
 
                     info!("dir after relative override: {}", dir.to_str().unwrap());
-
                 } else {
                     info!("Override path is absolute")
                 }
 
                 dir.push(path);
-            },
+            }
             None => {
                 dir.push("export");
                 dir.push(path);
-            },
+            }
         }
-
-
 
         info!("Exporting to: {}", dir.to_str().unwrap());
         info!("Recommended file name: {}", file_name);
