@@ -68,12 +68,12 @@ class OT_RunSelectedExport(Operator):
         result = conduct.export(data.department, export.format, data.asset, name, data.shot)
 
         locals = {}
-        globals = {}
-        script = result['script']
-        exec(script, locals, globals)
 
-        for item in globals:
-            instance = globals[item]
+        script = result['script']
+        exec(script, globals(), locals)
+
+        for item in locals:
+            instance = locals[item]
 
             if not inspect.isclass(instance):
                 continue
