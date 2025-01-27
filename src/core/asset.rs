@@ -14,6 +14,7 @@ pub enum AssetEntry {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Asset {
+    #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
     pub departments: BTreeMap<String, ElementCollection>,
 }
 
