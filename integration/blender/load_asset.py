@@ -10,6 +10,22 @@ def can_add_to_collection(item):
     
     if isinstance(item, bpy.types.Object):
         return True
+    
+    if type(item) is list:
+        for i in item:
+            if not can_add_to_collection(i):
+                return False
+        return True
+
+def add_to_collection(collection, item):
+    if isinstance(item, bpy.types.Collection):
+        collection.children.link(item)
+    if isinstance(item, bpy.types.Object):
+        collection.objects.link(item)
+
+    if type(item) is list:
+        for i in item:
+            add_to_collection(collection, i)
 
 def make_collection(item, asset, element):
     name = "IN_" + asset + "_" + element
@@ -22,11 +38,8 @@ def make_collection(item, asset, element):
         
         old_collection.user_remap(collection)
         bpy.data.collections.remove(old_collection)
-    
-    if isinstance(item, bpy.types.Collection):
-        collection.children.link(item)
-    if isinstance(item, bpy.types.Object):
-        collection.objects.link(item)
+
+    add_to_collection(collection, item)
 
     return collection
 
@@ -61,6 +74,10 @@ def load(results):
             
         asset_to_files[asset].append(file)
         importer = scripts[entry['script']]
+        
+        importer.asset = asset
+        importer.element = element
+
         result = importer.load(file)
 
         result = {
@@ -103,16 +120,36 @@ def load(results):
 
         for element in elements:
             info = "  Applying to: " + element['metadata']['asset'] + "/" + element['metadata']['element']
-            if hasattr(importer, "should_apply"):
-                if importer.should_apply(this_element, element):
-                    print(info)
-                    importer.apply(this_element, element)
 
+            data = element['data']
+
+            if not type(data) is list:
+                data_list = [data]
             else:
-                print(info)
-                importer.apply(this_element, element)
+                data_list = data
+
+            for i in range(len(data_list)):
+                item = data_list[i]
+                clone = dict(element)
+                clone['data'] = item
+
+                if hasattr(importer, "should_apply"):
+                    if importer.should_apply(this_element, clone):
+                        print(info)
+                        importer.apply(this_element, clone)
+                else:
+                    print(info)
+                    importer.apply(this_element, clone)
+
+                if type(data) is list:
+                    element['data'][i] = clone['data']
+                else:
+                    element['data'] = clone['data']
         
     print("Finished Applications")
+    
+    # Workaround for https://github.com/lagmachinery/conduct/issues/18
+    bpy.ops.file.make_paths_absolute()
 
     for entry in file_to_element.values():
         data = entry['data']

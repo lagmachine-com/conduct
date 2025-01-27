@@ -21,7 +21,18 @@ bl_info = {
     "warning" : "",
     "category" : "Generic"
 }
-from . import properties, menu, project_browser, select_project, export, export_menu, load_asset
+from . import properties, menu, project_browser, select_project, export, export_menu, load_asset, utils
+
+import bpy
+from bpy.app.handlers import persistent
+
+@persistent
+def pre_save_handler(dummy):
+    data = utils.get_conduct_data()
+
+    if data == None or data.asset == None or data.asset == "":
+        return
+    bpy.ops.file.make_paths_relative()
 
 
 def register():
@@ -32,9 +43,11 @@ def register():
     export_menu.register()
     project_browser.register()
     load_asset.register()
+    bpy.app.handlers.save_pre.append(pre_save_handler)
 
 
 def unregister():
+    bpy.app.handlers.save_pre.remove(pre_save_handler)
     load_asset.unregister()
     project_browser.unregister()
     export_menu.unregister()
@@ -42,3 +55,4 @@ def unregister():
     select_project.unregister()
     export.unregister()
     properties.unregister()
+    
