@@ -41,6 +41,7 @@ pub struct AssetLoadStep {
     pub script: String,
     pub file: String,
     pub file_type: String,
+    pub version: String,
 }
 
 #[derive(Debug, Serialize, Clone, Deserialize, TS)]
@@ -100,7 +101,7 @@ impl Command for LoadAssetsArgs {
 
                 for file in files.iter() {
                     for format in import_formats.iter() {
-                        if file.ends_with(format) {
+                        if file.path.ends_with(format) {
                             debug!("Getting script for format: {}", format);
 
                             let mut script_path = project.get_root_directory();
@@ -113,7 +114,8 @@ impl Command for LoadAssetsArgs {
                                 element: element.0.clone(),
                                 script: script_path.to_str().unwrap().to_string(),
                                 file_type: format.clone(),
-                                file: file.clone(),
+                                file: file.path.clone(),
+                                version: file.version.clone(),
                             });
 
                             break;

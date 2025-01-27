@@ -6,7 +6,7 @@ use crate::core::{
     version_control::common::resolve_element_path,
 };
 
-use super::{ExportError, ExportResult, VersionControl};
+use super::{ExportError, ExportResult, VersionControl, VersionControlFile};
 use log::{error, info};
 use path_absolutize::Absolutize;
 use serde::{Deserialize, Serialize};
@@ -86,7 +86,7 @@ impl VersionControl for VersionControlConfigDirect {
         project: &project::Project,
         element_name: String,
         element_data: &ResolvedElementData,
-    ) -> Vec<String> {
+    ) -> Vec<VersionControlFile> {
         let asset_name = element_data.get_asset_name().unwrap();
         let dept = element_data.get_owning_department().unwrap();
         let shot = element_data.get_shot();
@@ -110,7 +110,10 @@ impl VersionControl for VersionControlConfigDirect {
                 return files
                     .into_iter()
                     .filter(|e| e.is_ok())
-                    .map(|e| e.unwrap().path().to_str().unwrap().to_string())
+                    .map(|e| VersionControlFile {
+                        path: e.unwrap().path().to_str().unwrap().to_string(),
+                        version: "current".to_string(),
+                    })
                     .collect()
             }
             Err(_) => return Vec::new(),
