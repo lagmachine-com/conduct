@@ -18,6 +18,9 @@ pub struct VersionControlConfigDirect {
     #[serde(skip_serializing_if = "BTreeMap::is_empty", default)]
     export_overrides: BTreeMap<String, String>,
 
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub overrides_order: Vec<String>,
+
     #[serde(flatten)]
     common: CommonVersionControlConfig,
 }
@@ -35,9 +38,15 @@ impl VersionControl for VersionControlConfigDirect {
         let element_name = args.common.element.clone().unwrap();
         let shot = args.common.shot.clone();
 
+        let using_path_override = self.export_overrides.contains_key(&args.file_format);
+
+        let config = &mut self.common.clone();
+        if using_path_override && !self.overrides_order.is_empty() {
+            config.path_order = self.overrides_order.clone()
+        }
+
         let (path, file_name) =
-            match resolve_element_path(project, dept, asset_name, element_name, shot, &self.common)
-            {
+            match resolve_element_path(project, dept, asset_name, element_name, shot, &config) {
                 Ok(val) => val,
                 Err(err) => {
                     error!("Failed to resolve path");
