@@ -8,6 +8,7 @@ import DialogCreateSetup from './pages/dialogs/create_setup';
 import DialogLoadAsset from './pages/dialogs/load_asset';
 import { ColorModeProvider } from '@kobalte/core/color-mode';
 import { Component } from 'solid-js';
+import DialogExport from './pages/dialogs/export';
 
 const root = document.getElementById('root');
 
@@ -29,4 +30,5 @@ render(() => (<Router root={rootComponent}>
   <Route path="/" component={App} />
   <Route path="/dialogs/create_setup" component={DialogCreateSetup} />
   <Route path="/dialogs/load_asset" component={DialogLoadAsset} />
+  <Route path="/dialogs/export" component={DialogExport} />
 </Router>), root!);

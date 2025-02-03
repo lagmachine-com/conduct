@@ -49,6 +49,8 @@ departments:
       blender:
         exports:
         - .mesh.blend
+        - .shadergraph.blend
+        - .animbake.abc
 
 assets:
   3d:
@@ -57,6 +59,8 @@ assets:
         departments:
           model:
           - mesh
+          - lod
+          - test
           lookdev:
           - shadergraph
     - defaultCubeA:
