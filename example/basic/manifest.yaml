@@ -12,6 +12,9 @@ programs:
       .glb: import_glb_mesh.py
       .shadergraph.blend: import_blend_shadergraph.py
       .mesh.blend: import_blend_library_mesh.py
+  inkscape:
+    exports:
+      .png: export_png.py
 
 departments:
   anim:
@@ -51,7 +54,9 @@ departments:
         - .mesh.blend
   design:
     programs:
-      inkscape: {}
+      inkscape:
+        exports:
+        - .png
 
 assets:
   3d:
