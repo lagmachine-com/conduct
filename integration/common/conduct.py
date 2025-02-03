@@ -4,6 +4,9 @@ import os
 import subprocess
 import json
 
+def log(info):
+    print(info)
+
 class Conduct:
     conduct_exe = ""
     current_program = ""
@@ -24,12 +27,13 @@ class Conduct:
             startupinfo.dwFlags = subprocess.CREATE_NO_WINDOW
             creation_flags = subprocess.CREATE_NO_WINDOW
         
-        print("Executing: " + str(args))
+        log("Executing: " + str(args))
 
-        process=subprocess.Popen(args, cwd=os.path.dirname(self.conduct_exe), startupinfo=startupinfo, stdout=subprocess.PIPE, encoding='utf-8', creationflags=creation_flags)
+        process=subprocess.Popen(args, cwd=os.path.dirname(self.conduct_exe), startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, encoding='utf-8', creationflags=creation_flags)
 
         data = process.communicate()[0]
-        print(data)
+        
+        log(data)
 
         return json.loads(data)
 
@@ -65,7 +69,7 @@ class Conduct:
         return self.run_process(args)
 
 def get_from_manifest_path(manifest_path, current_program):
-    print("Getting exe from manifest path: " + manifest_path)
+    log("Getting exe from manifest path: " + manifest_path)
 
     dir_path = os.path.dirname(manifest_path)
     exe = "conduct"
@@ -76,7 +80,7 @@ def get_from_manifest_path(manifest_path, current_program):
     return Conduct(path, current_program)
 
 def find_from_current_path(current_file, current_program):
-    print("Looking for conduct path for file: " + current_file)
+    log("Looking for conduct path for file: " + current_file)
     path = os.path.dirname(current_file)
     while path != "":
         checks = [
@@ -86,7 +90,7 @@ def find_from_current_path(current_file, current_program):
 
         for check in checks:
             if os.path.isfile(check):
-                print("found:" + check)
+                log("found:" + check)
                 return get_from_manifest_path(check, current_program)
             
         path = os.path.dirname(path)
