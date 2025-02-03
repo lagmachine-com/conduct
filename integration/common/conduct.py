@@ -38,11 +38,11 @@ class Conduct:
         return summary
 
     def setup(self, file_format):
-        args = ["dialog", "create_setup", "--file-format", file_format]
+        args = ["dialog", "create_setup", "--", "--file-format", file_format]
         return self.run_process(args)
 
     def dialog_load_asset(self, department, shot=None, asset=None ):
-        args = ["dialog", "load_asset", "--program", self.current_program, "--department", department]
+        args = ["dialog", "load_asset", "--", "--program", self.current_program, "--department", department]
         if shot != None and shot != "":
             args.append("--shot")
             args.append(shot)

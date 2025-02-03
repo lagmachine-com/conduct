@@ -6,21 +6,13 @@ use query_string_builder::QueryString;
 use crate::{core::project::Project, gui};
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{error::CommandError, Command};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct DialogArgs {
-    #[command(flatten)]
-    #[serde(flatten)]
-    pub common: CommonArgs,
-
     kind: String,
 
-    #[arg(short, long)]
-    program: Option<String>,
-
-    #[arg(short, long)]
-    file_format: Option<String>,
+    extras: Vec<String>,
 }
 
 pub struct DialogOptions {
@@ -35,12 +27,14 @@ impl Command for DialogArgs {
         self,
         project: &RwLock<Project>,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
-        let args = QueryString::dynamic()
-            .with_opt_value("department", self.common.department)
-            .with_opt_value("asset", self.common.asset)
-            .with_opt_value("shot", self.common.shot)
-            .with_opt_value("program", self.program)
-            .with_opt_value("file_format", self.file_format);
+        let (_, argv) = argmap::parse(self.extras.iter());
+        log::debug!("Got extras: {:?}", argv);
+
+        let mut args = QueryString::dynamic();
+        for pair in argv.iter() {
+            let value = pair.1.get(0).unwrap();
+            _ = args.push(pair.0.clone(), value.clone())
+        }
 
         gui::gui(
             project.read().unwrap().clone(),
