@@ -1,4 +1,4 @@
-import { AssetTreeCategory, ListAssetsResult, ListShotsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
+import { AssetTreeCategory, ListAssetsResult, ListElementsResult, ListExportFormatsResult, ListShotsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
 
 
 declare global {
@@ -45,8 +45,15 @@ export async function getSummary(): Promise<SummaryResponse> {
     return await result.json() as SummaryResponse
 }
 
-export async function doExport(): Promise<SummaryResponse> {
-    let result = await get("api/v1/command/export?asset=suzanneA&department=model")
+export async function doExport(department: string, asset: string, element: string, shot: string | null | undefined, from: string, file_format: string): Promise<SummaryResponse> {
+    let result = await get("api/v1/command/export", {
+        "department": department,
+        "asset": asset,
+        "element": element,
+        "shot": shot,
+        "from": from,
+        "file_format": file_format
+    })
     return await result.json() as SummaryResponse
 }
 
@@ -70,6 +77,29 @@ export async function listAssets(department_filter: null | string = null): Promi
         "department": department_filter
     })
     return await result.json() as ListAssetsResult
+}
+
+export async function listElements(asset: string, department: null | string = null, load: boolean = false): Promise<ListElementsResult> {
+    let result = await get("api/v1/command/list_elements", {
+        "department": department,
+        "asset": asset,
+        "load": load,
+    })
+
+    let data = await result.json()
+    console.log(data)
+    return data as ListElementsResult
+}
+
+export async function listExportFormats(department: string, program: string,): Promise<ListExportFormatsResult> {
+    let result = await get("api/v1/command/list_export_formats", {
+        "department": department,
+        "from": program
+    })
+
+    let data = await result.json()
+    console.log(data)
+    return data as ListExportFormatsResult
 }
 
 export async function getAssetTree(department_filter: null | string = null): Promise<AssetTreeCategory> {

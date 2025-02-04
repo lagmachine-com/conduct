@@ -21,7 +21,7 @@ const DialogCreateSetup: Component = () => {
     const [shots] = createResource(listShots);
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const fileFormat = () => searchParams.file_format;
+    const fileFormat = () => searchParams['file-format'];
 
     const derivedState = () => {
         return { department: selectedDepartment(), asset: selectedAsset(), shot: selectedShot() }
