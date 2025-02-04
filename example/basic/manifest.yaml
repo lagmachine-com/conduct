@@ -58,7 +58,7 @@ assets:
     - $template:
         departments:
           model:
-          - mesh
+          - !shot_local mesh
           - lod
           - test
           lookdev:

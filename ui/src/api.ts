@@ -45,8 +45,15 @@ export async function getSummary(): Promise<SummaryResponse> {
     return await result.json() as SummaryResponse
 }
 
-export async function doExport(): Promise<SummaryResponse> {
-    let result = await get("api/v1/command/export?asset=suzanneA&department=model")
+export async function doExport(department: string, asset: string, element: string, shot: string | null | undefined, from: string, file_format: string): Promise<SummaryResponse> {
+    let result = await get("api/v1/command/export", {
+        "department": department,
+        "asset": asset,
+        "element": element,
+        "shot": shot,
+        "from": from,
+        "file_format": file_format
+    })
     return await result.json() as SummaryResponse
 }
 
