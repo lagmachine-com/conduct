@@ -14,7 +14,8 @@ programs:
       .mesh.blend: import_blend_library_mesh.py
   inkscape:
     exports:
-      .png: export_png.py
+      .png: export_png_512.py
+      .2x.png: export_png_1024.py
 
 departments:
   anim:
@@ -57,6 +58,7 @@ departments:
       inkscape:
         exports:
         - .png
+        - .2x.png
 
 assets:
   3d:
@@ -82,6 +84,7 @@ assets:
         departments:
           design:
           - vector 
+          - 2x
 
 shots:
   '103':

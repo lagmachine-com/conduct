@@ -11,6 +11,7 @@
    com.lagmachine.conduct.department="design"
    sodipodi:docname="iconA_design.svg"
    inkscape:version="1.4 (e7c3feb, 2024-10-09)"
+   com.lagmachine.conduct.export_save_state="&quot;{\&quot;vector\&quot;:{\&quot;fileFormat\&quot;:\&quot;.png\&quot;,\&quot;enabled\&quot;:true,\&quot;items\&quot;:[\&quot;pageA\&quot;]},\&quot;alt\&quot;:{\&quot;fileFormat\&quot;:\&quot;.png\&quot;,\&quot;enabled\&quot;:false,\&quot;items\&quot;:[\&quot;pageB\&quot;]},\&quot;alt2\&quot;:{\&quot;fileFormat\&quot;:\&quot;.png\&quot;,\&quot;enabled\&quot;:false,\&quot;items\&quot;:[\&quot;pageC\&quot;]},\&quot;2x\&quot;:{\&quot;fileFormat\&quot;:\&quot;.2x.png\&quot;,\&quot;enabled\&quot;:true,\&quot;items\&quot;:[\&quot;pageA\&quot;]}}&quot;"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -25,15 +26,39 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="1.0324986"
-     inkscape:cx="397.09497"
-     inkscape:cy="561.7441"
-     inkscape:window-width="1239"
-     inkscape:window-height="1217"
-     inkscape:window-x="1784"
-     inkscape:window-y="107"
+     inkscape:zoom="0.42588675"
+     inkscape:cx="463.73831"
+     inkscape:cy="717.32685"
+     inkscape:window-width="1725"
+     inkscape:window-height="1006"
+     inkscape:window-x="193"
+     inkscape:window-y="400"
      inkscape:window-maximized="0"
-     inkscape:current-layer="layer1" />
+     inkscape:current-layer="layer1">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="210"
+       height="297"
+       id="page1"
+       margin="0"
+       bleed="0"
+       inkscape:label="pageA" />
+    <inkscape:page
+       x="236.07606"
+       y="12.425056"
+       width="78.27785"
+       height="109.96175"
+       id="page2"
+       inkscape:label="pageB" />
+    <inkscape:page
+       x="252.22863"
+       y="196.31589"
+       width="66.474047"
+       height="88.217899"
+       id="page3"
+       inkscape:label="pageC" />
+  </sodipodi:namedview>
   <defs
      id="defs1" />
   <g
@@ -47,5 +72,94 @@
        height="54.838654"
        x="52.2761"
        y="57.401207" />
+    <ellipse
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="path1"
+       cx="255.64554"
+       cy="53.893677"
+       rx="19.569464"
+       ry="13.512247" />
+    <ellipse
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="path2"
+       cx="310.00513"
+       cy="231.41667"
+       rx="8.6975355"
+       ry="17.705704" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="rect2"
+       width="8.6975393"
+       height="25.471363"
+       x="20.501343"
+       y="28.577627" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="rect3"
+       width="45.972706"
+       height="18.637583"
+       x="68.337807"
+       y="16.152573" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="rect4"
+       width="27.956379"
+       height="62.125278"
+       x="159.04071"
+       y="42.866444" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="rect5"
+       width="72.686577"
+       height="63.367783"
+       x="86.975388"
+       y="147.85815" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="rect6"
+       width="3.7275167"
+       height="53.427738"
+       x="37.89642"
+       y="140.40314"
+       ry="1.8637583" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="rect7"
+       width="27.956379"
+       height="54.670246"
+       x="41.623936"
+       y="155.31319"
+       ry="1.8637583" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="rect8"
+       width="55.912754"
+       height="25.471378"
+       x="113.06801"
+       y="211.22592"
+       ry="1.8637583" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="rect9"
+       width="88.855713"
+       height="15.53132"
+       x="121.14429"
+       y="257.81992"
+       ry="1.8637583" />
+    <rect
+       style="fill:#000000;stroke:#000000;stroke-width:0.3"
+       id="rect10"
+       width="39.760178"
+       height="30.441387"
+       x="31.683889"
+       y="232.34854"
+       ry="1.8637583" />
+    <ellipse
+       style="fill:#ffff00;stroke:#000000;stroke-width:0.3"
+       id="path10"
+       cx="96.650246"
+       cy="174.46858"
+       rx="44.374142"
+       ry="62.228718" />
   </g>
 </svg>

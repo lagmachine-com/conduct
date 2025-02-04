@@ -57,6 +57,18 @@ class Conduct:
 
         return self.run_process(args)
     
+    def dialog_export(self, department, asset, items, prev_state=None, shot=None,  ):
+        args = ["dialog", "export", "--", "--program", self.current_program, "--department", department, "--asset", asset, "--items", items ]
+        if shot != None and shot != "":
+            args.append("--shot")
+            args.append(shot)
+
+        if prev_state != None and prev_state != "":
+            args.append("--prev-state")
+            args.append(prev_state)
+        
+        return self.run_process(args)
+    
     def list_export_formats(self, department):
         return self.run_process(["list-export-formats", "--from", self.current_program, "--department", department])
     
