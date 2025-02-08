@@ -5,12 +5,18 @@ use crate::core::{
     version_control::common::resolve_element_path,
 };
 
-use super::{ExportError, ExportResult, VersionControl};
+use super::{
+    common::CommonVersionControlConfig, ExportError, ExportResult, VersionControl,
+    VersionControlFile,
+};
 use log::{error, info, warn};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct VersionControlConfigVersionedDirectories {}
+pub struct VersionControlConfigVersionedDirectories {
+    #[serde(flatten)]
+    common: CommonVersionControlConfig,
+}
 
 impl VersionControl for VersionControlConfigVersionedDirectories {
     fn export(
@@ -26,7 +32,8 @@ impl VersionControl for VersionControlConfigVersionedDirectories {
         let shot = args.common.shot.clone();
 
         let (path, file_name) =
-            match resolve_element_path(project, dept, asset_name, element_name, shot) {
+            match resolve_element_path(project, dept, asset_name, element_name, shot, &self.common)
+            {
                 Ok(val) => val,
                 Err(err) => {
                     error!("Failed to resolve path");
@@ -63,13 +70,14 @@ impl VersionControl for VersionControlConfigVersionedDirectories {
         project: &project::Project,
         element_name: String,
         element_data: &ResolvedElementData,
-    ) -> Vec<String> {
+    ) -> Vec<VersionControlFile> {
         let asset_name = element_data.get_asset_name().unwrap();
         let dept = element_data.get_owning_department().unwrap();
         let shot = element_data.get_shot();
 
         let (path, _file_name) =
-            match resolve_element_path(project, dept, asset_name, element_name, shot) {
+            match resolve_element_path(project, dept, asset_name, element_name, shot, &self.common)
+            {
                 Ok(val) => val,
                 Err(err) => {
                     error!("Failed to resolve path {:?}", err);
@@ -104,10 +112,19 @@ impl VersionControl for VersionControlConfigVersionedDirectories {
             let files = std::fs::read_dir(path.path());
             match files {
                 Ok(files) => {
-                    let files: Vec<String> = files
+                    let files: Vec<VersionControlFile> = files
                         .into_iter()
                         .filter(|e| e.is_ok())
-                        .map(|e| e.unwrap().path().to_str().unwrap().to_string())
+                        .map(|e| {
+                            let mut path = e.unwrap().path();
+                            let file = path.to_str().unwrap().to_string();
+                            path.pop();
+                            let version = path.file_name().unwrap().to_str().unwrap().to_string();
+                            VersionControlFile {
+                                path: file,
+                                version,
+                            }
+                        })
                         .collect();
                     info!("Found files: {:?}", files);
 

@@ -53,12 +53,8 @@ departments:
       blender:
         exports:
         - .mesh.blend
-  design:
-    programs:
-      inkscape:
-        exports:
-        - .png
-        - .2x.png
+        - .shadergraph.blend
+        - .animbake.abc
 
 assets:
   3d:
@@ -66,7 +62,9 @@ assets:
     - $template:
         departments:
           model:
-          - mesh
+          - !shot_local mesh
+          - lod
+          - test
           lookdev:
           - shadergraph
     - defaultCubeA:

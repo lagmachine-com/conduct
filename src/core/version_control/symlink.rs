@@ -7,7 +7,10 @@ use crate::core::{
     version_control::{common::resolve_element_path, versioned_directories::get_next_version},
 };
 
-use super::{ExportError, ExportResult, VersionControl};
+use super::{
+    common::CommonVersionControlConfig, ExportError, ExportResult, VersionControl,
+    VersionControlFile,
+};
 use log::{error, info};
 use path_absolutize::Absolutize;
 use serde::{Deserialize, Serialize};
@@ -16,6 +19,9 @@ use serde::{Deserialize, Serialize};
 pub struct VersionControlConfigSymlink {
     relative: bool,
     pool: String,
+
+    #[serde(flatten)]
+    common: CommonVersionControlConfig,
 }
 
 impl VersionControl for VersionControlConfigSymlink {
@@ -32,7 +38,8 @@ impl VersionControl for VersionControlConfigSymlink {
         let shot = args.common.shot.clone();
 
         let (path, file_name) =
-            match resolve_element_path(project, dept, asset_name, element_name, shot) {
+            match resolve_element_path(project, dept, asset_name, element_name, shot, &self.common)
+            {
                 Ok(val) => val,
                 Err(err) => {
                     error!("Failed to resolve path");
@@ -111,7 +118,7 @@ impl VersionControl for VersionControlConfigSymlink {
         _project: &project::Project,
         _element_name: String,
         _element_data: &ResolvedElementData,
-    ) -> Vec<String> {
+    ) -> Vec<VersionControlFile> {
         todo!()
     }
 }

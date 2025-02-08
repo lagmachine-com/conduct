@@ -1,6 +1,7 @@
-use std::path::PathBuf;
+use std::{collections::HashMap, path::PathBuf};
 
 use log::{info, warn};
+use serde::{Deserialize, Serialize};
 
 use crate::core::{
     context::Context, element::element_resolver::ElementResolver, project,
@@ -9,26 +10,54 @@ use crate::core::{
 
 use super::ExportError;
 
+fn seperate_shots_and_assets_default() -> bool {
+    true
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CommonVersionControlConfig {
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub path_order: Vec<String>,
+
+    #[serde(default = "seperate_shots_and_assets_default")]
+    pub seperate_shots_and_assets: bool,
+}
+
+pub fn get_default_path_order() -> Vec<String> {
+    return vec![
+        "shot".to_string(),
+        "category".to_string(),
+        "asset".to_string(),
+        "department".to_string(),
+        "element".to_string(),
+    ];
+}
+
 pub fn resolve_element_path(
     project: &project::Project,
     department: String,
     asset_name: String,
     element_name: String,
     shot: Option<String>,
+    config: &CommonVersionControlConfig,
 ) -> Result<(PathBuf, String), ExportError> {
-    let asset = project.get_asset_by_name(asset_name.clone());
+    let mut map = HashMap::<&str, String>::new();
 
-    let (_asset, path) = match &asset {
-        Some(asset) => asset,
+    map.insert("department", department.clone());
+    map.insert("asset", asset_name.clone());
+
+    match project.get_asset_by_name(asset_name.clone()) {
+        Some(asset) => {
+            info!("Found asset at path: {}", asset.1);
+            map.insert("category", asset.1);
+        }
         None => {
             warn!("Could not find asset entry!");
             return Err(ExportError::NotImplemented);
         }
     };
 
-    info!("Found asset at path: {}", path);
-
-    let element = project.get_element(
+    let element_data = match project.get_element(
         asset_name.clone(),
         element_name.clone(),
         &Context {
@@ -36,10 +65,16 @@ pub fn resolve_element_path(
             mode: crate::core::context::ContextMode::Export,
             shot: shot,
         },
-    );
+    ) {
+        Some(data) => {
+            map.insert("element", element_name.clone());
 
-    let element_data = match element {
-        Some(data) => data,
+            if data.is_shot_local() {
+                map.insert("shot", data.get_shot().unwrap());
+                info!("Resolved shot: {}", data.get_shot().unwrap())
+            }
+            data
+        }
         None => {
             warn!("Could not find resolve element '{}'!", element_name);
             return Err(ExportError::NotImplemented);
@@ -48,42 +83,47 @@ pub fn resolve_element_path(
 
     let mut result = PathBuf::new();
 
-    if element_data.is_shot_local() {
-        let shot = match element_data.get_shot() {
-            Some(shot) => shot,
-            None => {
-                warn!("Element is shot local but no shot was resolved");
+    if config.seperate_shots_and_assets {
+        if element_data.is_shot_local() {
+            let shot = match element_data.get_shot() {
+                Some(shot) => shot,
+                None => {
+                    warn!("Element is shot local but no shot was resolved");
+                    return Err(ExportError::NotImplemented);
+                }
+            };
+
+            if project.shot_exists(&shot) == false {
+                warn!("Resolved shot {} does not exist", shot);
                 return Err(ExportError::NotImplemented);
             }
-        };
 
-        if project.shot_exists(&shot) == false {
-            warn!("Resolved shot {} does not exist", shot);
-            return Err(ExportError::NotImplemented);
+            result.push("shot");
+        } else {
+            result.push("asset");
         }
-
-        result.push("shot");
-
-        for part in shot.split("/").into_iter() {
-            result.push(part.to_lowercase());
-        }
-
-        info!("Result path: {}", result.to_str().unwrap());
-    } else {
-        result.push("asset");
     }
 
-    for part in path.split("/").into_iter() {
-        result.push(part);
+    let mut path_order = &config.path_order;
+    let default_path_order = get_default_path_order();
+    if path_order.is_empty() {
+        path_order = &default_path_order;
     }
 
-    result.push(
-        element_data
-            .get_asset_name()
-            .expect("Element did not have a valid asset name"),
-    );
-    result.push(&department);
-    result.push(&element_name);
+    for entry in path_order {
+        info!("Adding {} to path", entry);
+        match map.get(entry.as_str()) {
+            Some(entry) => {
+                for part in entry.split("/").into_iter() {
+                    info!("Pushing: {}", part);
+                    result.push(part);
+                }
+            }
+            None => {
+                info!("Part '{}' was not included in the path order", entry)
+            }
+        }
+    }
 
     let file_name = if element_data.is_shot_local() {
         let shot_name = element_data.get_shot().unwrap().replace("/", "-");
