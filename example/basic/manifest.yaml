@@ -12,6 +12,10 @@ programs:
       .glb: import_glb_mesh.py
       .shadergraph.blend: import_blend_shadergraph.py
       .mesh.blend: import_blend_library_mesh.py
+  inkscape:
+    exports:
+      .png: export_png_512.py
+      .2x.png: export_png_1024.py
 
 departments:
   anim:
@@ -72,6 +76,13 @@ assets:
         departments:
           layout:
             - !depends(defaultCubeA;defaultCubeB) cubeInstancer
+  2d:
+    icons:
+    - iconA:
+        departments:
+          design:
+          - vector 
+          - 2x
 
 shots:
   '103':

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>Create Setup</name>
+  <id>com.lagmachine.conduct.create_setup</id>
+  <param type="path" name="manifest" gui-text="Manifest File" mode="file" filetypes="yaml,yml" />
+  <effect needs-live-preview="false" show-stderr="true">
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu name="Conduct" />
+    </effects-menu>
+  </effect>
+  <script>
+    <command location="inx" interpreter="python">conduct_create_setup.py</command>
+  </script>
+</inkscape-extension>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<inkscape-extension xmlns="http://www.inkscape.org/namespace/inkscape/extension">
+  <name>Export</name>
+  <id>com.lagmachine.conduct.export</id>
+  <effect needs-live-preview="false" show-stderr="true">
+    <object-type>all</object-type>
+    <effects-menu>
+      <submenu name="Conduct" />
+    </effects-menu>
+  </effect>
+  <script>
+    <command location="inx" interpreter="python">conduct_export.py</command>
+  </script>
+</inkscape-extension>
