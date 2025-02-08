@@ -87,7 +87,7 @@ jobs:
           asset_name: conduct.exe
           asset_content_type: application/octet-stream
 
-  release-integrations:
+  release-blender-integration:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
@@ -107,4 +107,26 @@ jobs:
         upload_url: ${{ github.event.release.upload_url }}
         asset_path: integration/conduct-blender.zip
         asset_name: conduct-blender.zip
+        asset_content_type: application/zip
+
+  release-inkscape-integration:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Zip Inkscape Integration
+      run: |
+        cd integration
+        mv inkscape conduct-inkscape
+        zip -r conduct-inkscape.zip conduct-inkscape
+
+    - name: Upload to release
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: integration/conduct-inkscape.zip
+        asset_name: conduct-inkscape.zip
         asset_content_type: application/zip
