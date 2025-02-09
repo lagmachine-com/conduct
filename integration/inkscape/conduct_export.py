@@ -25,14 +25,34 @@ class ConductExportEffect(inkex.EffectExtension):
         asset = self.svg.get("com.lagmachine.conduct.asset")
 
         prev_state = self.svg.get("com.lagmachine.conduct.export_save_state")
-        prev_state = json.loads(prev_state)
+        if prev_state != None:
+            prev_state = json.loads(prev_state)
         
         c = conduct.find_from_current_path(file_path, "inkscape")
 
-        pages = self.svg.namedview.get_pages()
+        # We arent using get_pages because this is more reliable
+        # get_pages result doesnt contain the page label if there is only one page
+        children = self.svg.namedview.getchildren()
+        pages = [child for child in children if child.tag_name == "inkscape:page"]
+
+        if len(pages) == 0:
+            # this function replaces the default document with a page, so we create a temp page then remove it
+            self.svg.namedview.new_page("0", "0", "10", "10", "temp_page")
+
+            children = self.svg.namedview.getchildren()
+            pages = [child for child in children if child.tag_name == "inkscape:page"]
+
+            self.svg.namedview.remove(pages[1])
+            pages[0].label = "Page 1"
+
+            children = self.svg.namedview.getchildren()
+            pages = [child for child in children if child.tag_name == "inkscape:page"]
+
+
+        # only allow export of named pages
+        pages = [page for page in pages if page.label != None]
         items = ','.join([page.label for page in pages])
         
-
         result = c.dialog_export(department, asset, items, prev_state=prev_state)
 
         if result['result'] != 'ok':

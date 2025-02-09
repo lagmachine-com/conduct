@@ -15,7 +15,8 @@ class InkscapeDataExport():
             svg_file = inkex.command.write_svg(effect_context.svg, tmpdir, 'input.svg')
             output = os.path.join(directory, file_name + extension)
  
-            pages = effect_context.svg.namedview.get_pages()
+            children = effect_context.svg.namedview.getchildren()
+            pages = [child for child in children if child.tag_name == "inkscape:page"]
             index = pages.index(items[0])
 
             page = items[0]
