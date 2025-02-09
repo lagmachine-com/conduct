@@ -38,25 +38,8 @@ func run_process(args: PackedStringArray) -> Dictionary:
 func get_summary():
 	return run_process(["--command", "summary"])
 
-func setup(department, asset, sequence = "", shot = ""):
-	var args = ["--command", "setup"]
-
-	if department != "":
-		args.append("--department")
-		args.append(department)
-
-	if asset != "":
-		args.append("--asset")
-		args.append(asset)
-		
-	if sequence != "":
-		args.append("--sequence")
-		args.append(sequence)
-
-	if shot != "":
-		args.append("--shot")
-		args.append(shot)
-		
+func setup(file_format: String):
+	var args = ["dialog", "create_setup", "--", "--file-format", file_format]
 	return run_process(args)
 
 func export(format, department, asset, element = "", sequence = "", shot = ""):

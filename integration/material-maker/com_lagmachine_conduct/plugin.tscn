@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://cf6qj0f2kphb4"]
 
-[ext_resource type="Script" path="res://mm_plugin/conduct/plugin.gd" id="1_rbnjh"]
-[ext_resource type="Script" path="res://mm_plugin/conduct/conduct.gd" id="2_4eqar"]
+[ext_resource type="Script" path="res://com_lagmachine_conduct/plugin.gd" id="1_rbnjh"]
+[ext_resource type="Script" path="res://com_lagmachine_conduct/conduct.gd" id="2_4eqar"]
 
 [node name="conduct_integration" type="Node"]
 script = ExtResource("1_rbnjh")

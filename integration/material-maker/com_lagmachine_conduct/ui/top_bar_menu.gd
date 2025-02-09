@@ -6,7 +6,10 @@ static var exportId: int = 10000002
 var original_serialize_func = null
 var plugin = null
 @onready var fileDialog = $FileDialog
-var configureSetupDialog = preload("res://mm_plugin/conduct/ui/configure_setup/configure_setup.tscn")
+@onready var mm = get_node("/root/mm_plugins/com_lagmachine_conduct")
+
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	get_popup().add_item("Configure Project", configureProjectId)
@@ -39,7 +42,7 @@ func export_all():
 		if not "title" in node:
 			continue
 			
-		if node.title == "Vessel Export":
+		if node.title == "Conduct Export":
 			export_nodes.append(node)
 	
 	for node in export_nodes:
@@ -86,33 +89,33 @@ func configureProject():
 	
 func onFileSelected(file):
 	print(file)
-	plugin.vessel_api.set_manifest(file)
-	var summary = plugin.vessel_api.get_summary()
-	print(summary)
-	var popup = configureSetupDialog.instantiate() as Popup
-	popup.summary = summary
-	add_child(popup)
-	popup.popup_centered()
-	var result = await popup.done
+	plugin.conduct_api.set_manifest(file)
+
+	var result = plugin.conduct_api.setup(".ptex")
 	
-	print(result)
+	if result['result'] != 'ok':
+		print("Something went wrong!")
+		return
+		
+	var data = result['data']
+		
+
+	var dept = data['department']
+	var asset = data['asset']
+	var shot = data['shot']
 	
-	var dept = result[0]
-	var asset = result[1]
-	var sequence = result[2]
-	var shot = result[3]
-	
-	var setup_result = plugin.vessel_api.setup(dept, asset, sequence, shot)
-	print(setup_result)
+	var folder = data['folder']
+	var file_name = data['file_name']
+
+
 	
 	var globals = get_node("/root/mm_globals")
 	var project = globals.main_window.get_current_project()
 
-	project.top_generator.plugin_data["com.lagmachine.vessel"] = {
+	project.top_generator.plugin_data["com.lagmachine.conduct"] = {
 		"department": dept,
 		"asset": asset,
-		"sequence": sequence,
 		"shot": shot
 	}
 	
-	project.save_file(setup_result["file_path"] + "/" + asset + ".ptex")
+	project.save_file(folder + "/" + file_name + ".ptex")

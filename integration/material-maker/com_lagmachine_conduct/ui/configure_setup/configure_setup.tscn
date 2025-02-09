@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bwr31jlyg4hyc"]
 
-[ext_resource type="Script" path="res://mm_plugin/conduct/ui/configure_setup/configure_setup.gd" id="1_nyp6c"]
+[ext_resource type="Script" path="res://com_lagmachine_conduct/ui/configure_setup/configure_setup.gd" id="1_nyp6c"]
 
 [node name="ConfigureSetup" type="Popup"]
 size = Vector2i(423, 165)
