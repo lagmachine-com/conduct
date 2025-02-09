@@ -31,7 +31,10 @@ func find_conduct_exe(current_file: String) -> bool:
 
 func run_process(args: PackedStringArray) -> Dictionary:
 	var output = []
+	print("Executing")
+	print(args)
 	var exit_code = OS.execute(conduct_exe, args, output, false, false)
+	print(output[0])
 	var result = JSON.parse_string(output[0])
 	return result
 
@@ -42,31 +45,30 @@ func setup(file_format: String):
 	var args = ["dialog", "create_setup", "--", "--file-format", file_format]
 	return run_process(args)
 
-func export(format, department, asset, element = "", sequence = "", shot = ""):
-	var args = ["--command", "export"]
+func export(department, format, asset, element = "",  shot = ""):
+	var args = ["export"]
 
-	if department != "":
+	if department != "" and department != null:
 		args.append("--department")
 		args.append(department)
 
-	if asset != "":
+	if asset != "" and asset != null:
 		args.append("--asset")
 		args.append(asset)
-		
-	if sequence != "":
-		args.append("--sequence")
-		args.append(sequence)
 
-	if shot != "":
+	if shot != "" and shot != null:
 		args.append("--shot")
 		args.append(shot)
 		
-	if element != "":
+	if element != "" and element != null:
 		args.append("--element")
 		args.append(element)
 		
-	if format != "":
-		args.append("--file_format")
+	if format != "" and format != null:
+		args.append("--file-format")
 		args.append(format)
-		
+	
+	args.append("--from")
+	args.append("material_maker")
+	
 	return run_process(args)

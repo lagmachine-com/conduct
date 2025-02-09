@@ -9,19 +9,19 @@
 					"to_port": 0
 				}
 			],
-			"icon_data": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAJZJREFUeJzt0EERwDAAw7Cs/Dl3MPSohcDnb9vdw44O0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpA+wFQtAF/ACpk+QAAAABJRU5ErkJggg==",
+			"icon_data": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAACdJREFUeJztwQENAAAAwqD3T20ON6AAAAAAAAAAAAAAAAAAAACAdwNAQAABj/LJUQAAAABJRU5ErkJggg==",
 			"label": "Conduct Export",
 			"longdesc": "",
-			"name": "graph_3",
+			"name": "graph_2",
 			"nodes": [
 				{
 					"name": "export",
 					"node_position": {
-						"x": 4100,
-						"y": 420
+						"x": 4000.0,
+						"y": 440.0
 					},
 					"parameters": {
-						"size": 10,
+						"size": 5.0,
 						"suffix": "varA"
 					},
 					"seed_int": 0,
@@ -30,8 +30,8 @@
 				{
 					"name": "gen_inputs",
 					"node_position": {
-						"x": 3520,
-						"y": 580
+						"x": 3520.0,
+						"y": 580.0
 					},
 					"parameters": {
 
@@ -48,8 +48,8 @@
 				{
 					"name": "gen_outputs",
 					"node_position": {
-						"x": 4320,
-						"y": 580
+						"x": 4320.0,
+						"y": 580.0
 					},
 					"parameters": {
 
@@ -66,15 +66,16 @@
 				{
 					"name": "gen_parameters",
 					"node_position": {
-						"x": 3820,
-						"y": 140
+						"x": 3940.0,
+						"y": 100.0
 					},
 					"parameters": {
 						"element": "varA",
-						"end_time": 1,
-						"num_frames": 0,
-						"resolution": 10,
-						"start_time": 0,
+						"end_time": 0.5,
+						"format": ".png",
+						"num_frames": 10.0,
+						"resolution": 5.0,
+						"start_time": 0.0,
 						"suffix": ""
 					},
 					"seed_int": 0,
@@ -103,37 +104,48 @@
 							"type": "linked_control"
 						},
 						{
-							"default": 0,
+							"default": 0.0,
 							"label": "Start Time",
-							"max": 1000,
-							"min": 0,
+							"max": 1000.0,
+							"min": 0.0,
 							"name": "start_time",
-							"step": 1,
+							"step": 1.0,
 							"type": "named_parameter"
 						},
 						{
-							"default": 10,
+							"default": 10.0,
 							"label": "End Time",
-							"max": 1000,
-							"min": 0,
+							"max": 1000.0,
+							"min": 0.0,
 							"name": "end_time",
-							"step": 1,
+							"step": 1.0,
 							"type": "named_parameter"
 						},
 						{
-							"default": 10,
+							"default": 1.0,
 							"label": "Num Frames",
-							"max": 100,
-							"min": 0,
+							"max": 100.0,
+							"min": 0.0,
 							"name": "num_frames",
-							"step": 1,
+							"step": 1.0,
 							"type": "named_parameter"
+						},
+						{
+							"label": "File Format",
+							"linked_widgets": [
+								{
+									"node": "export_2",
+									"widget": "suffix"
+								}
+							],
+							"name": "format",
+							"type": "linked_control"
 						},
 						{
 							"label": "Suffix",
 							"linked_widgets": [
 								{
-									"node": "export_2",
+									"node": "export_3",
 									"widget": "suffix"
 								}
 							],
@@ -145,11 +157,24 @@
 				{
 					"name": "export_2",
 					"node_position": {
-						"x": 3860,
-						"y": 420
+						"x": 4240.0,
+						"y": 440.0
 					},
 					"parameters": {
-						"size": 10,
+						"size": 10.0,
+						"suffix": ".png"
+					},
+					"seed_int": 0,
+					"type": "export"
+				},
+				{
+					"name": "export_3",
+					"node_position": {
+						"x": 4460.0,
+						"y": 440.0
+					},
+					"parameters": {
+						"size": 10.0,
 						"suffix": ""
 					},
 					"seed_int": 0,
@@ -158,10 +183,11 @@
 			],
 			"parameters": {
 				"element": "varA",
-				"end_time": 1,
-				"num_frames": 0,
-				"resolution": 10,
-				"start_time": 0,
+				"end_time": 0.5,
+				"format": ".sheet.png",
+				"num_frames": 10.0,
+				"resolution": 5.0,
+				"start_time": 0.0,
 				"suffix": ""
 			},
 			"plugin_data": {
@@ -173,5 +199,5 @@
 			"type": "graph"
 		}
 	],
-	"name": "Condcut Integration"
+	"name": "Conduct Integration"
 }

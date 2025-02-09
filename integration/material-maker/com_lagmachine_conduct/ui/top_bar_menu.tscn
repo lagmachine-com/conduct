@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://d2cgbx2lpaicj"]
 
-[ext_resource type="Script" path="res://com_lagmachine_conduct/ui/top_bar_menu.gd" id="1_11cmi"]
+[ext_resource type="Script" uid="uid://d2xv8g4duwu5d" path="res://com_lagmachine_conduct/ui/top_bar_menu.gd" id="1_11cmi"]
 [ext_resource type="PackedScene" uid="uid://bwr31jlyg4hyc" path="res://com_lagmachine_conduct/ui/configure_setup/configure_setup.tscn" id="2_ritt7"]
 
 [node name="MenuButton" type="MenuButton"]

@@ -8,8 +8,6 @@ var plugin = null
 @onready var fileDialog = $FileDialog
 @onready var mm = get_node("/root/mm_plugins/com_lagmachine_conduct")
 
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	get_popup().add_item("Configure Project", configureProjectId)
@@ -32,7 +30,7 @@ func export_all():
 	var globals = get_node("/root/mm_globals")
 	var project = globals.main_window.get_current_project()
 	var path = project.save_path
-	var result = plugin.vessel_api.find_vessel_exe(path)
+	var result = plugin.conduct_api.find_conduct_exe(path)
 
 
 	var nodes = project.get_children()
@@ -53,12 +51,12 @@ func export_all():
 
 func export(export_node, project):
 	
-	var data = project.top_generator.plugin_data["com.lagmachine.vessel"]
+	var data = project.top_generator.plugin_data["com.lagmachine.conduct"]
 	var dept = data["department"]
 	var asset = data["asset"]
-	var seq = data["sequence"]
 	var shot = data["shot"]
 	var element = export_node.controls.element.text
+	var format = export_node.controls.format.text
 	var nodes = project.get_children()
 	
 	
@@ -75,14 +73,16 @@ func export(export_node, project):
 				if control.get_item_text(i) == element:
 					n.generator.set_parameter(key, i)
 	
-	var export = plugin.vessel_api.export(".png", dept, asset, element, seq, shot)
-	var script_file = FileAccess.open(export["script"], FileAccess.READ)
-	var code = script_file.get_as_text()
+	var export = plugin.conduct_api.export(dept, format, asset, element, shot)
+	print("Export result")
+	print(export)
+	
+	var code = export['script']
 
 	var script = GDScript.new()
 	script.source_code = code
 	script.reload()
-	await script.export(plugin, export_node, export["file_path"], export["recommended_file_name"])
+	await script.export(plugin, export_node, export["directory"], export["recommended_file_name"], export["file_format"])
 	
 func configureProject():
 	fileDialog.popup_centered()
