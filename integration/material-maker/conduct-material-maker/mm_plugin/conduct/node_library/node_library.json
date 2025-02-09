@@ -1,0 +1,177 @@
+{
+	"lib": [
+		{
+			"connections": [
+				{
+					"from": "gen_inputs",
+					"from_port": 0,
+					"to": "gen_outputs",
+					"to_port": 0
+				}
+			],
+			"icon_data": "iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAAAXNSR0IArs4c6QAAAJZJREFUeJzt0EERwDAAw7Cs/Dl3MPSohcDnb9vdw44O0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpAa4AO0BqgA7QG6ACtATpA+wFQtAF/ACpk+QAAAABJRU5ErkJggg==",
+			"label": "Conduct Export",
+			"longdesc": "",
+			"name": "graph_3",
+			"nodes": [
+				{
+					"name": "export",
+					"node_position": {
+						"x": 4100,
+						"y": 420
+					},
+					"parameters": {
+						"size": 10,
+						"suffix": "varA"
+					},
+					"seed_int": 0,
+					"type": "export"
+				},
+				{
+					"name": "gen_inputs",
+					"node_position": {
+						"x": 3520,
+						"y": 580
+					},
+					"parameters": {
+
+					},
+					"ports": [
+						{
+							"name": "port0",
+							"type": "rgba"
+						}
+					],
+					"seed_int": 0,
+					"type": "ios"
+				},
+				{
+					"name": "gen_outputs",
+					"node_position": {
+						"x": 4320,
+						"y": 580
+					},
+					"parameters": {
+
+					},
+					"ports": [
+						{
+							"name": "unnamed",
+							"type": "rgba"
+						}
+					],
+					"seed_int": 0,
+					"type": "ios"
+				},
+				{
+					"name": "gen_parameters",
+					"node_position": {
+						"x": 3820,
+						"y": 140
+					},
+					"parameters": {
+						"element": "varA",
+						"end_time": 1,
+						"num_frames": 0,
+						"resolution": 10,
+						"start_time": 0,
+						"suffix": ""
+					},
+					"seed_int": 0,
+					"type": "remote",
+					"widgets": [
+						{
+							"label": "Element",
+							"linked_widgets": [
+								{
+									"node": "export",
+									"widget": "suffix"
+								}
+							],
+							"name": "element",
+							"type": "linked_control"
+						},
+						{
+							"label": "Resolution",
+							"linked_widgets": [
+								{
+									"node": "export",
+									"widget": "size"
+								}
+							],
+							"name": "resolution",
+							"type": "linked_control"
+						},
+						{
+							"default": 0,
+							"label": "Start Time",
+							"max": 1000,
+							"min": 0,
+							"name": "start_time",
+							"step": 1,
+							"type": "named_parameter"
+						},
+						{
+							"default": 10,
+							"label": "End Time",
+							"max": 1000,
+							"min": 0,
+							"name": "end_time",
+							"step": 1,
+							"type": "named_parameter"
+						},
+						{
+							"default": 10,
+							"label": "Num Frames",
+							"max": 100,
+							"min": 0,
+							"name": "num_frames",
+							"step": 1,
+							"type": "named_parameter"
+						},
+						{
+							"label": "Suffix",
+							"linked_widgets": [
+								{
+									"node": "export_2",
+									"widget": "suffix"
+								}
+							],
+							"name": "suffix",
+							"type": "linked_control"
+						}
+					]
+				},
+				{
+					"name": "export_2",
+					"node_position": {
+						"x": 3860,
+						"y": 420
+					},
+					"parameters": {
+						"size": 10,
+						"suffix": ""
+					},
+					"seed_int": 0,
+					"type": "export"
+				}
+			],
+			"parameters": {
+				"element": "varA",
+				"end_time": 1,
+				"num_frames": 0,
+				"resolution": 10,
+				"start_time": 0,
+				"suffix": ""
+			},
+			"plugin_data": {
+
+			},
+			"seed_int": 0,
+			"shortdesc": "",
+			"tree_item": "Conduct/Conduct Export",
+			"type": "graph"
+		}
+	],
+	"name": "Condcut Integration"
+}

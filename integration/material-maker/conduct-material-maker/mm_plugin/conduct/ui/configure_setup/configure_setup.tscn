@@ -1,0 +1,58 @@
+[gd_scene load_steps=2 format=3 uid="uid://bwr31jlyg4hyc"]
+
+[ext_resource type="Script" path="res://mm_plugin/conduct/ui/configure_setup/configure_setup.gd" id="1_nyp6c"]
+
+[node name="ConfigureSetup" type="Popup"]
+size = Vector2i(423, 165)
+visible = true
+script = ExtResource("1_nyp6c")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 4.0
+offset_top = 4.0
+offset_right = 419.0
+offset_bottom = 161.0
+
+[node name="GridContainer" type="GridContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 10
+columns = 2
+
+[node name="Department label" type="Label" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Department"
+
+[node name="DepartmentOptions" type="OptionButton" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AssetLabel" type="Label" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Asset
+"
+
+[node name="AssetOptions" type="OptionButton" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SequenceLabel" type="Label" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Sequence"
+
+[node name="SequenceOptions" type="OptionButton" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShotLabel" type="Label" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+text = "Shot
+"
+
+[node name="ShotOptions" type="OptionButton" parent="VBoxContainer/GridContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="DoneButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Done!"

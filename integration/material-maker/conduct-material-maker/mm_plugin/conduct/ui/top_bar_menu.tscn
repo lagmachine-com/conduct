@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://d2cgbx2lpaicj"]
+
+[ext_resource type="Script" path="res://mm_plugin/conduct/ui/top_bar_menu.gd" id="1_11cmi"]
+[ext_resource type="PackedScene" uid="uid://bwr31jlyg4hyc" path="res://mm_plugin/conduct/ui/configure_setup/configure_setup.tscn" id="2_ritt7"]
+
+[node name="MenuButton" type="MenuButton"]
+offset_right = 8.0
+offset_bottom = 8.0
+text = "Conduct"
+script = ExtResource("1_11cmi")
+
+[node name="ConfigureSetup" parent="." instance=ExtResource("2_ritt7")]
+visible = false
+
+[node name="FileDialog" type="FileDialog" parent="."]
+title = "Open a File"
+initial_position = 2
+size = Vector2i(755, 419)
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.yml")
