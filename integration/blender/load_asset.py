@@ -172,6 +172,27 @@ def load(results):
                 data.asset_data.tags.new('element:' + element)
 
 
+
+class OT_ImportAssetByName(bpy.types.Operator):
+
+    bl_idname = "conduct.load_asset_by_name"
+    bl_label = "Import Asset(s)"
+    asset: bpy.props.StringProperty()
+
+    def execute(self, context):
+        """Do something with the selected file(s)."""
+
+        data = utils.get_conduct_data()
+        conduct = utils.get_conduct_object()
+        result = conduct.load_asset(self.asset, data.department, data.shot)
+        
+        data = result['results']
+        load(data)
+
+        print("Finished Importing Assets")
+        return {'FINISHED'}
+
+
 class OT_ImportAsset(bpy.types.Operator):
 
     bl_idname = "conduct.load_asset"
@@ -197,6 +218,8 @@ class OT_ImportAsset(bpy.types.Operator):
 
 def register():
     bpy.utils.register_class(OT_ImportAsset)
+    bpy.utils.register_class(OT_ImportAssetByName)
 
 def unregister():
     bpy.utils.unregister_class(OT_ImportAsset)
+    bpy.utils.unregister_class(OT_ImportAssetByName)

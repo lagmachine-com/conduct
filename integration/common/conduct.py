@@ -57,6 +57,14 @@ class Conduct:
 
         return self.run_process(args)
     
+    def load_asset(self, asset, department, shot=None, ):
+        args = ["load-assets", "--program", self.current_program, asset, "--department", department]
+        if shot != None and shot != "":
+            args.append("--shot")
+            args.append(shot)
+
+        return self.run_process(args)
+
     def dialog_export(self, department, asset, items, prev_state=None, shot=None,  ):
         args = ["dialog", "export", "--", "--program", self.current_program, "--department", department, "--asset", asset, "--items", items ]
         if shot != None and shot != "":
