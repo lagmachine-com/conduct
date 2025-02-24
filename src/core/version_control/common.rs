@@ -1,6 +1,6 @@
 use std::{collections::HashMap, path::PathBuf};
 
-use log::{info, trace, warn};
+use log::{trace, warn};
 use serde::{Deserialize, Serialize};
 
 use crate::core::{
@@ -70,9 +70,17 @@ pub fn resolve_element_path(
             map.insert("element", element_name.clone());
 
             if data.is_shot_local() {
-                map.insert("shot", data.get_shot().unwrap());
-                trace!("Resolved shot: {}", data.get_shot().unwrap())
+                match data.get_shot() {
+                    Some(shot) => {
+                        map.insert("shot", shot.clone());
+                        trace!("Resolved shot: {}", shot)
+                    },
+                    None => {
+                        return Err(ExportError::Message("Tried to resolve the path of a shot_local element, but we are not in a shot context".into()))
+                    },
+                }
             }
+
             data
         }
         None => {
@@ -126,7 +134,10 @@ pub fn resolve_element_path(
     }
 
     let file_name = if element_data.is_shot_local() {
-        let shot_name = element_data.get_shot().unwrap().replace("/", "-");
+        let shot_name = element_data
+            .get_shot()
+            .expect("Element data is shot local, but the element data didn't resolve to a shot")
+            .replace("/", "-");
         format!(
             "{}_{}_{}_{}",
             asset_name, shot_name, department, element_name
