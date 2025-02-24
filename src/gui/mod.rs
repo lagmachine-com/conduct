@@ -5,7 +5,7 @@ mod routes;
 
 use std::sync::{Arc, RwLock};
 
-use log::{debug, info};
+use log::{debug, info, trace};
 use router::{ApiEntry, RequestContext};
 use routes::register_routes;
 use tao::{
@@ -113,7 +113,7 @@ pub fn gui(project: crate::core::project::Project, dialog_options: Option<Dialog
                 let result = router::route(request, router.clone(), context, responder);
 
                 if let Some(result) = result {
-                    debug!("Received control flow result from api: {:?}", result);
+                    trace!("Received control flow result from api: {:?}", result);
                     match result {
                         router::ApiControlFlowResult::Close => {
                             let _ = proxy.send_event(UserWindowEvent::Exit);

@@ -1,4 +1,4 @@
-use log::warn;
+use log::{trace, warn};
 use serde::{Deserialize, Serialize};
 
 use super::{element::Element, element_collection::ElementCollection};
@@ -28,7 +28,7 @@ pub trait GetElements {
 
 impl From<serde_yaml::Value> for ElementOrCollection {
     fn from(value: serde_yaml::Value) -> Self {
-        warn!("Deserializing element or collection: {:?}", value);
+        trace!("Deserializing element or collection: {:?}", value);
 
         match value {
             serde_yaml::Value::String(str) => ElementOrCollection::Element(Element::Value(str)),

@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use log::{debug, warn};
+use log::{debug, trace, warn};
 
 use crate::core::{
     asset::Asset,
@@ -53,7 +53,7 @@ impl ElementResolver for Project {
     ) -> BTreeMap<String, ResolvedElementData> {
         let asset = self.get_asset_by_name(asset_name.clone());
 
-        debug!("Getting assets with context: {:#?}", context);
+        trace!("Getting assets with context: {:#?}", context);
 
         let (asset, category_path) = match asset {
             Some(asset) => asset,
@@ -92,7 +92,7 @@ fn add_elements_from_department_default(
     context: &Context,
     element_data: ResolvedElementData,
 ) {
-    debug!("Adding elements from default departments");
+    trace!("Adding elements from default departments");
     match context.mode {
         ContextMode::Load => {
             for (dept_name, _elements) in asset.departments.iter() {
@@ -150,7 +150,7 @@ fn add_elements_from_category_template(
     context: &Context,
     element_data: ResolvedElementData,
 ) {
-    debug!("Adding elements from category template");
+    trace!("Adding elements from category template");
     let category = project.get_category_by_path(category_path.clone());
     match category {
         Some(category) => match &category.template {
@@ -167,7 +167,7 @@ fn add_elements_from_asset(
     context: &Context,
     element_data: ResolvedElementData,
 ) {
-    debug!("Adding elements from asset");
+    trace!("Adding elements from asset");
     for (name, elements) in asset.departments.iter() {
         match context.mode {
             // If we are in export context, we only want to see the elements this department owns
@@ -203,7 +203,7 @@ fn add_elements(
     for element in elements.iter() {
         match &element.element {
             Element::Value(name) => {
-                debug!(" - got element: {}", name);
+                trace!(" - got element: {}", name);
                 result.insert(name.clone(), element.context.clone());
             }
             Element::Operator(element_operator) => {

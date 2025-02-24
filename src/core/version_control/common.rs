@@ -1,6 +1,6 @@
 use std::{collections::HashMap, path::PathBuf};
 
-use log::{info, warn};
+use log::{info, trace, warn};
 use serde::{Deserialize, Serialize};
 
 use crate::core::{
@@ -48,7 +48,7 @@ pub fn resolve_element_path(
 
     match project.get_asset_by_name(asset_name.clone()) {
         Some(asset) => {
-            info!("Found asset at path: {}", asset.1);
+            trace!("Found asset at path: {}", asset.1);
             map.insert("category", asset.1);
         }
         None => {
@@ -71,7 +71,7 @@ pub fn resolve_element_path(
 
             if data.is_shot_local() {
                 map.insert("shot", data.get_shot().unwrap());
-                info!("Resolved shot: {}", data.get_shot().unwrap())
+                trace!("Resolved shot: {}", data.get_shot().unwrap())
             }
             data
         }
@@ -111,16 +111,16 @@ pub fn resolve_element_path(
     }
 
     for entry in path_order {
-        info!("Adding {} to path", entry);
+        trace!("Adding {} to path", entry);
         match map.get(entry.as_str()) {
             Some(entry) => {
                 for part in entry.split("/").into_iter() {
-                    info!("Pushing: {}", part);
+                    trace!("Pushing: {}", part);
                     result.push(part);
                 }
             }
             None => {
-                info!("Part '{}' was not included in the path order", entry)
+                trace!("Part '{}' was not included in the path order", entry)
             }
         }
     }

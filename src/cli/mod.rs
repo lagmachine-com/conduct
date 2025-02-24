@@ -92,7 +92,7 @@ pub fn cli() -> CliResult {
 
     match args.command {
         Some(command) => {
-            debug!("Running command: {:?}", command);
+            info!("Running command: {:?}", command);
             let result = CommandType::execute(command, &project);
 
             match result {

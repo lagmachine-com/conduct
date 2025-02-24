@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 
 use include_directory::include_directory;
-use log::debug;
+use log::{debug, trace};
 use wry::{
     http::{response::Builder, Response},
     RequestAsyncResponder,
@@ -16,7 +16,7 @@ pub fn get(path: String, response_builder: Builder, responder: RequestAsyncRespo
     }
     .to_string();
 
-    debug!("Looking for file: {}", path);
+    trace!("Looking for file: {}", path);
 
     let file = UI_FILES.get_file(path);
 
@@ -27,7 +27,7 @@ pub fn get(path: String, response_builder: Builder, responder: RequestAsyncRespo
 
     let response: Response<Cow<'static, [u8]>> = match file {
         Some(file) => {
-            debug!("Found file! mime: {}", file.mimetype_as_string());
+            trace!("Found file! mime: {}", file.mimetype_as_string());
 
             response_builder
                 .status(200)

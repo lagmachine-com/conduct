@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use log::{debug, info, warn};
+use log::{debug, info, trace, warn};
 use serde::{Deserialize, Serialize};
 use serde_yaml::{Mapping, Value};
 
@@ -32,7 +32,7 @@ pub fn parse_category_assets(value: &Vec<serde_yaml::Value>, key: String) -> Ass
         children: BTreeMap::new(),
     };
 
-    debug!("Reading asset category: {}", key);
+    trace!("Reading asset category: {}", key);
 
     for asset_entry in value.iter() {
         let mapping = asset_entry
@@ -46,12 +46,12 @@ pub fn parse_category_assets(value: &Vec<serde_yaml::Value>, key: String) -> Ass
             .as_str()
             .expect("Asset key was not a valid string");
 
-        debug!("  Reading asset: {}", key);
+        trace!("  Reading asset: {}", key);
 
         for entry in mapping.iter() {
-            warn!("Reading asset from yaml");
+            trace!("Reading asset from yaml");
 
-            warn!("Entry: {:?}", entry);
+            trace!("Entry: {:?}", entry);
             let asset = serde_yaml::from_value::<Asset>(entry.1.clone())
                 .expect("Unable to parse asset form yaml data");
 
@@ -71,7 +71,7 @@ pub fn parse_category(value: &serde_yaml::Mapping, key: String) -> AssetEntry {
         children: BTreeMap::new(),
     };
 
-    debug!("Reading asset category: {}", key);
+    trace!("Reading asset category: {}", key);
 
     for entry in value.iter() {
         let key = entry
@@ -142,7 +142,7 @@ fn asset_category_items_to_yaml(value: &AssetCategory) -> serde_yaml::Value {
 }
 
 pub fn to_yaml(value: &AssetCategory) -> serde_yaml::Value {
-    info!("Current key: {}", value.name);
+    trace!("Current key: {}", value.name);
     let mut result = serde_yaml::Mapping::new();
 
     let child = value.children.iter().next();

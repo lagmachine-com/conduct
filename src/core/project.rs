@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, HashSet};
 use std::path::PathBuf;
 
 use indexmap::IndexMap;
-use log::{debug, info, warn};
+use log::{debug, info, trace, warn};
 use path_absolutize::Absolutize;
 use serde_yaml::Mapping;
 
@@ -131,7 +131,7 @@ impl Project {
         let mut current = &self.assets;
 
         for part in parts.into_iter() {
-            debug!("Looking for part: {}", part);
+            trace!("Looking for part: {}", part);
             let result = current.children.get(part);
             match result {
                 Some(result) => match result {
@@ -151,7 +151,7 @@ impl Project {
         let mut current = &self.assets;
 
         for part in parts.into_iter() {
-            debug!("Looking for part: {}", part);
+            trace!("Looking for part: {}", part);
             let result = current.children.get(part);
             match result {
                 Some(result) => match result {
@@ -171,7 +171,7 @@ impl Project {
         let mut current = &mut self.assets;
 
         for part in parts.into_iter() {
-            debug!("Looking for part: {}", part);
+            trace!("Looking for part: {}", part);
             let result = current.children.get_mut(part);
             match result {
                 Some(result) => match result {
@@ -226,7 +226,7 @@ fn is_valid_project_structure(project: &Project) -> bool {
     let mut asset_names = HashSet::<String>::new();
 
     for entry in flat.iter() {
-        debug!("Checking asset: {}", entry.0);
+        trace!("Checking asset: {}", entry.0);
         if asset_names.insert(entry.0.clone()) == false {
             warn!("Invalid project structure, found duplicate asset entry");
             return false;
@@ -328,7 +328,7 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         .expect("Version control config was not a valid mapping");
 
     let config = crate::core::version_control::from_yaml(config);
-    debug!("Using version control config: {:?}", config);
+    trace!("Using version control config: {:?}", config);
 
     info!(" --- Reading shots ---");
     let shot_data = map.get("shots");

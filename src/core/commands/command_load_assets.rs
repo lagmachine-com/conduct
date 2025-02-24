@@ -1,7 +1,7 @@
 use std::sync::RwLock;
 
 use clap::{command, Args};
-use log::{debug, info, warn};
+use log::{debug, error, info, trace, warn};
 use ts_rs::TS;
 
 use crate::core::{
@@ -86,7 +86,7 @@ impl Command for LoadAssetsArgs {
             info!("Loading asset: {}", asset);
 
             let elements = project.get_elements(asset.to_string(), &c);
-            info!("Resolved elements: {:?}", elements);
+            info!("Resolved elements: {:#?}", elements);
 
             for element in elements.iter() {
                 let files = VersionControl::get_element_files(
@@ -99,7 +99,7 @@ impl Command for LoadAssetsArgs {
                 for file in files.iter() {
                     for format in import_formats.iter() {
                         if file.path.ends_with(format) {
-                            debug!("Getting script for format: {}", format);
+                            trace!("Getting script for format: {}", format);
 
                             let mut script_path = project.get_root_directory();
                             script_path.push("scripts");

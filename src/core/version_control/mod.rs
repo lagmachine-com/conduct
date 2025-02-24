@@ -13,6 +13,7 @@ use super::{commands::ExportArgs, element::resolved_element_data::ResolvedElemen
 
 #[derive(Debug)]
 pub enum ExportError {
+    Message(String),
     NotImplemented,
 }
 

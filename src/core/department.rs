@@ -1,6 +1,6 @@
 use std::collections::BTreeMap;
 
-use log::info;
+use log::{info, trace};
 use serde::{Deserialize, Serialize};
 
 use super::{element::element::Element, project::Project};
@@ -51,14 +51,14 @@ impl DepartmentFinder for Project {
             None => return result,
         };
 
-        info!("found asset {} at path: {}", asset_name, asset.1);
+        trace!("found asset {} at path: {}", asset_name, asset.1);
 
         for dept in asset.0.departments.iter() {
             result.push(dept.0.clone());
         }
 
         if let Some(category) = self.get_category_by_path(asset.1) {
-            info!("Found category: {:#?}", category);
+            trace!("Found category: {:#?}", category);
             if let Some(template) = &category.template {
                 for template in template.departments.iter() {
                     if result.contains(template.0) {
