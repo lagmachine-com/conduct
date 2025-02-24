@@ -64,7 +64,7 @@ impl Command for LoadAssetsArgs {
 
         let assets = get_required_assets(&assets, &project, &c);
 
-        info!("Loading assets: {:?}", assets);
+        info!("Assets to load: {:?}", assets);
 
         let department = project
             .departments
@@ -83,12 +83,23 @@ impl Command for LoadAssetsArgs {
         };
 
         for asset in assets.into_iter() {
-            info!("Loading asset: {}", asset);
-
+            info!("----");
+            info!("Loading Asset: `{}`", asset);
             let elements = project.get_elements(asset.to_string(), &c);
-            info!("Resolved elements: {:#?}", elements);
-
             for element in elements.iter() {
+                debug!("Resolved element: {:?}", element);
+            }
+
+            info!("Looking for files...");
+            for element in elements.iter() {
+                if element.1.is_shot_local() && self.common.shot.is_none() {
+                    debug!(
+                        "Element `{}` is shot local, but we are not in a shot context, skipping",
+                        element.0
+                    );
+                    continue;
+                }
+
                 let files = VersionControl::get_element_files(
                     &project.version_control,
                     &project,
@@ -96,7 +107,14 @@ impl Command for LoadAssetsArgs {
                     element.1,
                 );
 
+                if files.is_empty() {
+                    info!("`{}`: None", element.0)
+                }
+
                 for file in files.iter() {
+                    info!("`{}`: ({}) {}", element.0, file.version, file.path);
+                    let mut found_load_script = false;
+
                     for format in import_formats.iter() {
                         if file.path.ends_with(format) {
                             trace!("Getting script for format: {}", format);
@@ -104,24 +122,35 @@ impl Command for LoadAssetsArgs {
                             let mut script_path = project.get_root_directory();
                             script_path.push("scripts");
                             script_path.push(self.program.clone());
-                            script_path.push(scripts.get(format).unwrap().clone());
 
-                            result.results.push(AssetLoadStep {
-                                asset: asset.clone(),
-                                element: element.0.clone(),
-                                script: script_path.to_str().unwrap().to_string(),
-                                file_type: format.clone(),
-                                file: file.path.clone(),
-                                version: file.version.clone(),
-                            });
+                            match scripts.get(format) {
+                                Some(script_file) => {
+                                    script_path.push(script_file.clone());
 
-                            break;
+                                    result.results.push(AssetLoadStep {
+                                        asset: asset.clone(),
+                                        element: element.0.clone(),
+                                        script: script_path.to_str().unwrap().to_string(),
+                                        file_type: format.clone(),
+                                        file: file.path.clone(),
+                                        version: file.version.clone(),
+                                    });
+
+                                    found_load_script = true;
+                                    break;
+                                }
+                                None => {}
+                            }
                         }
                     }
-                }
 
-                info!("Checking import formats {:?}", import_formats)
+                    if !found_load_script {
+                        warn!("Found a file to load: {} but could not find any load script for the format in the department `{}`", file.path,  self.common.department.clone().unwrap().to_string())
+                    }
+                }
             }
+
+            info!("----")
         }
 
         info!("Resuling load steps: {:#?}", result);
@@ -139,8 +168,6 @@ fn get_required_assets(
     warn!("TODO: Check for dependency loops");
     let mut result = Vec::new();
     for asset in asset_names.into_iter() {
-        info!("Loading asset: {}", asset);
-
         let elements = project.get_elements(asset.to_string(), context);
         for (element, data) in elements.iter() {
             match data.get_dependencies() {

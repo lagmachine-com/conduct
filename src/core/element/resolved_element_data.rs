@@ -1,6 +1,6 @@
 #[derive(Clone, Debug)]
 pub struct ResolvedElementData {
-    scene_local: bool,
+    shot_local: bool,
     dependencies: Option<Vec<String>>,
     asset: Option<String>,
     shot: Option<String>,
@@ -10,7 +10,7 @@ pub struct ResolvedElementData {
 impl ResolvedElementData {
     pub fn new() -> Self {
         ResolvedElementData {
-            scene_local: false,
+            shot_local: false,
             dependencies: None,
             asset: None,
             shot: None,
@@ -19,11 +19,11 @@ impl ResolvedElementData {
     }
 
     pub fn set_shot_local(&mut self, value: bool) {
-        self.scene_local = value;
+        self.shot_local = value;
     }
 
     pub fn is_shot_local(&self) -> bool {
-        self.scene_local
+        self.shot_local
     }
 
     pub fn set_shot(&mut self, value: &String) {
