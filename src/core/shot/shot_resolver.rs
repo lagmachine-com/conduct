@@ -28,9 +28,7 @@ impl ShotResolver for Project {
 
     fn get_shot_formatted(&self, shot: &String) -> Option<String> {
         let shots = self.get_shots();
-        let index = shots
-            .iter()
-            .position(|s| s == shot);
+        let index = shots.iter().position(|s| s == shot);
 
         let formatted: Option<String> = match index {
             Some(i) => Some(shots.index(i).clone()),
