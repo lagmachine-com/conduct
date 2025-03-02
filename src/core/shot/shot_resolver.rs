@@ -22,8 +22,7 @@ impl ShotResolver for Project {
     }
 
     fn shot_exists(&self, shot: &String) -> bool {
-        let shots: Vec<String> = self.get_shots().iter().map(|s| s).collect();
-        return shots.contains(&shot);
+        return self.get_shots().contains(shot);
     }
 
     fn get_shot_formatted(&self, shot: &String) -> Option<String> {
