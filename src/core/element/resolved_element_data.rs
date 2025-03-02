@@ -27,7 +27,7 @@ impl ResolvedElementData {
     }
 
     pub fn set_shot(&mut self, value: &String) {
-        self.shot = Some(value.to_lowercase());
+        self.shot = Some(value.clone());
     }
 
     pub fn get_shot(&self) -> Option<String> {
