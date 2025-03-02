@@ -77,6 +77,7 @@ def load(results):
         
         importer.asset = asset
         importer.element = element
+        importer.data = utils.get_conduct_data()
 
         result = importer.load(file)
 

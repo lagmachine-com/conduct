@@ -3,6 +3,7 @@ import bpy
 from bpy.types import Operator
 from . import utils
 import inspect
+import traceback
 
 class OT_AddObjectToPublish(Operator):
 
@@ -79,13 +80,20 @@ class OT_RunSelectedExport(Operator):
                 continue
 
             exporter_instance = instance()
+            exporter_instance.data = data
 
-            exporter_instance.export(
-                directory=result['directory'], 
-                file_name=result['recommended_file_name'], 
-                extension=result['file_format'],
-                items = items
-                )
+            try:
+                exporter_instance.export(
+                    directory=result['directory'], 
+                    file_name=result['recommended_file_name'], 
+                    extension=result['file_format'],
+                    items = items
+                    )
+            except Exception as ex:
+                self.report({'ERROR_INVALID_INPUT'}, ex.args[0])
+                print(ex)  
+                traceback.print_exc()
+                return {'FINISHED'}
         
         self.report({'INFO'}, "Exported %s!" % name)
 
