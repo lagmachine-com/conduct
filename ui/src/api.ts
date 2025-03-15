@@ -57,9 +57,17 @@ export async function doExport(department: string, asset: string, element: strin
     return await result.json() as SummaryResponse
 }
 
-export async function doCreate(): Promise<SummaryResponse> {
-    let result = await get("api/v1/command/create?asset=suzanneA&department=model")
-    return await result.json() as SummaryResponse
+export async function doCreate(asset: string | null, category: string | null): Promise<any> {
+    let result = await get("api/v1/command/create", {
+        "asset": asset,
+        "category": category
+    })
+
+    if (result.status == 200) {
+        return true
+    } else {
+        return await result.json()
+    }
 }
 
 export async function exitDialog(result: any) {

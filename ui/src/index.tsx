@@ -20,7 +20,7 @@ if (!(root instanceof HTMLElement)) {
 
 const rootComponent: Component<RouteSectionProps> = (props) => {
   return (
-    <ColorModeProvider initialColorMode='light'>
+    <ColorModeProvider initialColorMode='dark'>
       {props.children}
     </ColorModeProvider>
   )

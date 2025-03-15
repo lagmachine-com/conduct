@@ -4,18 +4,18 @@ display_name: Basic Project
 programs:
   blender:
     exports:
+      .animbake.abc: export_alembic.py
       .mesh.blend: export_blend_library.py
       .shadergraph.blend: export_blend_library.py
-      .animbake.abc: export_alembic.py
     imports:
       .animbake.abc: import_animbake_alembic.py
       .glb: import_glb_mesh.py
-      .shadergraph.blend: import_blend_shadergraph.py
       .mesh.blend: import_blend_library_mesh.py
+      .shadergraph.blend: import_blend_shadergraph.py
   inkscape:
     exports:
-      .png: export_png_512.py
       .2x.png: export_png_1024.py
+      .png: export_png_512.py
 
 departments:
   anim:
@@ -23,23 +23,23 @@ departments:
       blender:
         exports:
         - .animbake.abc
+  layout:
+    programs:
+      blender:
+        exports:
+        - .instancer.blend
+        imports:
+        - .mesh.blend
   light:
     default_elements:
     - default_light_rig
     programs:
       blender:
         imports:
-          - .glb
-          - .mesh.blend
-          - .animbake.abc
-          - .shadergraph.blend
-  layout:
-    programs:
-      blender:
-        exports:
-          - .instancer.blend
-        imports:
-          - .mesh.blend
+        - .glb
+        - .mesh.blend
+        - .animbake.abc
+        - .shadergraph.blend
   lookdev:
     programs:
       blender:
@@ -57,32 +57,30 @@ departments:
         - .animbake.abc
 
 assets:
-  3d:
-    prop:
-    - $template:
-        departments:
-          model:
-          - !shot_local mesh
-          - lod
-          - test
-          lookdev:
-          - shadergraph
-    - defaultCubeA:
-        departments: {}
-    - defaultCubeB:
-        departments: {}
-    environment:
-    - cubeWorldA:
-        departments:
-          layout:
-            - !depends(defaultCubeA;defaultCubeB) cubeInstancer
   2d:
     icons:
     - iconA:
         departments:
           design:
-          - vector 
+          - vector
           - 2x
+  3d:
+    environment:
+    - cubeWorldA:
+        departments:
+          layout:
+          - !depends(defaultCubeA;defaultCubeB) cubeInstancer
+    prop:
+    - $template:
+        departments:
+          lookdev:
+          - shadergraph
+          model:
+          - !shot_local mesh
+          - lod
+          - test
+    - defaultCubeA: {}
+    - defaultCubeB: {}
 
 shots:
   '103':
@@ -104,3 +102,4 @@ shots:
 
 version_control:
   type: versioned_directories
+  seperate_shots_and_assets: true

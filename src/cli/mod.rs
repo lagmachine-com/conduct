@@ -103,7 +103,7 @@ pub fn cli() -> CliResult {
                     }
                     None => CliResult::Success,
                 },
-                Err(_) => CliResult::Error("".to_string()),
+                Err(error) => CliResult::Error(error.to_string()),
             }
         }
         None => {
