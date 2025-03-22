@@ -87,6 +87,12 @@ impl Command for LoadAssetsArgs {
             info!("----");
             info!("Loading Asset: `{}`", asset);
             let elements = project.get_elements(asset.to_string(), &c);
+
+            let elements = match elements {
+                Ok(elements) => elements,
+                Err(err) => return Err(CommandError::Message(format!("{}", err))),
+            };
+
             for element in elements.iter() {
                 debug!("Resolved element: {:?}", element);
             }
@@ -170,6 +176,12 @@ fn get_required_assets(
     let mut result = Vec::new();
     for asset in asset_names.into_iter() {
         let elements = project.get_elements(asset.to_string(), context);
+
+        let elements = match elements {
+            Ok(elements) => elements,
+            Err(_) => return vec![],
+        };
+
         for (element, data) in elements.iter() {
             match data.get_dependencies() {
                 Some(dependencies) => {

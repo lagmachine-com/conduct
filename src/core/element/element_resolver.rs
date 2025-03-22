@@ -5,6 +5,7 @@ use log::{debug, trace, warn};
 use crate::core::{
     asset::Asset,
     context::{Context, ContextMode},
+    error::ProjectError,
     project::Project,
 };
 
@@ -18,7 +19,7 @@ pub trait ElementResolver {
         &self,
         asset_name: String,
         context: &Context,
-    ) -> BTreeMap<String, ResolvedElementData>;
+    ) -> Result<BTreeMap<String, ResolvedElementData>, ProjectError>;
 
     fn get_element(
         &self,
@@ -42,7 +43,10 @@ impl ElementResolver for Project {
     ) -> Option<ResolvedElementData> {
         let result = self.get_elements(asset_name, context);
 
-        return result.get(&element_name).cloned();
+        match result {
+            Ok(results) => results.get(&element_name).cloned(),
+            Err(_) => None,
+        }
     }
 
     // Resolve the list of elements for a given asset
@@ -50,7 +54,7 @@ impl ElementResolver for Project {
         &self,
         asset_name: String,
         context: &Context,
-    ) -> BTreeMap<String, ResolvedElementData> {
+    ) -> Result<BTreeMap<String, ResolvedElementData>, ProjectError> {
         let asset = self.get_asset_by_name(asset_name.clone());
 
         trace!("Getting assets with context: {:#?}", context);
@@ -59,7 +63,7 @@ impl ElementResolver for Project {
             Some(asset) => asset,
             None => {
                 warn!("Asset {} does not exist", asset_name);
-                panic!()
+                return Err(ProjectError::Message("Asset does not exist".to_string()));
             }
         };
 
@@ -81,7 +85,7 @@ impl ElementResolver for Project {
         );
         add_elements_from_department_default(&mut result, self, asset, context, element_data);
 
-        result
+        Ok(result)
     }
 }
 

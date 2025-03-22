@@ -1,4 +1,4 @@
-import { AssetTreeCategory, ListAssetsResult, ListElementsResult, ListExportFormatsResult, ListShotsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
+import { AssetTreeCategory, ListAssetsResult, ListElementsResult, ListExportFormatsResult, ListShotsResult, ResolveElementsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
 
 
 declare global {
@@ -151,4 +151,11 @@ export async function create_setup(department: string, asset: string, file_forma
 export async function listShots(): Promise<ListShotsResult> {
     let result = await get("api/v1/command/list_shots")
     return await result.json() as ListShotsResult
+}
+
+export async function resolveElements(asset: string): Promise<ResolveElementsResult> {
+    let result = await get("api/v1/command/resolve_elements", {
+        "asset": asset
+    })
+    return await result.json() as ResolveElementsResult
 }

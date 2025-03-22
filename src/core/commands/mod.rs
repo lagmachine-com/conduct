@@ -7,6 +7,7 @@ mod command_list_elements;
 mod command_list_export_formats;
 mod command_list_shots;
 mod command_load_assets;
+mod command_resolve_elements;
 mod command_save;
 mod command_setup;
 mod command_summary;
@@ -33,6 +34,7 @@ use command_list_elements::ListElementsArgs;
 use command_list_export_formats::ListExportFormatsArgs;
 use command_list_shots::ListShotsArgs;
 use command_load_assets::LoadAssetsArgs;
+use command_resolve_elements::ResolveElementsArgs;
 use command_save::SaveArgs;
 use command_setup::SetupArgs;
 use command_summary::SummaryArgs;
@@ -87,6 +89,8 @@ pub enum CommandType {
 
     /// List all shots
     ListShots(ListShotsArgs),
+
+    ResolveElements(ResolveElementsArgs),
 
     GetAssetTree(GetAssetTreeArgs),
 

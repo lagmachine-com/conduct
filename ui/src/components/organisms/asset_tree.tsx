@@ -16,6 +16,7 @@ import { TooltipContent, TooltipTrigger } from "../ui/tooltip";
 export interface AssetTreeProps {
     contextMenuBuilder?(name: string, entry: AssetTreeEntry): any
     categoryContextMenuBuilder?(name: string): any
+    onPathClicked?(path: string): any
     assets: Resource<AssetTreeCategory>
 }
 
@@ -23,6 +24,7 @@ const AssetTree = (props: AssetTreeProps) => {
 
     let closedPaths: string[] = [];
     let contextMenuBuilder = props.contextMenuBuilder;
+    let onClick = props.onPathClicked;
 
 
     const assetEntry: Component<{ entry_name: string, entry: AssetTreeEntry, current_path: string }> = (props) => {
@@ -32,7 +34,9 @@ const AssetTree = (props: AssetTreeProps) => {
                 <div class='flex-row flex p-1'>
                     <ContextMenu>
                         <ContextMenuTrigger>
-                            <Label class='ml-2 text-muted-foreground text-sm'>{props.entry_name}</Label>
+                            <Label onClick={() => {
+                                onClick?.(path)
+                            }} class='ml-2 select-none hover:underline text-muted-foreground text-sm'>{props.entry_name}</Label>
                         </ContextMenuTrigger>
                         <ContextMenuContent>
                             <Label class="text-muted-foreground text-xs">{path}</Label>

@@ -55,13 +55,18 @@ impl Command for ListElementsArgs {
         };
 
         let project = project.read().unwrap();
+
+        let asset = self.common.asset.unwrap();
+        let asset = asset.split("/").last().unwrap();
+
+        let elements = project.get_elements(asset.to_string(), &context);
+        let elements = match elements {
+            Ok(elements) => elements,
+            Err(err) => return Err(CommandError::Message(format!("{}", err))),
+        };
+
         let mut result = ListElementsResult {
-            elements: project
-                .get_elements(self.common.asset.unwrap(), &context)
-                .keys()
-                .into_iter()
-                .map(|f| f.to_string())
-                .collect(),
+            elements: elements.keys().into_iter().map(|f| f.to_string()).collect(),
         };
 
         result.elements.sort();
