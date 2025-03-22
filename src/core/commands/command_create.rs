@@ -1,3 +1,4 @@
+use core::fmt;
 use std::{collections::BTreeMap, sync::RwLock};
 
 use clap::{command, Args};
@@ -9,7 +10,7 @@ use crate::core::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct CreateArgs {
@@ -25,6 +26,7 @@ impl Command for CreateArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         info!("Returning result from command create!");
 
@@ -39,13 +41,17 @@ impl Command for CreateArgs {
         };
 
         match self.category {
-            Some(category) => {
-                p.create_category_tree_from_path(&category);
-            }
+            Some(category) => match p.create_category_tree_from_path(&category) {
+                Some(err) => return Err(CommandError::Message(format!("{}", err).to_string())),
+                None => (),
+            },
             None => (),
         }
 
-        p.save();
+        if context.is_cli {
+            p.save();
+        }
+
         Ok(None)
     }
 }
@@ -67,7 +73,11 @@ fn create_asset(
     }
     let path = &parts[..(parts.len() - 1)];
     let category_path = path.join("/");
-    p.create_category_tree_from_path(&category_path);
+    match p.create_category_tree_from_path(&category_path) {
+        Some(err) => return Err(CommandError::Message(format!("{}", err).to_string())),
+        None => (),
+    }
+
     let category = p.get_mut_category_by_path(category_path);
 
     match category {

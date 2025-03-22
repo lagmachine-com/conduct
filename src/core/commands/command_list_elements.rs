@@ -10,7 +10,7 @@ use crate::core::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct ListElementsArgs {
@@ -38,6 +38,7 @@ impl Command for ListElementsArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         if self.common.asset.is_none() {
             return Err(CommandError::InvalidArguments);

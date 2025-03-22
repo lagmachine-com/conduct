@@ -6,7 +6,7 @@ use query_string_builder::QueryString;
 use crate::{core::project::Project, gui};
 use serde::{Deserialize, Serialize};
 
-use super::{error::CommandError, Command};
+use super::{error::CommandError, Command, CommandContext};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct DialogArgs {
@@ -26,6 +26,7 @@ impl Command for DialogArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         let (_, argv) = argmap::parse(self.extras.iter());
         log::debug!("Got extras: {:?}", argv);

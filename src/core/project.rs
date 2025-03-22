@@ -11,6 +11,7 @@ use crate::core::{asset, format};
 
 use super::asset::{Asset, AssetCategory, AssetEntry};
 use super::department::{self, Department};
+use super::error::ProjectError;
 use super::program::{self, Program};
 use super::version_control::VersionControlConfig;
 
@@ -205,7 +206,7 @@ impl Project {
         Some(current)
     }
 
-    pub fn create_category_tree_from_path(&mut self, path: &String) {
+    pub fn create_category_tree_from_path(&mut self, path: &String) -> Option<ProjectError> {
         let parts: Vec<String> = path.split('/').map(|x| x.to_string()).collect();
         let mut current = &mut self.assets;
 
@@ -222,6 +223,13 @@ impl Project {
                     _ => panic!(),
                 },
                 None => {
+                    for child in current.children.values().into_iter() {
+                        match child {
+                            AssetEntry::Asset(_) => return Some(ProjectError::Message("Cannot create a new category in a category which already contains assets".to_string())),
+                            AssetEntry::Category(_) => continue,
+                        }
+                    }
+
                     current.children.insert(
                         part.clone(),
                         AssetEntry::Category(AssetCategory {
@@ -239,6 +247,8 @@ impl Project {
                 }
             }
         }
+
+        return None;
     }
 }
 

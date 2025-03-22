@@ -63,7 +63,7 @@ const AssetTree = (props: AssetTreeProps) => {
                         <AccordionPrimitive.Trigger class="h-0 absolute"></AccordionPrimitive.Trigger>
                         <ContextMenu>
                             <ContextMenuTrigger>
-                                <AccordionTrigger >
+                                <AccordionTrigger class="flex-row-reverse justify-end" >
                                     <Label for={path}>{props.entry_name}</Label>
                                 </AccordionTrigger>
                             </ContextMenuTrigger>

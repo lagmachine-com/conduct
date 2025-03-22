@@ -7,7 +7,7 @@ use clap::Parser;
 use log::*;
 pub use result::CliResult;
 
-use crate::core::commands::{write_command_result, Command, CommandType};
+use crate::core::commands::{write_command_result, Command, CommandContext, CommandType};
 
 #[derive(Debug, Parser)]
 #[command(name = "conduct")]
@@ -93,7 +93,7 @@ pub fn cli() -> CliResult {
     match args.command {
         Some(command) => {
             info!("Running command: {:?}", command);
-            let result = CommandType::execute(command, &project);
+            let result = CommandType::execute(command, &project, CommandContext { is_cli: true });
 
             match result {
                 Ok(value) => match value {

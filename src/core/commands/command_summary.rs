@@ -8,7 +8,7 @@ use ts_rs::TS;
 
 use crate::core::project::Project;
 
-use super::{error::CommandError, Command};
+use super::{error::CommandError, Command, CommandContext};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct SummaryArgs {}
@@ -26,6 +26,7 @@ impl Command for SummaryArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         let project = project.read().unwrap();
 

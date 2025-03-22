@@ -10,7 +10,7 @@ use crate::core::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 
 pub enum LoadReason {
     Requested,
@@ -51,6 +51,7 @@ impl Command for LoadAssetsArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         let project = project.read().unwrap();
 

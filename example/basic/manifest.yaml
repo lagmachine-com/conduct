@@ -64,12 +64,19 @@ assets:
           design:
           - vector
           - 2x
+    - iconB: {}
+    sprites:
+      enemy:
+      - zombieA: {}
+      player:
+      - playerA: {}
   3d:
     environment:
     - cubeWorldA:
         departments:
           layout:
           - !depends(defaultCubeA;defaultCubeB) cubeInstancer
+    - cubeWorldB: {}
     prop:
     - $template:
         departments:

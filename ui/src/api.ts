@@ -118,6 +118,12 @@ export async function getAssetTree(department_filter: null | string = null): Pro
     return json as AssetTreeCategory
 }
 
+export async function saveChanges(): Promise<any> {
+    let result = await get("api/v1/command/save");
+    let json = await result.json()
+    return json
+}
+
 export async function loadAssets(program: string, department: string, shot: null | string = null, assets: string[]): Promise<AssetTreeCategory> {
     let result = await get("api/v1/command/load_assets", {
         "program": program,

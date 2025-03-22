@@ -7,7 +7,7 @@ use ts_rs::TS;
 use crate::core::{project::Project, shot::shot_resolver::ShotResolver};
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct SetupArgs {
@@ -37,6 +37,7 @@ impl Command for SetupArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         if self.common.asset.is_none() || self.common.department.is_none() {
             return Err(CommandError::InvalidArguments);

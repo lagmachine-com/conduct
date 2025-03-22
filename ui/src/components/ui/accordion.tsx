@@ -34,7 +34,7 @@ const AccordionTrigger = <T extends ValidComponent = "button">(
     <AccordionPrimitive.Header class="flex">
       <AccordionPrimitive.Trigger
         class={cn(
-          "flex flex-1 items-center justify-between py-1 font-medium transition-all hover:underline [&[data-expanded]>svg]:rotate-180",
+          "flex flex-1 items-center justify-between py-1 font-medium transition-all hover:underline [&[data-expanded]>svg]:rotate-90",
           local.class
         )}
         {...others}
@@ -50,7 +50,7 @@ const AccordionTrigger = <T extends ValidComponent = "button">(
           stroke-linejoin="round"
           class="size-4 shrink-0 transition-transform duration-200"
         >
-          <path d="M6 9l6 6l6 -6" />
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12l-5 -5M15 12l-5 5"></path>
         </svg>
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>

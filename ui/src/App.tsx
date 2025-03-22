@@ -1,6 +1,6 @@
-import { createResource, type Component, Show, Switch, Match, createSignal } from 'solid-js';
+import { createResource, type Component, Show, Switch, Match, createSignal, For } from 'solid-js';
 
-import { getSummary, getAssetTree, doCreate } from './api';
+import { getSummary, getAssetTree, doCreate, get, saveChanges } from './api';
 
 import { Button } from './components/ui/button';
 import { ColorModeProvider } from '@kobalte/core/color-mode';
@@ -10,6 +10,14 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { ContextMenuCheckboxItem, ContextMenuGroupLabel, ContextMenuItem } from './components/ui/context-menu';
 import { TextField, TextFieldInput } from './components/ui/text-field';
 import { Callout, CalloutContent, CalloutTitle } from './components/ui/callout';
+import { Menubar, MenubarContent, MenubarItem, MenubarItemLabel, MenubarMenu, MenubarSeparator, MenubarShortcut, MenubarSub, MenubarSubContent, MenubarSubTrigger, MenubarTrigger } from './components/ui/menubar';
+import { comma } from 'postcss/lib/list';
+
+interface CommandEntry {
+  command: string,
+  content: any,
+  label: string
+}
 
 const App: Component = () => {
   const [info] = createResource(getSummary);
@@ -23,7 +31,6 @@ const App: Component = () => {
 
   const [error, setError] = createSignal<string>("")
 
-
   const newAssetPath = () => {
     let path = category()
     if (path.length > 0) path += "/"
@@ -34,11 +41,13 @@ const App: Component = () => {
   const openCreateAssetDialog = (parent: string) => {
     setOpenCreateAssetDialog(true)
     setNewAssetname("")
+    setError("")
     setCategory(parent)
   }
 
   const openCreateCategoryDialog = (parent: string) => {
     setNewAssetname("")
+    setError("")
     setCategory(parent)
     setOpenCreateCategoryDialog(true);
   }
@@ -47,10 +56,42 @@ const App: Component = () => {
   return (
     <ColorModeProvider initialColorMode="system" >
       <Show when={info()}>
+        <Menubar class='m-1'>
+          <div class='mr-2'>
+            <h4 class="text-sm font-medium leading-none">{info()!.display_name}</h4>
+            <p class="text-xs text-muted-foreground">{info()!.identifier}</p>
+          </div>
+          <Separator orientation="vertical" />
+          <MenubarMenu>
+            <MenubarTrigger>File</MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem onClick={() => {
+                saveChanges()
+              }
+              }>Save Changes</MenubarItem>
+            </MenubarContent>
+          </MenubarMenu>
+          <MenubarMenu>
+            <MenubarTrigger>Edit</MenubarTrigger>
+            <MenubarContent>
+              <MenubarItem onClick={() => {
+                openCreateCategoryDialog("")
+              }}>Create Category</MenubarItem>
+              <MenubarItem onClick={() => {
+                openCreateAssetDialog("")
+              }}>Create Asset</MenubarItem>
+              <MenubarSeparator />
+              <MenubarSub overlap>
+                <MenubarSubTrigger>Undo</MenubarSubTrigger>
+                <MenubarSubContent>
+
+
+                </MenubarSubContent>
+              </MenubarSub>
+            </MenubarContent>
+          </MenubarMenu>
+        </Menubar>
         <div class='border-spacing-10 p-3 pb-12'>
-          <h4 class="text-lg font-medium leading-none">{info()!.display_name}</h4>
-          <p class="text-sm text-muted-foreground">{info()!.identifier}</p>
-          <Separator class='my-4'></Separator>
           <div class='w-full'>
 
             <AssetTree assets={assets} contextMenuBuilder={(path, entry) => (
@@ -66,15 +107,6 @@ const App: Component = () => {
             )}></AssetTree>
           </div>
         </div>
-        <div class='flex space-x-3 w-full bg-accent p-3 fixed bottom-0'>
-          <Button onclick={() => {
-            openCreateCategoryDialog("")
-          }}>Create Category</Button>
-          <Button onClick={() => {
-            openCreateAssetDialog("")
-          }}>Create Asset</Button>
-        </div>
-
         <Dialog open={isCreateAssetDialogOpen()} onOpenChange={setOpenCreateAssetDialog}>
           <DialogContent>
             <DialogHeader>
@@ -110,6 +142,7 @@ const App: Component = () => {
                     setOpenCreateAssetDialog(false)
                     refetch()
                     setNewAssetname("")
+                    setError("")
                   } else {
                     setError(result['error'])
                   }
@@ -155,6 +188,7 @@ const App: Component = () => {
                     setOpenCreateCategoryDialog(false)
                     refetch()
                     setNewAssetname("")
+
                   } else {
                     setError(result['error'])
                   }

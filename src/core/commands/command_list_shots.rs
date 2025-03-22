@@ -6,7 +6,7 @@ use ts_rs::TS;
 use crate::core::project::Project;
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 use crate::core::shot::shot_resolver::ShotResolver;
 
 #[derive(Debug, Args, Serialize, Deserialize)]
@@ -26,6 +26,7 @@ impl Command for ListShotsArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         let project = project.read().unwrap();
 
