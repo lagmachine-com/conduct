@@ -161,13 +161,14 @@ export async function resolveElements(asset: string): Promise<ResolveElementsRes
     return await result.json() as ResolveElementsResult
 }
 
-export async function doIngest(asset: string, element: string | null, department: string, file: string, target_format: string | null, license: string, source: string): Promise<IngestResult> {
+export async function doIngest(asset: string, element: string | null, department: string, shot: string | null, file: string, target_format: string | null, license: string, source: string): Promise<IngestResult> {
     let result = await get("api/v1/command/ingest", {
         "asset": asset,
         "element": element,
         "department": department,
         "file": file,
         "target_format": target_format,
+        "shot": shot,
         "license": license,
         "source": source
     })

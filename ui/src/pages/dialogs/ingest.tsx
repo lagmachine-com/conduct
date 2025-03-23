@@ -2,7 +2,7 @@
 import { Combobox } from '@kobalte/core/*';
 import { useSearchParams } from '@solidjs/router';
 import { createResource, createSignal, For, Show, type Component } from 'solid-js';
-import { doIngest, exitDialog, getSummary, listElements, listExportFormats } from '~/api';
+import { doIngest, exitDialog, getSummary, listElements, listExportFormats, listShots } from '~/api';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Label } from '~/components/ui/label';
@@ -12,8 +12,10 @@ import { TextField, TextFieldInput } from '~/components/ui/text-field';
 const DialogIngest: Component = () => {
     const [files, setFiles] = createSignal<string[]>([])
     const [selectedDepartment, setSelectedDepartment] = createSignal<string | null>()
+    const [selectedShot, setSelectedShot] = createSignal<string | null>()
 
     const [info] = createResource(getSummary);
+    const [shots] = createResource(listShots);
 
     const [license, setLicenseFiles] = createSignal<string[]>([])
 
@@ -22,11 +24,13 @@ const DialogIngest: Component = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const targetAsset = () => searchParams.asset;
 
-    const [elements] = createResource(() => listElements(targetAsset() as string, selectedDepartment()));
+    const [elements] = createResource(selectedDepartment, (department) => listElements(targetAsset() as string, department));
     const [elementSelections, setElementSelections] = createSignal<any>({});
 
     const [formats] = createResource(selectedDepartment, (department) => listExportFormats(department, "ingest"));
     const [formatSelections, setFormatSelections] = createSignal<any>({});
+
+    const [shotSelections, setShotSelections] = createSignal<any>({});
 
     const [source, setSource] = createSignal("");
 
@@ -72,8 +76,9 @@ const DialogIngest: Component = () => {
                 setIngestStatus(file + " -> " + asset + " " + "(" + element + ")")
                 let format = formatSelections()[file]
                 let dept = selectedDepartment()
+                let shot = shotSelections()[file]
                 let license_file = license()[0];
-                let result = await doIngest(targetAsset() as string, element, dept!, file, format, license_file, source())
+                let result = await doIngest(targetAsset() as string, element, dept!, shot, file, format, license_file, source())
 
 
                 if (result['script'] != null) {
@@ -83,6 +88,7 @@ const DialogIngest: Component = () => {
                         "element": element,
                         "asset": asset,
                         "department": dept,
+                        "shot": shot,
                         "format": format
                     }
 
@@ -160,7 +166,7 @@ const DialogIngest: Component = () => {
                             <SelectContent class=' overflow-y-auto max-h-[50vh]' />
                         </Select>
                     </Show>
-                    <Show when={elements() != undefined && formats() != undefined && files().length > 0}>
+                    <Show when={elements() != undefined && formats() != undefined && files().length > 0 && shots()}>
                         <Card>
                             <CardHeader>
                                 <CardTitle>Selected Files</CardTitle>
@@ -170,13 +176,13 @@ const DialogIngest: Component = () => {
                                     {
                                         (e) => {
                                             return <div class=' border- text-xs text-muted-foreground flex items-center'>
-                                                <div class='w-9/12'>
+                                                <div class='w-full'>
                                                     <TextField disabled class='w-full text-xs ' defaultValue={e}>
                                                         <TextFieldInput class='text-xs' />
                                                     </TextField></div>
-                                                <div class='flex items-center w-3/12'>
+                                                <div class='flex items-center w-full'>
 
-                                                    <Select class='w-full p-1' id={e} value={elementSelections()[e]} options={elements()!.elements} onChange={(selected) => {
+                                                    <Select class='w-full pl-1' id={e} value={elementSelections()[e]} options={elements()!.elements} onChange={(selected) => {
                                                         console.log(selected)
                                                         let selections = {
                                                             ...elementSelections()
@@ -196,7 +202,7 @@ const DialogIngest: Component = () => {
                                                     </Select>
 
 
-                                                    <Select class='justify-end w-full'
+                                                    <Select class='justify-end w-full pl-1'
                                                         id={"file_format_" + e}
                                                         options={formats()!.formats}
                                                         placeholder="Format"
@@ -218,13 +224,37 @@ const DialogIngest: Component = () => {
                                                         </SelectTrigger>
                                                         <SelectContent class=' overflow-y-auto max-h-[50vh]' />
                                                     </Select>
+
+
+                                                    <Select class='justify-end w-full pl-1'
+                                                        id={"shot_" + e}
+                                                        options={shots()!.shots}
+                                                        placeholder="Shot"
+                                                        onChange={(selected) => {
+
+                                                            console.log(selected)
+                                                            let selections = {
+                                                                ...shotSelections()
+                                                            }
+
+                                                            selections[e] = selected
+                                                            setShotSelections(selections)
+
+                                                            console.log(shotSelections())
+                                                        }}
+                                                        itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
+                                                        <SelectTrigger aria-label="Shot">
+                                                            <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
+                                                        </SelectTrigger>
+                                                        <SelectContent class=' overflow-y-auto max-h-[50vh]' />
+                                                    </Select>
                                                 </div>
                                             </div>
                                         }
                                     }
                                 </For>
                                 <Show when={files().length > 0}>
-                                    <div class='flex justify-end'>
+                                    <div class='flex justify-end py-1'>
                                         <Button onClick={() => {
                                             setFiles([]);
                                             setStep("select_files");

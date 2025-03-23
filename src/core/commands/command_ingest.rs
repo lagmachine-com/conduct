@@ -122,7 +122,7 @@ impl Command for IngestArgs {
 
                                 let now = OffsetDateTime::now_local().unwrap();
 
-                                if let Err(e) = writeln!(file, " - `{}`: {} at {}", original.file_name().unwrap().to_str().unwrap(), source, now) {
+                                if let Err(e) = writeln!(file, " - `{}`: {} at {}  ({})", original.file_name().unwrap().to_str().unwrap(), source, now, original.to_str().unwrap()) {
                                     eprintln!("Couldn't write to file: {}", e);
                                 } else {
                                     info!("Wrote source down in {}", sources_path.to_str().unwrap())
