@@ -6,6 +6,7 @@ declare global {
         conduct: {
             get: (path: string) => Promise<Response>,
             post: (path: string, body: string) => Promise<Response>
+            api: any
         }
     }
 }
@@ -171,4 +172,10 @@ export async function doIngest(asset: string, element: string | null, department
         "source": source
     })
     return await result.json() as IngestResult
+}
+
+window.conduct.api = {
+    doExport,
+    doIngest,
+    listShots
 }

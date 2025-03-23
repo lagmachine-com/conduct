@@ -12,3 +12,12 @@ window.conduct = {
         });
     }
 };
+
+window.os = {
+    execute: function (command) {
+        return fetch(`${base_path}/os/execute`, {
+            method: "POST",
+            body: command
+        });
+    }
+}

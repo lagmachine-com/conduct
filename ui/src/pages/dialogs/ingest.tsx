@@ -89,7 +89,7 @@ const DialogIngest: Component = () => {
                     let obj = eval(result['script'])
 
                     console.log(obj)
-                    obj(data)
+                    await obj(data)
                 }
 
                 console.log(result)
