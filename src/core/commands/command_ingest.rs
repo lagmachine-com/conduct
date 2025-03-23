@@ -119,8 +119,7 @@ impl Command for IngestArgs {
                                     .create(true)
                                     .open(&sources_path)
                                     .unwrap();
-                                
-                                    
+
                                 let now = OffsetDateTime::now_local().unwrap();
 
                                 if let Err(e) = writeln!(file, " - `{}`: {} at {}", original.file_name().unwrap().to_str().unwrap(), source, now) {
@@ -144,7 +143,7 @@ impl Command for IngestArgs {
                         let original = PathBuf::from(license.clone());
                         let file_name = PathBuf::from(self.file.unwrap());
                         let file_name = file_name.file_stem().unwrap().to_str().unwrap();
-                        let license_file_name =  original.file_name().unwrap().to_str().unwrap();
+                        let license_file_name = original.file_name().unwrap().to_str().unwrap();
                         license_path.push(format!("{} - {}", file_name, license_file_name));
 
                         info!(

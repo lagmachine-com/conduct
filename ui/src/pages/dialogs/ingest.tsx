@@ -2,7 +2,7 @@
 import { Combobox } from '@kobalte/core/*';
 import { useSearchParams } from '@solidjs/router';
 import { createResource, createSignal, For, Show, type Component } from 'solid-js';
-import { doIngest, getSummary, listElements, listExportFormats } from '~/api';
+import { doIngest, exitDialog, getSummary, listElements, listExportFormats } from '~/api';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Label } from '~/components/ui/label';
@@ -31,6 +31,7 @@ const DialogIngest: Component = () => {
     const [source, setSource] = createSignal("");
 
     const [isIngesting, setIsIngesting] = createSignal(false);
+    const [ingestFinished, setIsIngestFinished] = createSignal(false);
     const [ingestStatus, setIngestStatus] = createSignal("");
 
 
@@ -91,7 +92,6 @@ const DialogIngest: Component = () => {
                     obj(data)
                 }
 
-
                 console.log(result)
                 setIngestStatus("Ingested: " + JSON.stringify(result))
 
@@ -101,7 +101,18 @@ const DialogIngest: Component = () => {
             }
         }
 
-        setIngestStatus("Done!")
+        setIsIngestFinished(true)
+        setIngestStatus("Ingest finished")
+    }
+
+    function onFinished() {
+        console.log("test")
+        console.log(history.length)
+        if (history.length > 1) {
+            history.back()
+        } else {
+            exitDialog(null)
+        }
     }
 
     return (
@@ -115,6 +126,11 @@ const DialogIngest: Component = () => {
                                 <CardTitle>Ingesting</CardTitle>
                                 <CardDescription>{ingestStatus()}</CardDescription>
                             </CardHeader>
+                            <Show when={ingestFinished()}>
+                                <CardContent>
+                                    <Button onClick={onFinished}>Done!</Button>
+                                </CardContent>
+                            </Show>
                         </Card>
                     </div>
                     <div class='bg-white opacity-80 absolute w-screen h-screen overflow-clip'>
