@@ -129,6 +129,8 @@ const App: Component = () => {
                     {selectedPath()}
                   </CardDescription>
                   <CardContent class='p-0 overflow-y-scroll'>
+
+
                     <Accordion multiple>
                       <For each={Object.entries(resolvedElements()?.result ?? {})}
                       >{(item) => {
@@ -179,6 +181,15 @@ const App: Component = () => {
                       }
                         }</For>
                     </Accordion>
+                    <div class='p-1'>
+                      <Separator></Separator>
+                    </div>
+                    <div class='flex justify-end'>
+                      <Button onClick={() => {
+                        let asset = selectedPath().split("/").slice(-1)[0];
+                        window.location.href = `/dialogs/ingest?asset=${asset}`
+                      }} variant={"ghost"}>Ingest</Button>
+                    </div>
                   </CardContent>
                 </CardHeader>
 
@@ -280,7 +291,7 @@ const App: Component = () => {
 
         </div>
       </Show>
-    </ColorModeProvider>
+    </ColorModeProvider >
   );
 };
 

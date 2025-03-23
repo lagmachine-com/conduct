@@ -12,6 +12,9 @@ programs:
       .glb: import_glb_mesh.py
       .mesh.blend: import_blend_library_mesh.py
       .shadergraph.blend: import_blend_shadergraph.py
+  ingest:
+    exports:
+      .ogg: ingest_audio_file.js
   inkscape:
     exports:
       .2x.png: export_png_1024.py
@@ -55,6 +58,11 @@ departments:
         - .mesh.blend
         - .shadergraph.blend
         - .animbake.abc
+  sound:
+    programs:
+      ingest:
+        exports:
+        - .ogg
 
 assets:
   2d:
@@ -88,6 +96,16 @@ assets:
           - test
     - defaultCubeA: {}
     - defaultCubeB: {}
+  audio:
+    sfx:
+      impact:
+      - impactGlassLight:
+          departments:
+            sound:
+            - varA
+            - varB
+            - varC
+            - varD
 
 shots:
   '103':

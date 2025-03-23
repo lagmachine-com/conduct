@@ -7,6 +7,8 @@ export type AssetTreeCategory = { children: { [key in string]?: AssetTreeEntry }
 
 export type AssetTreeEntry = { "type": "Asset" } | { "type": "Category" } & AssetTreeCategory;
 
+export type IngestResult = { original_file: string | null, new_file: string | null, new_license_file: string | null, script: string | null, };
+
 export type ListAssetsResult = { assets: Array<string>, };
 
 export type ListElementsResult = { elements: Array<string>, };

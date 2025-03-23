@@ -13,10 +13,10 @@ use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 pub struct SetupArgs {
     #[command(flatten)]
     #[serde(flatten)]
-    common: CommonArgs,
+    pub common: CommonArgs,
 
     #[arg(short, long)]
-    file_format: String,
+    pub file_format: String,
 
     #[arg(long)]
     pub dry: bool,

@@ -2,6 +2,7 @@ mod command_create;
 mod command_dialog;
 mod command_export;
 mod command_get_asset_tree;
+mod command_ingest;
 mod command_list_assets;
 mod command_list_elements;
 mod command_list_export_formats;
@@ -29,6 +30,7 @@ pub use command_dialog::DialogOptions;
 pub use command_export::ExportArgs;
 
 use command_get_asset_tree::GetAssetTreeArgs;
+use command_ingest::IngestArgs;
 use command_list_assets::ListAssetsArgs;
 use command_list_elements::ListElementsArgs;
 use command_list_export_formats::ListExportFormatsArgs;
@@ -97,6 +99,8 @@ pub enum CommandType {
     LoadAssets(LoadAssetsArgs),
 
     Save(SaveArgs),
+
+    Ingest(IngestArgs),
 }
 
 pub fn write_command_result(result: serde_json::Value) {

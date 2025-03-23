@@ -1,4 +1,4 @@
-import { AssetTreeCategory, ListAssetsResult, ListElementsResult, ListExportFormatsResult, ListShotsResult, ResolveElementsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
+import { AssetTreeCategory, IngestResult, ListAssetsResult, ListElementsResult, ListExportFormatsResult, ListShotsResult, ResolveElementsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
 
 
 declare global {
@@ -158,4 +158,17 @@ export async function resolveElements(asset: string): Promise<ResolveElementsRes
         "asset": asset
     })
     return await result.json() as ResolveElementsResult
+}
+
+export async function doIngest(asset: string, element: string | null, department: string, file: string, target_format: string | null, license: string, source: string): Promise<IngestResult> {
+    let result = await get("api/v1/command/ingest", {
+        "asset": asset,
+        "element": element,
+        "department": department,
+        "file": file,
+        "target_format": target_format,
+        "license": license,
+        "source": source
+    })
+    return await result.json() as IngestResult
 }

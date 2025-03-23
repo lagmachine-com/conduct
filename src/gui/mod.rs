@@ -3,11 +3,15 @@ mod embedded_files;
 mod router;
 mod routes;
 
-use std::sync::{Arc, RwLock};
+use std::{
+    clone,
+    sync::{Arc, RwLock},
+};
 
-use log::{debug, info, trace};
+use log::{debug, info, trace, warn, Log};
 use router::{ApiEntry, RequestContext};
 use routes::register_routes;
+use serde_json::json;
 use tao::{
     dpi::{LogicalSize, PhysicalPosition, Position, Size},
     event::{Event, WindowEvent},
@@ -15,7 +19,7 @@ use tao::{
     window::WindowBuilder,
 };
 
-use wry::WebViewBuilder;
+use wry::{WebView, WebViewBuilder};
 
 use crate::core::commands::DialogOptions;
 
@@ -66,6 +70,8 @@ pub fn gui(project: crate::core::project::Project, dialog_options: Option<Dialog
     let mut minimizable = true;
     let mut maximizable = true;
 
+    let mut webview_ref: Arc<RwLock<Option<WebView>>> = Arc::new(RwLock::new(None));
+
     if let Some(options) = dialog_options {
         page += options.path.as_str();
         title = options.title;
@@ -97,10 +103,38 @@ pub fn gui(project: crate::core::project::Project, dialog_options: Option<Dialog
         i32::try_from((size.height / 2) - (window_size.height / 2) - (size.height / 16)).unwrap(),
     )));
 
+    let cloned = webview_ref.clone();
+
     let builder = WebViewBuilder::new()
         .with_url(page)
         .with_devtools(true)
         .with_initialization_script(get_init_script().as_str())
+        .with_drag_drop_handler(move |e| {
+            match e {
+                wry::DragDropEvent::Drop { paths, position } => match webview_ref.clone().read() {
+                    Ok(webview) => {
+                        if webview.is_some() {
+                            let _ = webview.as_ref().unwrap().evaluate_script(
+                                &format!(
+                                    "window.postMessage({});",
+                                    json!({
+                                        "type": "files_dropped",
+                                        "data": paths
+                                    })
+                                )
+                                .to_string(),
+                            );
+                        } else {
+                            warn!("Failed to get webview")
+                        }
+                    }
+                    Err(_) => warn!("Failed to read"),
+                },
+                _ => (),
+            }
+
+            true
+        })
         .with_asynchronous_custom_protocol(
             "conduct".into(),
             move |_webview_id, request, responder| {
@@ -143,6 +177,12 @@ pub fn gui(project: crate::core::project::Project, dialog_options: Option<Dialog
         builder.build_gtk(vbox).unwrap()
     };
 
+    {
+        let mut view = cloned.write().unwrap();
+        *view = Some(_webview);
+        drop(view);
+    }
+
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
 
@@ -151,7 +191,7 @@ pub fn gui(project: crate::core::project::Project, dialog_options: Option<Dialog
                 WindowEvent::CloseRequested => {
                     *control_flow = ControlFlow::Exit;
                 }
-                _ => (),
+                event => {}
             },
             Event::UserEvent(event) => match event {
                 UserWindowEvent::Exit => {
