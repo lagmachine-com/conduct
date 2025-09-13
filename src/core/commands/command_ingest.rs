@@ -8,7 +8,10 @@ use ts_rs::TS;
 use super::{
     args::CommonArgs, command_setup::SetupArgs, error::CommandError, Command, CommandContext,
 };
-use crate::core::{program, project::Project, shot::shot_resolver::ShotResolver};
+use crate::{
+    core::{program, project::Project, shot::shot_resolver::ShotResolver},
+    utils,
+};
 use serde::{Deserialize, Serialize};
 use std::io::prelude::*;
 
@@ -55,6 +58,8 @@ impl Command for IngestArgs {
             file_format: "".to_string(),
             dry: true,
         };
+
+        let project_path = project.try_read().unwrap().get_root_directory();
 
         let result = Command::execute(setup, project, context);
 
@@ -108,10 +113,17 @@ impl Command for IngestArgs {
 
                         result.new_file = Some(file_path.to_str().unwrap().to_string());
 
+                        let file_relative = file_path.strip_prefix(&project_path).unwrap();
+
                         match self.source {
                             Some(source) => {
-                                let mut sources_path = path.clone();
-                                sources_path.push("sources.md");
+                                let mut sources_path = project_path.clone();
+                                sources_path.push("logs");
+                                std::fs::create_dir_all(&sources_path);
+
+                                sources_path.push("ingest_sources.csv");
+
+                                let exists = std::fs::exists(&sources_path).unwrap();
 
                                 let mut file = OpenOptions::new()
                                     .write(true)
@@ -120,13 +132,19 @@ impl Command for IngestArgs {
                                     .open(&sources_path)
                                     .unwrap();
 
+                                if !exists {
+                                    writeln!(file, "FILE,ORIGINAL_FILE_NAME,ORIGINAL_FILE_PATH,SOURCE,TIMESTAMP,USER");
+                                }
+                                
                                 let now = OffsetDateTime::now_local().unwrap();
 
-                                if let Err(e) = writeln!(file, " - `{}`: {} at {}  ({})", original.file_name().unwrap().to_str().unwrap(), source, now, original.to_str().unwrap()) {
-                                    eprintln!("Couldn't write to file: {}", e);
-                                } else {
-                                    info!("Wrote source down in {}", sources_path.to_str().unwrap())
-                                }
+                                write!(file, "{},", file_relative.to_str().unwrap());
+                                write!(file, "{},", original.file_name().unwrap().to_str().unwrap());
+                                write!(file, "{},", original.to_str().unwrap());
+                                write!(file, "{},", source);
+                                write!(file, "{},", now);
+                                writeln!(file, "{},", whoami::username());
+
                             }
                             None => warn!("No source for this ingest has been specified! continuing regardless"),
                         }

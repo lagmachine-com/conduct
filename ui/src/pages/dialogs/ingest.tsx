@@ -1,7 +1,8 @@
 
 import { Combobox } from '@kobalte/core/*';
 import { useSearchParams } from '@solidjs/router';
-import { createResource, createSignal, For, Show, type Component } from 'solid-js';
+import { createEffect, createResource, createSignal, For, Show, type Component } from 'solid-js';
+import { build } from 'vite';
 import { doIngest, exitDialog, getSummary, listElements, listExportFormats, listShots } from '~/api';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
@@ -9,8 +10,15 @@ import { Label } from '~/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '~/components/ui/select';
 import { TextField, TextFieldInput } from '~/components/ui/text-field';
 
+interface file {
+    path: string;
+    mime: string;
+}
+
 const DialogIngest: Component = () => {
-    const [files, setFiles] = createSignal<string[]>([])
+    const [files, setFiles] = createSignal<file[]>([])
+    const [blobs, setBlobs] = createSignal<Map<string, Blob>>(new Map());
+
     const [selectedDepartment, setSelectedDepartment] = createSignal<string | null>()
     const [selectedShot, setSelectedShot] = createSignal<string | null>()
 
@@ -38,23 +46,55 @@ const DialogIngest: Component = () => {
     const [ingestFinished, setIsIngestFinished] = createSignal(false);
     const [ingestStatus, setIngestStatus] = createSignal("");
 
+    createEffect(async () => {
+        console.log("Selected files:", files())
+        let f = files();
+
+        let map = new Map();
+
+        await Promise.all(f.map(async (file) => {
+            let req = await window.os.file(file.path);
+            let data = await req.arrayBuffer();
+            console.log(data);
+            let blob = new Blob([data]);
+            map.set(file.path, blob);
+
+        }));
+
+        setBlobs(map);
+    })
+
+    addEventListener("drop", function () {
+        console.log("File entered");
+    });
 
     addEventListener("message", (event) => {
         console.log("Received message!")
         console.log(event)
 
-        if (event.data.type == "files_dropped") {
+        if (event.data.type == "drag_drop_dropped") {
+            console.log("Files dropped");
 
             if (step() == "select_files") {
                 setFiles(event.data.data)
+
                 setStep("select_license")
             } else if (step() == "select_license") {
-                setLicenseFiles([event.data.data[0]])
+                setLicenseFiles([event.data.data[0].path])
             }
 
             if (license().length > 0) {
                 setStep("add_source")
             }
+
+        }
+
+        if (event.data.type == "drag_drop_enter") {
+            console.log("Drag drop started");
+        }
+
+        if (event.data.type == "drag_drop_leave") {
+            console.log("Drag drop ended");
         }
     });
 
@@ -71,14 +111,14 @@ const DialogIngest: Component = () => {
 
         for (var file of files()) {
             try {
-                let element = elementSelections()[file]
+                let element = elementSelections()[file.path]
                 let asset = targetAsset() as string
                 setIngestStatus(file + " -> " + asset + " " + "(" + element + ")")
-                let format = formatSelections()[file]
+                let format = formatSelections()[file.path]
                 let dept = selectedDepartment()
-                let shot = shotSelections()[file]
+                let shot = shotSelections()[file.path]
                 let license_file = license()[0];
-                let result = await doIngest(targetAsset() as string, element, dept!, shot, file, format, license_file, source())
+                let result = await doIngest(targetAsset() as string, element, dept!, shot, file.path, format, license_file, source())
 
 
                 if (result['script'] != null) {
@@ -119,6 +159,40 @@ const DialogIngest: Component = () => {
         } else {
             exitDialog(null)
         }
+    }
+
+    function canPreviewFileType(mime: String) {
+        if (mime.startsWith("audio/")) {
+            return true;
+        }
+    }
+
+    function buildPreview(path: string, mime: string) {
+        var safe_path = encodeURIComponent(path);
+        let blob = blobs().get(path);
+
+        if (blob == null) {
+            return (
+                <div></div>
+            )
+        }
+
+        let url = URL.createObjectURL(blob);
+
+        if (mime.startsWith("audio")) {
+
+            return (
+                <div class='w-full' >
+                    <audio controls class='w-full' src={url}>
+                    </audio>
+                </div>
+            )
+        }
+        return (
+            <div>
+                TESTTT
+            </div>
+        )
     }
 
     return (
@@ -175,79 +249,92 @@ const DialogIngest: Component = () => {
                                 <For each={files()}>
                                     {
                                         (e) => {
-                                            return <div class=' border- text-xs text-muted-foreground flex items-center'>
-                                                <div class='w-full'>
-                                                    <TextField disabled class='w-full text-xs ' defaultValue={e}>
-                                                        <TextFieldInput class='text-xs' />
-                                                    </TextField></div>
-                                                <div class='flex items-center w-full'>
+                                            return <div class=' mt-4 mb-4 text-xs text-muted-foreground'>
+                                                <div class='w-full flex'>
+                                                    <div class='w-full'>
+                                                        <TextField disabled class='w-full text-xs ' defaultValue={e.path}>
+                                                            <TextFieldInput class='text-xs' />
+                                                        </TextField></div>
 
-                                                    <Select class='w-full pl-1' id={e} value={elementSelections()[e]} options={elements()!.elements} onChange={(selected) => {
-                                                        console.log(selected)
-                                                        let selections = {
-                                                            ...elementSelections()
+
+                                                    <div class='flex items-center w-full'>
+
+                                                        <Select class='w-full pl-1' id={e.path} value={elementSelections()[e.path]} options={elements()!.elements} onChange={(selected) => {
+                                                            console.log(selected)
+                                                            let selections = {
+                                                                ...elementSelections()
+                                                            }
+
+                                                            selections[e.path] = selected
+                                                            setElementSelections(selections)
+
+                                                            console.log(elementSelections())
+                                                        }}
+                                                            placeholder="Element"
+                                                            itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
+                                                            <SelectTrigger aria-label="Element">
+                                                                <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
+                                                            </SelectTrigger>
+                                                            <SelectContent class=' overflow-y-auto max-h-[50vh]' />
+                                                        </Select>
+
+
+                                                        <Select class='justify-end w-full pl-1'
+                                                            id={"file_format_" + e}
+                                                            options={formats()!.formats}
+                                                            placeholder="Format"
+                                                            onChange={(selected) => {
+
+                                                                console.log(selected)
+                                                                let selections = {
+                                                                    ...formatSelections()
+                                                                }
+
+                                                                selections[e.path] = selected
+                                                                setFormatSelections(selections)
+
+                                                                console.log(formatSelections())
+                                                            }}
+                                                            itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
+                                                            <SelectTrigger aria-label="Asset">
+                                                                <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
+                                                            </SelectTrigger>
+                                                            <SelectContent class=' overflow-y-auto max-h-[50vh]' />
+                                                        </Select>
+
+
+                                                        <Select class='justify-end w-full pl-1'
+                                                            id={"shot_" + e}
+                                                            options={shots()!.shots}
+                                                            placeholder="Shot"
+                                                            onChange={(selected) => {
+
+                                                                console.log(selected)
+                                                                let selections = {
+                                                                    ...shotSelections()
+                                                                }
+
+                                                                selections[e.path] = selected
+                                                                setShotSelections(selections)
+
+                                                                console.log(shotSelections())
+                                                            }}
+                                                            itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
+                                                            <SelectTrigger aria-label="Shot">
+                                                                <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
+                                                            </SelectTrigger>
+                                                            <SelectContent class=' overflow-y-auto max-h-[50vh]' />
+                                                        </Select>
+                                                    </div>
+                                                </div>
+                                                <div>
+
+                                                    <Show when={canPreviewFileType(e.mime)}>
+                                                        {
+                                                            buildPreview(e.path, e.mime)
                                                         }
+                                                    </Show>
 
-                                                        selections[e] = selected
-                                                        setElementSelections(selections)
-
-                                                        console.log(elementSelections())
-                                                    }}
-                                                        placeholder="Element"
-                                                        itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
-                                                        <SelectTrigger aria-label="Element">
-                                                            <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
-                                                        </SelectTrigger>
-                                                        <SelectContent class=' overflow-y-auto max-h-[50vh]' />
-                                                    </Select>
-
-
-                                                    <Select class='justify-end w-full pl-1'
-                                                        id={"file_format_" + e}
-                                                        options={formats()!.formats}
-                                                        placeholder="Format"
-                                                        onChange={(selected) => {
-
-                                                            console.log(selected)
-                                                            let selections = {
-                                                                ...formatSelections()
-                                                            }
-
-                                                            selections[e] = selected
-                                                            setFormatSelections(selections)
-
-                                                            console.log(formatSelections())
-                                                        }}
-                                                        itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
-                                                        <SelectTrigger aria-label="Asset">
-                                                            <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
-                                                        </SelectTrigger>
-                                                        <SelectContent class=' overflow-y-auto max-h-[50vh]' />
-                                                    </Select>
-
-
-                                                    <Select class='justify-end w-full pl-1'
-                                                        id={"shot_" + e}
-                                                        options={shots()!.shots}
-                                                        placeholder="Shot"
-                                                        onChange={(selected) => {
-
-                                                            console.log(selected)
-                                                            let selections = {
-                                                                ...shotSelections()
-                                                            }
-
-                                                            selections[e] = selected
-                                                            setShotSelections(selections)
-
-                                                            console.log(shotSelections())
-                                                        }}
-                                                        itemComponent={(props) => <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>}>
-                                                        <SelectTrigger aria-label="Shot">
-                                                            <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
-                                                        </SelectTrigger>
-                                                        <SelectContent class=' overflow-y-auto max-h-[50vh]' />
-                                                    </Select>
                                                 </div>
                                             </div>
                                         }
@@ -292,7 +379,7 @@ const DialogIngest: Component = () => {
                                 <CardHeader>
                                     <CardTitle>Source</CardTitle>
                                     <Show when={step() == "add_source"}>
-                                        <CardDescription>Please enter where these files were sourced from</CardDescription>
+                                        <CardDescription>Please enter the URL where these files were sourced from (Download / Store page)</CardDescription>
                                     </Show>
                                 </CardHeader>
                                 <CardContent>

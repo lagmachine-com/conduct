@@ -4,9 +4,15 @@ import { AssetTreeCategory, IngestResult, ListAssetsResult, ListElementsResult, 
 declare global {
     interface Window {
         conduct: {
+            url_base_path: () => String,
             get: (path: string) => Promise<Response>,
             post: (path: string, body: string) => Promise<Response>
             api: any
+        },
+
+        os: {
+            execute: (command: any) => Promise<Response>,
+            file: (path: String) => Promise<Response>,
         }
     }
 }

@@ -21,7 +21,7 @@ use tao::{
 
 use wry::{WebView, WebViewBuilder};
 
-use crate::core::commands::DialogOptions;
+use crate::{core::commands::DialogOptions, utils};
 
 enum UserWindowEvent {
     Exit,
@@ -44,7 +44,7 @@ fn get_homepage_url() -> String {
 }
 
 fn get_init_script() -> String {
-    let str = include_str!("../../ui/api.js").to_string();
+    let str = include_str!("../ui/api.js").to_string();
     let base = get_custom_protocol_url();
 
     let result = str.replace("${BASE_PATH}", &base);
@@ -109,32 +109,7 @@ pub fn gui(project: crate::core::project::Project, dialog_options: Option<Dialog
         .with_url(page)
         .with_devtools(true)
         .with_initialization_script(get_init_script().as_str())
-        .with_drag_drop_handler(move |e| {
-            match e {
-                wry::DragDropEvent::Drop { paths, position } => match webview_ref.clone().read() {
-                    Ok(webview) => {
-                        if webview.is_some() {
-                            let _ = webview.as_ref().unwrap().evaluate_script(
-                                &format!(
-                                    "window.postMessage({});",
-                                    json!({
-                                        "type": "files_dropped",
-                                        "data": paths
-                                    })
-                                )
-                                .to_string(),
-                            );
-                        } else {
-                            warn!("Failed to get webview")
-                        }
-                    }
-                    Err(_) => warn!("Failed to read"),
-                },
-                _ => (),
-            }
-
-            true
-        })
+        .with_drag_drop_handler(move |e| drag_drop_handler(webview_ref.clone(), e))
         .with_asynchronous_custom_protocol(
             "conduct".into(),
             move |_webview_id, request, responder| {
@@ -201,4 +176,95 @@ pub fn gui(project: crate::core::project::Project, dialog_options: Option<Dialog
             _ => (),
         }
     });
+}
+
+fn drag_drop_handler(webview_ref: Arc<RwLock<Option<WebView>>>, event: wry::DragDropEvent) -> bool {
+    match event {
+        wry::DragDropEvent::Drop { paths, position } => {
+            info!("Received drop event");
+
+            match webview_ref.clone().read() {
+                Ok(webview) => {
+                    info!("Handling drop!");
+                    if webview.is_some() {
+                        info!("Posting event");
+
+                        let mut result = vec![];
+
+                        for path in paths.iter() {
+                            let mime = utils::mime::mime_from_file_path(path);
+
+                            result.push(json!({
+                                "path": path,
+                                "mime": mime
+                            }));
+                        }
+
+                        let _ = webview.as_ref().unwrap().evaluate_script(
+                            &format!(
+                                "window.postMessage({});",
+                                json!({
+                                    "type": "drag_drop_dropped",
+                                    "data": result
+                                })
+                            )
+                            .to_string(),
+                        );
+                    } else {
+                        info!("Failed to get webview")
+                    }
+
+                    info!("Done handling drop");
+                }
+                Err(_) => warn!("Failed to read"),
+            }
+
+            info!("Done handling drop event");
+            return true;
+        }
+        wry::DragDropEvent::Enter { paths, position } => match webview_ref.clone().read() {
+            Ok(webview) => {
+                info!("Handling Drag Drop Enter!");
+                if webview.is_some() {
+                    let _ = webview.as_ref().unwrap().evaluate_script(
+                        &format!(
+                            "window.postMessage({});",
+                            json!({
+                                "type": "drag_drop_enter",
+                                "data": paths
+                            })
+                        )
+                        .to_string(),
+                    );
+                } else {
+                    warn!("Failed to get webview")
+                }
+            }
+            Err(_) => warn!("Failed to read"),
+        },
+        wry::DragDropEvent::Leave => match webview_ref.clone().read() {
+            Ok(webview) => {
+                info!("Handling Drag Drop Leave!");
+                if webview.is_some() {
+                    let _ = webview.as_ref().unwrap().evaluate_script(
+                        &format!(
+                            "window.postMessage({});",
+                            json!({
+                                "type": "drag_drop_leave"
+                            })
+                        )
+                        .to_string(),
+                    );
+                } else {
+                    warn!("Failed to get webview")
+                }
+            }
+            Err(_) => warn!("Failed to read"),
+        },
+        wry::DragDropEvent::Over { position } => (),
+        _ => {
+            info!("Some other event :o");
+        }
+    }
+    true
 }

@@ -11,7 +11,10 @@ use wry::{
     RequestAsyncResponder,
 };
 
-use crate::{core::project::Project, gui::embedded_files};
+use crate::{
+    core::project::Project,
+    gui::{api_result::ApiResultType, embedded_files},
+};
 
 use super::api_result::ApiResult;
 
@@ -111,14 +114,18 @@ fn handle_api(
             match (handler.handler)(&request, m.params, context) {
                 Some(result) => match result {
                     ApiResult::Ok(value) => match value {
-                        Some(response) => response_builder
+                        ApiResultType::Json(value) => response_builder
                             .status(200)
                             .header("Content-Type", "text/json")
                             .body(Cow::Owned::<[u8]>(
-                                serde_json::to_string(&response).unwrap().into(),
+                                serde_json::to_string(&value).unwrap().into(),
                             ))
                             .unwrap(),
-                        None => response_builder
+                        ApiResultType::Binary(value) => response_builder
+                            .status(200)
+                            .body(Cow::Owned::<[u8]>(value))
+                            .unwrap(),
+                        ApiResultType::None => response_builder
                             .status(200)
                             .body(Cow::Owned("Ok".into()))
                             .unwrap(),

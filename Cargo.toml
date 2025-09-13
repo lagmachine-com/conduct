@@ -32,7 +32,9 @@ tao = "0.30.3"
 time = { version = "0.3.40", features = ["local-offset"]}
 ts-rs = { version = "10.0.0", features = ["serde-compat"] }
 url = "2.5.2"
-wry = { version = "0.46.3", features = ["linux-body"] }
+urlencoding = "2.1.3"
+whoami = "1.6.1"
+wry = { version = "0.53.3", features = ["linux-body"] }
 
 [dev-dependencies]
 colored = "2.1.0"

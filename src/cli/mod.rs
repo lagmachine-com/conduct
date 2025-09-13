@@ -67,7 +67,7 @@ fn get_project_manifest_path(cli: &CLI) -> PathBuf {
         }
     }
 
-    panic!("Could not find project manifest")
+    panic!("Could not find project manifest, you might want to use `--project-dir <PATH>`")
 }
 
 pub fn cli() -> CliResult {
