@@ -135,7 +135,7 @@ impl Command for IngestArgs {
                                 if !exists {
                                     writeln!(file, "FILE,ORIGINAL_FILE_NAME,ORIGINAL_FILE_PATH,SOURCE,TIMESTAMP,USER");
                                 }
-                                
+
                                 let now = OffsetDateTime::now_local().unwrap();
 
                                 write!(file, "{},", file_relative.to_str().unwrap());
