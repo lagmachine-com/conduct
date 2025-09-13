@@ -9,6 +9,7 @@ import DialogLoadAsset from './pages/dialogs/load_asset';
 import { ColorModeProvider } from '@kobalte/core/color-mode';
 import { Component } from 'solid-js';
 import DialogExport from './pages/dialogs/export';
+import DialogIngest from './pages/dialogs/ingest';
 
 const root = document.getElementById('root');
 
@@ -20,7 +21,7 @@ if (!(root instanceof HTMLElement)) {
 
 const rootComponent: Component<RouteSectionProps> = (props) => {
   return (
-    <ColorModeProvider initialColorMode='light'>
+    <ColorModeProvider initialColorMode='dark'>
       {props.children}
     </ColorModeProvider>
   )
@@ -31,4 +32,5 @@ render(() => (<Router root={rootComponent}>
   <Route path="/dialogs/create_setup" component={DialogCreateSetup} />
   <Route path="/dialogs/load_asset" component={DialogLoadAsset} />
   <Route path="/dialogs/export" component={DialogExport} />
+  <Route path="/dialogs/ingest" component={DialogIngest} />
 </Router>), root!);

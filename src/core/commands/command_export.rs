@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::core::{project::Project, version_control::VersionControl};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct ExportArgs {
@@ -26,6 +26,7 @@ impl Command for ExportArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         info!("Exporting Asset!");
 

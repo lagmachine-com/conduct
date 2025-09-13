@@ -2,11 +2,14 @@ mod command_create;
 mod command_dialog;
 mod command_export;
 mod command_get_asset_tree;
+mod command_ingest;
 mod command_list_assets;
 mod command_list_elements;
 mod command_list_export_formats;
 mod command_list_shots;
 mod command_load_assets;
+mod command_resolve_elements;
+mod command_save;
 mod command_setup;
 mod command_summary;
 mod error;
@@ -27,11 +30,14 @@ pub use command_dialog::DialogOptions;
 pub use command_export::ExportArgs;
 
 use command_get_asset_tree::GetAssetTreeArgs;
+use command_ingest::IngestArgs;
 use command_list_assets::ListAssetsArgs;
 use command_list_elements::ListElementsArgs;
 use command_list_export_formats::ListExportFormatsArgs;
 use command_list_shots::ListShotsArgs;
 use command_load_assets::LoadAssetsArgs;
+use command_resolve_elements::ResolveElementsArgs;
+use command_save::SaveArgs;
 use command_setup::SetupArgs;
 use command_summary::SummaryArgs;
 use log::{info, warn};
@@ -41,10 +47,17 @@ use enum_dispatch::enum_dispatch;
 use error::CommandError;
 use serde::{Deserialize, Serialize};
 
+pub struct CommandContext {
+    pub is_cli: bool,
+}
+
 #[enum_dispatch]
 pub trait Command {
-    fn execute(self, _project: &RwLock<Project>)
-        -> Result<Option<serde_json::Value>, CommandError>;
+    fn execute(
+        self,
+        _project: &RwLock<Project>,
+        context: CommandContext,
+    ) -> Result<Option<serde_json::Value>, CommandError>;
 }
 
 #[derive(Debug, Subcommand, Serialize, Deserialize)]
@@ -79,9 +92,15 @@ pub enum CommandType {
     /// List all shots
     ListShots(ListShotsArgs),
 
+    ResolveElements(ResolveElementsArgs),
+
     GetAssetTree(GetAssetTreeArgs),
 
     LoadAssets(LoadAssetsArgs),
+
+    Save(SaveArgs),
+
+    Ingest(IngestArgs),
 }
 
 pub fn write_command_result(result: serde_json::Value) {

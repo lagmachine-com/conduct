@@ -1,4 +1,7 @@
-#[derive(Clone, Debug)]
+use serde::{Deserialize, Serialize};
+use ts_rs::TS;
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
 pub struct ResolvedElementData {
     shot_local: bool,
     dependencies: Option<Vec<String>>,

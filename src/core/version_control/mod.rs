@@ -7,6 +7,7 @@ use direct::VersionControlConfigDirect;
 use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
 use symlink::VersionControlConfigSymlink;
+use ts_rs::TS;
 use versioned_directories::VersionControlConfigVersionedDirectories;
 
 use super::{commands::ExportArgs, element::resolved_element_data::ResolvedElementData, project};
@@ -28,7 +29,7 @@ pub struct ExportResult {
     pub script: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
 pub struct VersionControlFile {
     pub path: String,
     pub version: String,

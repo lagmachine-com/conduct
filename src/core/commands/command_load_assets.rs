@@ -10,7 +10,7 @@ use crate::core::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 
 pub enum LoadReason {
     Requested,
@@ -51,6 +51,7 @@ impl Command for LoadAssetsArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         let project = project.read().unwrap();
 
@@ -86,6 +87,12 @@ impl Command for LoadAssetsArgs {
             info!("----");
             info!("Loading Asset: `{}`", asset);
             let elements = project.get_elements(asset.to_string(), &c);
+
+            let elements = match elements {
+                Ok(elements) => elements,
+                Err(err) => return Err(CommandError::Message(format!("{}", err))),
+            };
+
             for element in elements.iter() {
                 debug!("Resolved element: {:?}", element);
             }
@@ -169,6 +176,12 @@ fn get_required_assets(
     let mut result = Vec::new();
     for asset in asset_names.into_iter() {
         let elements = project.get_elements(asset.to_string(), context);
+
+        let elements = match elements {
+            Ok(elements) => elements,
+            Err(_) => return vec![],
+        };
+
         for (element, data) in elements.iter() {
             match data.get_dependencies() {
                 Some(dependencies) => {

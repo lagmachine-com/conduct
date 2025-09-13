@@ -6,7 +6,7 @@ use ts_rs::TS;
 use crate::core::{department::DepartmentFinder, project::Project};
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct ListAssetsArgs {
@@ -25,6 +25,7 @@ impl Command for ListAssetsArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         let project = project.read().unwrap();
         let assets = project.get_assets_flattened();

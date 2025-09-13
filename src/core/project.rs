@@ -11,6 +11,7 @@ use crate::core::{asset, format};
 
 use super::asset::{Asset, AssetCategory, AssetEntry};
 use super::department::{self, Department};
+use super::error::ProjectError;
 use super::program::{self, Program};
 use super::version_control::VersionControlConfig;
 
@@ -183,6 +184,71 @@ impl Project {
         }
 
         None
+    }
+
+    pub fn get_mut_category_by_path(&mut self, path: String) -> Option<&mut AssetCategory> {
+        let parts = path.split('/');
+
+        let mut current = &mut self.assets;
+
+        for part in parts.into_iter() {
+            trace!("Looking for part: {}", part);
+            let result = current.children.get_mut(part);
+            match result {
+                Some(result) => match result {
+                    AssetEntry::Category(asset_category) => current = asset_category,
+                    _ => panic!("Found unexpected asset while parsing category path"),
+                },
+                None => return None,
+            }
+        }
+
+        Some(current)
+    }
+
+    pub fn create_category_tree_from_path(&mut self, path: &String) -> Option<ProjectError> {
+        let parts: Vec<String> = path.split('/').map(|x| x.to_string()).collect();
+        let mut current = &mut self.assets;
+
+        for i in 0..parts.len() {
+            let part = &parts[i];
+
+            let entry = current.children.get(part);
+            current = match entry {
+                Some(_) => match current.children.get_mut(part) {
+                    Some(entry) => match entry {
+                        AssetEntry::Asset(_) => panic!(),
+                        AssetEntry::Category(asset_category) => asset_category,
+                    },
+                    _ => panic!(),
+                },
+                None => {
+                    for child in current.children.values().into_iter() {
+                        match child {
+                            AssetEntry::Asset(_) => return Some(ProjectError::Message("Cannot create a new category in a category which already contains assets".to_string())),
+                            AssetEntry::Category(_) => continue,
+                        }
+                    }
+
+                    current.children.insert(
+                        part.clone(),
+                        AssetEntry::Category(AssetCategory {
+                            name: part.clone(),
+                            template: None,
+                            children: BTreeMap::new(),
+                        }),
+                    );
+
+                    let result = current.children.get_mut(part).unwrap();
+                    match result {
+                        AssetEntry::Asset(_) => panic!(),
+                        AssetEntry::Category(asset_category) => asset_category,
+                    }
+                }
+            }
+        }
+
+        return None;
     }
 }
 

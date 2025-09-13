@@ -10,7 +10,7 @@ use crate::core::{
 };
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct ListElementsArgs {
@@ -38,6 +38,7 @@ impl Command for ListElementsArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         if self.common.asset.is_none() {
             return Err(CommandError::InvalidArguments);
@@ -54,13 +55,18 @@ impl Command for ListElementsArgs {
         };
 
         let project = project.read().unwrap();
+
+        let asset = self.common.asset.unwrap();
+        let asset = asset.split("/").last().unwrap();
+
+        let elements = project.get_elements(asset.to_string(), &context);
+        let elements = match elements {
+            Ok(elements) => elements,
+            Err(err) => return Err(CommandError::Message(format!("{}", err))),
+        };
+
         let mut result = ListElementsResult {
-            elements: project
-                .get_elements(self.common.asset.unwrap(), &context)
-                .keys()
-                .into_iter()
-                .map(|f| f.to_string())
-                .collect(),
+            elements: elements.keys().into_iter().map(|f| f.to_string()).collect(),
         };
 
         result.elements.sort();

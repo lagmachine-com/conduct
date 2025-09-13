@@ -1,6 +1,7 @@
 mod cli;
 pub mod core;
 mod gui;
+mod utils;
 
 use log::*;
 

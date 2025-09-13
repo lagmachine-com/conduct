@@ -5,9 +5,9 @@ use url::Url;
 use wry::http::Request;
 
 use crate::{
-    core::commands::{Command, CommandType},
+    core::commands::{Command, CommandContext, CommandType},
     gui::{
-        api_result::ApiResult,
+        api_result::{ApiResult, ApiResultType},
         router::{ApiEntry, RequestContext},
     },
 };
@@ -67,10 +67,14 @@ fn do_command(
     match command {
         Ok(command) => {
             debug!("Got command: {:?}", command);
-            let command_result = CommandType::execute(command, &context.project);
+            let command_result =
+                CommandType::execute(command, &context.project, CommandContext { is_cli: false });
 
             match command_result {
-                Ok(value) => Some(ApiResult::Ok(value)),
+                Ok(value) => match value {
+                    Some(value) => Some(ApiResult::Ok(ApiResultType::Json(value))),
+                    None => Some(ApiResult::Ok(ApiResultType::None)),
+                },
                 Err(err) => Some(ApiResult::Error(err.to_string())),
             }
         }

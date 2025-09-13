@@ -1,11 +1,18 @@
-import { AssetTreeCategory, ListAssetsResult, ListElementsResult, ListExportFormatsResult, ListShotsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
+import { AssetTreeCategory, IngestResult, ListAssetsResult, ListElementsResult, ListExportFormatsResult, ListShotsResult, ResolveElementsResult, SetupResult, SummaryResponse } from "./bindings/bindings_gen";
 
 
 declare global {
     interface Window {
         conduct: {
+            url_base_path: () => String,
             get: (path: string) => Promise<Response>,
             post: (path: string, body: string) => Promise<Response>
+            api: any
+        },
+
+        os: {
+            execute: (command: any) => Promise<Response>,
+            file: (path: String) => Promise<Response>,
         }
     }
 }
@@ -57,9 +64,17 @@ export async function doExport(department: string, asset: string, element: strin
     return await result.json() as SummaryResponse
 }
 
-export async function doCreate(): Promise<SummaryResponse> {
-    let result = await get("api/v1/command/create?asset=suzanneA&department=model")
-    return await result.json() as SummaryResponse
+export async function doCreate(asset: string | null, category: string | null): Promise<any> {
+    let result = await get("api/v1/command/create", {
+        "asset": asset,
+        "category": category
+    })
+
+    if (result.status == 200) {
+        return true
+    } else {
+        return await result.json()
+    }
 }
 
 export async function exitDialog(result: any) {
@@ -110,6 +125,12 @@ export async function getAssetTree(department_filter: null | string = null): Pro
     return json as AssetTreeCategory
 }
 
+export async function saveChanges(): Promise<any> {
+    let result = await get("api/v1/command/save");
+    let json = await result.json()
+    return json
+}
+
 export async function loadAssets(program: string, department: string, shot: null | string = null, assets: string[]): Promise<AssetTreeCategory> {
     let result = await get("api/v1/command/load_assets", {
         "program": program,
@@ -137,4 +158,31 @@ export async function create_setup(department: string, asset: string, file_forma
 export async function listShots(): Promise<ListShotsResult> {
     let result = await get("api/v1/command/list_shots")
     return await result.json() as ListShotsResult
+}
+
+export async function resolveElements(asset: string): Promise<ResolveElementsResult> {
+    let result = await get("api/v1/command/resolve_elements", {
+        "asset": asset
+    })
+    return await result.json() as ResolveElementsResult
+}
+
+export async function doIngest(asset: string, element: string | null, department: string, shot: string | null, file: string, target_format: string | null, license: string, source: string): Promise<IngestResult> {
+    let result = await get("api/v1/command/ingest", {
+        "asset": asset,
+        "element": element,
+        "department": department,
+        "file": file,
+        "target_format": target_format,
+        "shot": shot,
+        "license": license,
+        "source": source
+    })
+    return await result.json() as IngestResult
+}
+
+window.conduct.api = {
+    doExport,
+    doIngest,
+    listShots
 }

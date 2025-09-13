@@ -3,6 +3,7 @@ pub mod commands;
 pub mod context;
 pub mod department;
 pub mod element;
+pub mod error;
 pub mod format;
 pub mod program;
 pub mod project;

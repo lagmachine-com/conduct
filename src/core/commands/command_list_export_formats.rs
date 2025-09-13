@@ -7,7 +7,7 @@ use ts_rs::TS;
 use crate::core::project::Project;
 use serde::{Deserialize, Serialize};
 
-use super::{args::CommonArgs, error::CommandError, Command};
+use super::{args::CommonArgs, error::CommandError, Command, CommandContext};
 
 #[derive(Debug, Args, Serialize, Deserialize)]
 pub struct ListExportFormatsArgs {
@@ -29,6 +29,7 @@ impl Command for ListExportFormatsArgs {
     fn execute(
         self,
         project: &RwLock<Project>,
+        _context: CommandContext,
     ) -> Result<std::option::Option<serde_json::Value>, CommandError> {
         if self.common.department.is_none() {
             return Err(CommandError::InvalidArguments);

@@ -76,7 +76,7 @@ pub fn resolve_element_path(
                         trace!("Resolved shot: {}", shot)
                     },
                     None => {
-                        return Err(ExportError::Message("Tried to resolve the path of a shot_local element, but we are not in a shot context".into()))
+                        return Err(ExportError::Message(format!("Tried to resolve the path of a shot_local element '{}', but we are not in a shot context", element_name).into()))
                     },
                 }
             }
