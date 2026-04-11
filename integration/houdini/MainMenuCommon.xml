@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mainMenu>
+    <menuBar>
+
+        <subMenu id="conduct_menu">
+            <label>Conduct</label>
+            <scriptItem id="conduct">
+                <labelExpression><![CDATA["Select Project" if not getattr(hou.session, "projectImported", False) else "Load Asset(s)"]]></labelExpression>
+                <insertAtIndex>0</insertAtIndex>
+                <scriptCode><![CDATA[
+if not getattr(hou.session, "projectImported", False):
+    import ConductPlugin.select_project as select_project
+    select_project.create_setup()
+else:
+    import ConductPlugin.load_asset as load_asset
+    load_asset.load()
+                    ]]>
+                </scriptCode>
+            </scriptItem>
+        </subMenu>
+    </menuBar>
+</mainMenu>
