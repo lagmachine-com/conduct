@@ -16,7 +16,12 @@ class Conduct:
         self.current_program = current_program
 
     def run_process(self, args):
-        args = [self.conduct_exe] + args
+
+        exe = self.conduct_exe
+        if "CONDUCT_EXE" in os.environ:
+            exe = os.environ["CONDUCT_EXE"]
+
+        args = [exe] + args
 
         #Hide the cmd window on windows
         startupinfo = None
@@ -26,13 +31,37 @@ class Conduct:
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags = subprocess.CREATE_NO_WINDOW
             creation_flags = subprocess.CREATE_NO_WINDOW
-        
-        log("Executing: " + str(args))
+ 
+        env = os.environ.copy()
 
-        process=subprocess.Popen(args, cwd=os.path.dirname(self.conduct_exe), startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, encoding='utf-8', creationflags=creation_flags)
+        # Fix errors where conduct tries to inherit env from the host app (occurred in inkscape appimage)
+        for name in [
+            "LD_LIBRARY_PATH",
+            "LD_PRELOAD",
+            "GDK_PIXBUF_MODULE_FILE",
+            "GDK_PIXBUF_MODULEDIR",
+            "GTK_PATH",
+            "GTK_DATA_PREFIX",
+            "GTK_EXE_PREFIX",
+            "GIO_EXTRA_MODULES",
+            "PYTHONPATH",
+            "PYTHONHOME",
+        ]:
+            env.pop(name, None)
 
-        data = process.communicate()[0]
-        
+
+        cwd = None
+        if "CONDUCT_ROOT" in os.environ:
+            cwd = os.environ["CONDUCT_ROOT"]
+        else:
+            os.path.dirname(self.conduct_exe)
+
+        log("Running process: " + str(args))
+        process=subprocess.Popen(args, cwd=cwd, startupinfo=startupinfo, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding='utf-8', creationflags=creation_flags, env=env)
+        res = process.communicate()
+        code = process.returncode
+        data = res[0]
+        err = res[1]
         log(data)
 
         return json.loads(data)
@@ -42,6 +71,7 @@ class Conduct:
         return summary
 
     def setup(self, file_format):
+        log("Running process")
         args = ["dialog", "create_setup", "--", "--file-format", file_format]
         return self.run_process(args)
 
@@ -87,6 +117,12 @@ class Conduct:
             args.append(shot)
 
         return self.run_process(args)
+
+def can_load_from_env():
+    return "CONDUCT_MANIFEST" in os.environ
+
+def load_from_env(current_program):
+    return Conduct("conduct", current_program)
 
 def get_from_manifest_path(manifest_path, current_program):
     log("Getting exe from manifest path: " + manifest_path)

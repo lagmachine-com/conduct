@@ -1,5 +1,6 @@
 import bpy
 from . import utils
+from .conduct import conduct
 
 class ConductMenu(bpy.types.Menu):
     bl_label = "Conduct"
@@ -10,7 +11,10 @@ class ConductMenu(bpy.types.Menu):
         data = utils.get_conduct_data()
 
         if data == None:
-            layout.operator("conduct.select_project", icon='ADD', text="Select Project")
+            if conduct.can_load_from_env():
+                layout.operator("conduct.configure_setup", icon='ADD', text="Configure Setup")
+            else:
+                layout.operator("conduct.select_project", icon='ADD', text="Select Project")
         else:
             layout.operator("conduct.load_asset", icon='IMPORT', text="Load Asset(s)")
 

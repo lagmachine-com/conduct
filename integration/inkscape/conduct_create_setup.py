@@ -13,13 +13,20 @@ def log(info):
 class ConductCreateSetup(inkex.EffectExtension):
 
     def add_arguments(self, pars):
-        pars.add_argument("-m", "--manifest", default="", help="Manifest File Path")
+        if not conduct.can_load_from_env():
+            pars.add_argument("-m", "--manifest", default="", help="Manifest File Path")
 
 
     def effect(self):
-        manifest_path = self.options.manifest
         conduct.log = log_stub
-        c = conduct.get_from_manifest_path(manifest_path, "inkscape")
+
+        c = None
+        if conduct.can_load_from_env():
+            c = conduct.load_from_env("inkscape")
+        else:
+            manifest_path = self.options.manifest
+            c = conduct.get_from_manifest_path(manifest_path, "inkscape")
+
         result = c.setup('.svg')
 
         if result['result'] != 'ok':

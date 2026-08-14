@@ -14,5 +14,8 @@ def get_conduct_object(manifest_path = None) -> conduct.Conduct:
     if manifest_path != None:
         return conduct.get_from_manifest_path(manifest_path, "blender")
     else:
+        if conduct.can_load_from_env():
+            return conduct.load_from_env("blender")
+        
         return conduct.find_from_current_path(bpy.data.filepath, "blender")
     
