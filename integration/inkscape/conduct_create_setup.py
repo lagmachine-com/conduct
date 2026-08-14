@@ -3,6 +3,7 @@ from inkex import command
 import os 
 from conduct import conduct
 import subprocess
+import signal
 
 def log_stub(info):
     pass
@@ -49,17 +50,19 @@ class ConductCreateSetup(inkex.EffectExtension):
 
         exe = inkex.command.which('inkscape')
 
-        if(exe.startswith('/tmp/.mount')):
-            log("Detected running in an AppImage, this process will hang until the new instance is closed!")
-            inkex.command.inkscape(path)
-            return
-        
+        appimage = os.environ.get("APPIMAGE")
+        if appimage != None:
+            exe = appimage
+
         #if we could find a good way to kill the original inkscape instance after starting the new one, that would be ideal
         if os.name == 'nt':
             creation_flags = subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS
             proc = subprocess.Popen([exe, path], creationflags=creation_flags, start_new_session=True)
         else:
-            proc = subprocess.Popen([exe, path], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
-        
+            args = [exe, path]
+            log("args: " + str(args))
+            proc = subprocess.Popen(args, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, stdin=subprocess.DEVNULL)
+
+
 if __name__ == '__main__':
     ConductCreateSetup().run()
