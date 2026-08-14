@@ -150,8 +150,3 @@ def find_from_current_path(current_file, current_program):
                 return get_from_manifest_path(check, current_program)
             
         path = os.path.dirname(path)
-
-            
-
-    
-    
