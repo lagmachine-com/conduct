@@ -21,7 +21,7 @@ bl_info = {
     "warning" : "",
     "category" : "Generic"
 }
-from . import properties, menu, project_browser, select_project, export, export_menu, load_asset, utils
+from . import properties, menu, project_browser, select_project, configure_setup, export, export_menu, load_asset, utils
 
 import bpy
 from bpy.app.handlers import persistent
@@ -39,6 +39,7 @@ def register():
     properties.register()
     export.register()
     select_project.register()
+    configure_setup.register()
     menu.register()
     export_menu.register()
     project_browser.register()
@@ -53,6 +54,7 @@ def unregister():
     export_menu.unregister()
     menu.unregister()
     select_project.unregister()
+    configure_setup.unregister()
     export.unregister()
     properties.unregister()
     

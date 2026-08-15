@@ -27,8 +27,11 @@ class ConductExportEffect(inkex.EffectExtension):
         prev_state = self.svg.get("com.lagmachine.conduct.export_save_state")
         if prev_state != None:
             prev_state = json.loads(prev_state)
-        
-        c = conduct.find_from_current_path(file_path, "inkscape")
+        c = None
+        if conduct.can_load_from_env():
+            c = conduct.load_from_env("inkscape")
+        else:
+            c = conduct.find_from_current_path(file_path, "inkscape")
 
         # We arent using get_pages because this is more reliable
         # get_pages result doesnt contain the page label if there is only one page

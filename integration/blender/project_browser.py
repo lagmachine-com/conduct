@@ -1,6 +1,7 @@
 import bpy
 
 from . import utils
+from .conduct import conduct
 
 class TaskItemSlot(bpy.types.UIList):
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
@@ -28,7 +29,10 @@ class ProjectBrowser(bpy.types.Panel):
         data = utils.get_conduct_data()
 
         if data == None or data.asset == None or data.asset == "":
-            layout.operator("conduct.select_project", icon='ADD', text="Select Project")
+            if conduct.can_load_from_env():
+                layout.operator("conduct.configure_setup", icon='ADD', text="Configure Setup")
+            else:
+                layout.operator("conduct.select_project", icon='ADD', text="Select Project")
             return
 
         if data.department != "":
