@@ -43,14 +43,12 @@ fn get_project_manifest_path(cli: &CLI) -> PathBuf {
         paths.push(path);
     }
 
-
     match std::env::var("CONDUCT_MANIFEST") {
         Ok(var) => {
             return PathBuf::from(var);
         }
         Err(_) => (),
     }
-
 
     for path in paths.iter() {
         let mut test_path = PathBuf::from(path);
