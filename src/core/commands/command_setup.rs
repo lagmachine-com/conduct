@@ -44,24 +44,23 @@ impl Command for SetupArgs {
         }
 
         // shot is swapped for 'asset' if not in a shot
-        
+
         const DEFAULT_PATH: &str = "setup/${shot}/${department}/${asset}";
 
         let department = self.common.department.clone().unwrap();
         let asset = self.common.asset.clone().unwrap();
 
-        
         let mut map = HashMap::<&str, String>::new();
         map.insert("department", department.clone());
         map.insert("asset", asset.clone());
-        
+
         match &self.common.shot {
             Some(shot) => {
                 map.insert("shot", "shot/".to_owned() + &shot.clone());
-            },
+            }
             None => {
                 map.insert("shot", "asset".into());
-            },
+            }
         }
 
         let mut shot_code: Option<String> = None;
@@ -78,7 +77,7 @@ impl Command for SetupArgs {
             }
             None => format!("{}_{}", asset, department),
         };
-        
+
         let mut resolved_path: String = match &project.read().unwrap().setup_path_template {
             Some(s) => s.clone(),
             None => DEFAULT_PATH.to_string(),
@@ -97,7 +96,6 @@ impl Command for SetupArgs {
         if self.dry == false {
             _ = std::fs::create_dir_all(&new_dir_path);
         }
-
 
         let file_name_with_ext = file_name.clone() + &self.file_format;
 

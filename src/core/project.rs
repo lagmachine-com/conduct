@@ -25,7 +25,7 @@ pub struct Project {
     pub assets: AssetCategory,
     pub version_control: VersionControlConfig,
     pub shots: ShotEntry,
-    pub setup_path_template: Option<String>
+    pub setup_path_template: Option<String>,
 }
 
 impl Project {
@@ -317,8 +317,11 @@ pub fn to_yaml(project: &Project) -> serde_yaml::Value {
 
     match &project.setup_path_template {
         Some(template) => {
-            mapping.insert("setup_path_template".into(), serde_yaml::to_value(template).unwrap());
-        },
+            mapping.insert(
+                "setup_path_template".into(),
+                serde_yaml::to_value(template).unwrap(),
+            );
+        }
         None => (),
     }
 
@@ -413,19 +416,15 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         None => ShotEntry::Subcategory(IndexMap::new()),
     };
 
-    
     let mut setup_path_template: Option<String> = None;
-    
-    match map
-        .get("setup_path_template") {
-            Some(v) => match v {
-                serde_yaml::Value::String(v) => {
-                    setup_path_template = Some(v.clone())
-                },
-                _ => ()
-            },
-            None => ()
-        }
+
+    match map.get("setup_path_template") {
+        Some(v) => match v {
+            serde_yaml::Value::String(v) => setup_path_template = Some(v.clone()),
+            _ => (),
+        },
+        None => (),
+    }
 
     let result = Project {
         manifest_file: file_path,
@@ -436,7 +435,7 @@ pub fn from_yaml(content: String, file_path: PathBuf) -> Project {
         version_control: config,
         programs: programs,
         shots: shots,
-        setup_path_template: setup_path_template
+        setup_path_template: setup_path_template,
     };
 
     to_yaml(&result);
