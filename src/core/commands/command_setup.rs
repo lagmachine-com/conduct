@@ -48,6 +48,15 @@ impl Command for SetupArgs {
         let mut dir_path = project.read().unwrap().get_root_directory();
         dir_path.push("setup");
 
+        match project.read().unwrap().get_asset_by_name(asset.clone()) {
+            Some(asset) => {
+                map.insert("category", asset.1);
+            }
+            None => {
+                warn!("Could not find asset entry!");
+            }
+        };
+
         match &self.common.shot {
             Some(shot) => {
                 if project.read().unwrap().shot_exists(shot) {
