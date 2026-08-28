@@ -2,7 +2,13 @@ pub fn pretty_format_yaml(content: String) -> String {
     let mut result = "".to_string();
 
     for line in content.lines().into_iter() {
-        let filter = [" ", "-", "identifier", "display_name"];
+        let filter = [
+            " ",
+            "-",
+            "identifier",
+            "display_name",
+            "setup_path_template",
+        ];
 
         if !filter.iter().any(|f| line.starts_with(f)) {
             result.push_str("\n");
