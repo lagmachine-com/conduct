@@ -1,7 +1,7 @@
-use std::sync::RwLock;
+use std::{collections::HashMap, sync::RwLock};
 
 use clap::{command, Args};
-use log::warn;
+use log::{info, warn};
 use ts_rs::TS;
 
 use crate::core::{project::Project, shot::shot_resolver::ShotResolver};
@@ -43,26 +43,25 @@ impl Command for SetupArgs {
             return Err(CommandError::InvalidArguments);
         }
 
+        // shot is swapped for 'asset' if not in a shot
+        
+        const DEFAULT_PATH: &str = "setup/${shot}/${department}/${asset}";
+
         let department = self.common.department.clone().unwrap();
         let asset = self.common.asset.clone().unwrap();
-        let mut dir_path = project.read().unwrap().get_root_directory();
-        dir_path.push("setup");
 
+        
+        let mut map = HashMap::<&str, String>::new();
+        map.insert("department", department.clone());
+        map.insert("asset", asset.clone());
+        
         match &self.common.shot {
             Some(shot) => {
-                if project.read().unwrap().shot_exists(shot) {
-                    dir_path.push("shot");
-                    for part in shot.split("/").into_iter() {
-                        dir_path.push(part);
-                    }
-                } else {
-                    warn!("Invalid shot: {}", shot);
-                    return Err(CommandError::InvalidArguments);
-                }
-            }
+                map.insert("shot", "shot/".to_owned() + &shot.clone());
+            },
             None => {
-                dir_path.push("asset");
-            }
+                map.insert("shot", "asset".into());
+            },
         }
 
         let mut shot_code: Option<String> = None;
@@ -79,17 +78,30 @@ impl Command for SetupArgs {
             }
             None => format!("{}_{}", asset, department),
         };
+        
+        let mut resolved_path: String = match &project.read().unwrap().setup_path_template {
+            Some(s) => s.clone(),
+            None => DEFAULT_PATH.to_string(),
+        };
 
-        dir_path.push(&department);
-        dir_path.push(&asset);
+        for (key, value) in map.iter() {
+            let replace = "${".to_string() + &key.to_string() + "}";
+            resolved_path = resolved_path.replace(&replace, value);
+        }
+
+        let mut new_dir_path = project.read().unwrap().get_root_directory();
+        for entry in resolved_path.split("/") {
+            new_dir_path.push(entry);
+        }
 
         if self.dry == false {
-            _ = std::fs::create_dir_all(&dir_path);
+            _ = std::fs::create_dir_all(&new_dir_path);
         }
+
 
         let file_name_with_ext = file_name.clone() + &self.file_format;
 
-        let mut path = dir_path.clone();
+        let mut path = new_dir_path.clone();
         path.push(&file_name_with_ext);
 
         if self.dry {
@@ -109,7 +121,7 @@ impl Command for SetupArgs {
             serde_json::to_value(SetupResult {
                 asset: self.common.asset.unwrap(),
                 department: self.common.department.unwrap(),
-                folder: dir_path.to_str().unwrap().to_string(),
+                folder: new_dir_path.to_str().unwrap().to_string(),
                 path: path.to_str().unwrap().to_string(),
                 file_name: file_name,
                 shot: shot_code,

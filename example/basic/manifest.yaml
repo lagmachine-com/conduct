@@ -1,5 +1,6 @@
 identifier: bsc
 display_name: Basic Project
+setup_path_template: setup/${asset}/${shot}/${department}
 
 programs:
   blender:
