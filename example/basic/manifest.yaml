@@ -2,7 +2,6 @@ identifier: bsc
 display_name: Basic Project
 setup_path_template: setup/${category}/${asset}/${shot}/${department}
 
-
 programs:
   blender:
     exports:
